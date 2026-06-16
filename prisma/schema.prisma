@@ -1,0 +1,565 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  student
+  instructor
+  admin
+}
+
+enum UserStatus {
+  active
+  suspended
+  banned
+}
+
+enum InstructorApplicationStatus {
+  pending
+  approved
+  rejected
+}
+
+enum CourseStatus {
+  draft
+  pending
+  approved
+  rejected
+  suspended
+}
+
+enum CurrencyCode {
+  ZAR
+  USD
+  ZWL
+}
+
+enum TransactionType {
+  enrollment
+  payout
+  commission
+  refund
+  adjustment
+}
+
+enum TransactionStatus {
+  pending
+  succeeded
+  failed
+  reversed
+}
+
+enum ReportType {
+  course_complaint
+  user_report
+}
+
+enum ReportStatus {
+  open
+  reviewing
+  resolved
+  dismissed
+}
+
+enum SubscriptionStatus {
+  active
+  trialing
+  past_due
+  canceled
+}
+
+enum InvoiceStatus {
+  paid
+  open
+  void
+  uncollectible
+}
+
+enum LiveLessonStatus {
+  upcoming
+  completed
+  canceled
+}
+
+enum HomeworkSubmissionStatus {
+  not_submitted
+  submitted
+  graded
+}
+
+enum ExamResourceKind {
+  paper
+  memo
+}
+
+enum ResourceKind {
+  notes
+  study_resource
+  worksheet
+  recording
+}
+
+enum SubjectEnrollmentStatus {
+  pending
+  active
+  expired
+  cancelled
+}
+
+enum BillingPeriod {
+  monthly
+}
+
+model User {
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String
+  email     String     @unique
+  role      UserRole
+  status    UserStatus @default(active)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+
+  courses     Course[]      @relation("InstructorCourses")
+  enrollments Enrollment[]
+  progress    Progress[]
+  favorites   Favorite[]
+  instructorApplication InstructorApplication? @relation("InstructorApplicationUser")
+  reviewedInstructorApplications InstructorApplication[] @relation("InstructorApplicationReviewer")
+
+  transactions   Transaction[] @relation("TransactionUser")
+  reportsMade    Report[]      @relation("ReportReporter")
+  reportsAgainst Report[]      @relation("ReportAccusedUser")
+  reportsResolved Report[]     @relation("ReportResolver")
+
+  certificates  Certificate[]
+  notifications Notification[]
+  subscription  Subscription?
+  invoices      Invoice[]
+  achievements  UserAchievement[]
+
+  liveLessonsTeaching LiveLesson[] @relation("LiveLessonTeacher")
+  homeworkTeaching HomeworkAssignment[] @relation("HomeworkTeacher")
+  homeworkSubmissions HomeworkSubmission[] @relation("HomeworkStudent")
+  announcementsMade Announcement[]
+  liveLessonAttendance Attendance[]
+
+  subjectPackagesTeaching SubjectPackage[] @relation("SubjectPackageTeacher")
+  subjectEnrollments SubjectEnrollment[]
+}
+
+model Course {
+  id           String      @id @default(uuid()) @db.Uuid
+  title        String
+  description  String
+  price        Int
+  instructorId String   @db.Uuid
+  status       CourseStatus @default(approved)
+  featured     Boolean   @default(false)
+  categoryId   String?   @db.Uuid
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+
+  instructor  User        @relation("InstructorCourses", fields: [instructorId], references: [id])
+  sections    Section[]
+  enrollments Enrollment[]
+  favorites   Favorite[]
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  transactions Transaction[] @relation("TransactionCourse")
+  reports     Report[]
+  certificates Certificate[]
+}
+
+model Section {
+  id       String @id @default(uuid()) @db.Uuid
+  title    String
+  courseId String @db.Uuid
+  order    Int    @default(0)
+
+  course  Course   @relation(fields: [courseId], references: [id])
+  lessons Lesson[]
+}
+
+model Lesson {
+  id        String @id @default(uuid()) @db.Uuid
+  title     String
+  videoUrl  String
+  sectionId String @db.Uuid
+  order     Int    @default(0)
+
+  section  Section    @relation(fields: [sectionId], references: [id])
+  progress Progress[]
+}
+
+model Enrollment {
+  id       String @id @default(uuid()) @db.Uuid
+  userId   String @db.Uuid
+  courseId String @db.Uuid
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+  transactions Transaction[] @relation("TransactionEnrollment")
+
+  @@unique([userId, courseId])
+}
+
+model Progress {
+  id        String  @id @default(uuid()) @db.Uuid
+  userId    String  @db.Uuid
+  lessonId  String  @db.Uuid
+  completed Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, lessonId])
+}
+
+model Favorite {
+  id       String @id @default(uuid()) @db.Uuid
+  userId   String @db.Uuid
+  courseId String @db.Uuid
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model Category {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courses Course[]
+  liveLessons LiveLesson[]
+  subjectPackages SubjectPackage[]
+}
+
+model InstructorApplication {
+  id         String                      @id @default(uuid()) @db.Uuid
+  userId     String                      @unique @db.Uuid
+  status     InstructorApplicationStatus @default(pending)
+  createdAt  DateTime                    @default(now())
+  updatedAt  DateTime                    @updatedAt
+  reviewedAt DateTime?
+  reviewerId String?                     @db.Uuid
+  notes      String?
+  phone      String?
+  linkedinUrl String?
+  expertise  String?
+  yearsExperience Int?
+  certifications String?
+  biography  String?
+  sampleCourseProposal String?
+  preferredCategorySlugs String[] @default([])
+  resumeFileName String?
+  resumeFileType String?
+  resumeFileSize Int?
+  resumeData Bytes?
+
+  user     User  @relation("InstructorApplicationUser", fields: [userId], references: [id])
+  reviewer User? @relation("InstructorApplicationReviewer", fields: [reviewerId], references: [id])
+}
+
+model Transaction {
+  id           String            @id @default(uuid()) @db.Uuid
+  type         TransactionType
+  status       TransactionStatus @default(succeeded)
+  currency     CurrencyCode      @default(USD)
+  amount       Int
+  reference    String?
+  description  String?
+  userId       String?           @db.Uuid
+  courseId     String?           @db.Uuid
+  enrollmentId String?           @db.Uuid
+  createdAt    DateTime          @default(now())
+
+  user       User?       @relation("TransactionUser", fields: [userId], references: [id])
+  course     Course?     @relation("TransactionCourse", fields: [courseId], references: [id])
+  enrollment Enrollment? @relation("TransactionEnrollment", fields: [enrollmentId], references: [id])
+}
+
+model Report {
+  id            String       @id @default(uuid()) @db.Uuid
+  type          ReportType
+  status        ReportStatus @default(open)
+  reporterId    String       @db.Uuid
+  courseId      String?      @db.Uuid
+  accusedUserId String?      @db.Uuid
+  message       String
+  createdAt     DateTime     @default(now())
+  resolvedAt    DateTime?
+  resolverId    String?      @db.Uuid
+
+  reporter    User   @relation("ReportReporter", fields: [reporterId], references: [id])
+  course      Course? @relation(fields: [courseId], references: [id])
+  accusedUser User?  @relation("ReportAccusedUser", fields: [accusedUserId], references: [id])
+  resolver    User?  @relation("ReportResolver", fields: [resolverId], references: [id])
+}
+
+model PlatformSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Certificate {
+  id            String   @id @default(uuid()) @db.Uuid
+  certificateId String   @unique
+  userId        String   @db.Uuid
+  courseId      String   @db.Uuid
+  issuedAt      DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model AchievementDefinition {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  name        String
+  description String
+  icon        String?
+  createdAt   DateTime @default(now())
+
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @db.Uuid
+  achievementId String   @db.Uuid
+  earnedAt      DateTime @default(now())
+
+  user        User                  @relation(fields: [userId], references: [id])
+  achievement AchievementDefinition @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  title     String
+  body      String?
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, readAt])
+}
+
+model Subscription {
+  id                  String             @id @default(uuid()) @db.Uuid
+  userId              String             @unique @db.Uuid
+  planName            String             @default("Free")
+  status              SubscriptionStatus @default(active)
+  currentPeriodStart  DateTime           @default(now())
+  currentPeriodEnd    DateTime?
+  cancelAtPeriodEnd   Boolean            @default(false)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @default(now()) @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Invoice {
+  id        String      @id @default(uuid()) @db.Uuid
+  userId    String      @db.Uuid
+  currency  CurrencyCode @default(USD)
+  amount    Int
+  status    InvoiceStatus @default(open)
+  reference String?
+  issuedAt  DateTime    @default(now())
+  paidAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, issuedAt])
+}
+
+model LiveLesson {
+  id              String           @id @default(uuid()) @db.Uuid
+  title           String
+  subject         String
+  grade           Int
+  status          LiveLessonStatus @default(upcoming)
+  startsAt        DateTime
+  durationMinutes Int
+  meetingLink     String?
+  recordingUrl    String?
+  teacherId       String           @db.Uuid
+  categoryId      String?          @db.Uuid
+  subjectPackageId String?         @db.Uuid
+  createdAt       DateTime         @default(now())
+
+  teacher    User      @relation("LiveLessonTeacher", fields: [teacherId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
+  subjectPackage SubjectPackage? @relation(fields: [subjectPackageId], references: [id])
+  attendance Attendance[]
+
+  @@index([startsAt])
+  @@index([grade, subject])
+}
+
+model Attendance {
+  id           String   @id @default(uuid()) @db.Uuid
+  liveLessonId String   @db.Uuid
+  userId       String   @db.Uuid
+  joinedAt     DateTime @default(now())
+
+  liveLesson LiveLesson @relation(fields: [liveLessonId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@unique([liveLessonId, userId])
+}
+
+model HomeworkAssignment {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  subject     String
+  grade       Int
+  dueAt       DateTime
+  teacherId   String   @db.Uuid
+  subjectPackageId String? @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  teacher     User                 @relation("HomeworkTeacher", fields: [teacherId], references: [id])
+  subjectPackage SubjectPackage?   @relation(fields: [subjectPackageId], references: [id])
+  submissions HomeworkSubmission[]
+
+  @@index([dueAt])
+  @@index([grade, subject])
+}
+
+model HomeworkSubmission {
+  id           String                   @id @default(uuid()) @db.Uuid
+  assignmentId String                   @db.Uuid
+  studentId    String                   @db.Uuid
+  status       HomeworkSubmissionStatus @default(not_submitted)
+  answerText   String?
+  fileUrl      String?
+  feedback     String?
+  submittedAt  DateTime?
+  updatedAt    DateTime                 @default(now()) @updatedAt
+
+  assignment HomeworkAssignment @relation(fields: [assignmentId], references: [id])
+  student    User               @relation("HomeworkStudent", fields: [studentId], references: [id])
+
+  @@unique([assignmentId, studentId])
+}
+
+model ExamResource {
+  id        String           @id @default(uuid()) @db.Uuid
+  title     String
+  kind      ExamResourceKind
+  subject   String
+  grade     Int
+  year      Int
+  term      Int?
+  examType  String?
+  fileUrl   String?
+  subjectPackageId String? @db.Uuid
+  createdAt DateTime @default(now())
+
+  subjectPackage SubjectPackage? @relation(fields: [subjectPackageId], references: [id])
+
+  @@index([grade, subject, year])
+}
+
+model LearningResource {
+  id        String       @id @default(uuid()) @db.Uuid
+  title     String
+  kind      ResourceKind
+  subject   String
+  grade     Int
+  fileUrl   String?
+  subjectPackageId String? @db.Uuid
+  createdAt DateTime @default(now())
+
+  subjectPackage SubjectPackage? @relation(fields: [subjectPackageId], references: [id])
+}
+
+model Announcement {
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String
+  body      String
+  grade     Int?
+  subject   String?
+  authorId  String   @db.Uuid
+  subjectPackageId String? @db.Uuid
+  createdAt DateTime @default(now())
+
+  author User @relation(fields: [authorId], references: [id])
+  subjectPackage SubjectPackage? @relation(fields: [subjectPackageId], references: [id])
+}
+
+model SubjectPackage {
+  id                 String   @id @default(uuid()) @db.Uuid
+  title              String
+  description        String
+  subject            String
+  grade              Int
+  term               Int?
+  price              Int
+  currency           CurrencyCode @default(USD)
+  billingPeriod      BillingPeriod @default(monthly)
+  isCapsAligned      Boolean @default(true)
+  includesLiveLessons Boolean @default(true)
+  isExamPrep         Boolean @default(false)
+  isHolidayLearning  Boolean @default(false)
+  teacherId          String? @db.Uuid
+  categoryId         String? @db.Uuid
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  teacher       User?     @relation("SubjectPackageTeacher", fields: [teacherId], references: [id])
+  category      Category? @relation(fields: [categoryId], references: [id])
+  enrollments   SubjectEnrollment[]
+  liveLessons   LiveLesson[]
+  homework      HomeworkAssignment[]
+  examResources ExamResource[]
+  resources     LearningResource[]
+  announcements Announcement[]
+
+  @@index([grade, subject])
+  @@index([term])
+}
+
+model SubjectEnrollment {
+  id              String                 @id @default(uuid()) @db.Uuid
+  userId          String                 @db.Uuid
+  subjectPackageId String                @db.Uuid
+  status          SubjectEnrollmentStatus @default(pending)
+  grade           Int
+  price           Int
+  currency        CurrencyCode @default(USD)
+  billingPeriod   BillingPeriod @default(monthly)
+  startDate       DateTime?
+  endDate         DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+
+  user           User           @relation(fields: [userId], references: [id])
+  subjectPackage SubjectPackage @relation(fields: [subjectPackageId], references: [id])
+
+  @@unique([userId, subjectPackageId])
+  @@index([status])
+}
