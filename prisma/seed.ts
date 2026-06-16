@@ -946,10 +946,8 @@ async function main() {
 main()
   .finally(async () => {
     await prisma.$disconnect()
-    await pool.end()
   })
   .catch(async (e) => {
     await prisma.$disconnect()
-    await pool.end()
     throw e
   })
