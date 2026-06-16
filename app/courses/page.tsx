@@ -5,6 +5,8 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { prisma } from "@/lib/prisma"
 
+export const dynamic = "force-dynamic"
+
 export default async function CoursesPage() {
   const courses = await prisma.course.findMany({
     where: { status: "approved" },

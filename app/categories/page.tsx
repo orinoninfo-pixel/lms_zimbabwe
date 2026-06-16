@@ -4,6 +4,8 @@ import { Footer } from "@/components/footer"
 import { prisma } from "@/lib/prisma"
 import { BookOpen, ClipboardCheck, Cpu, Map, Target, TrendingUp, Trophy, Users } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 type CategoryStyle = {
   icon: typeof BookOpen
   meta: string
@@ -88,4 +90,3 @@ export default async function CategoriesPage() {
     </div>
   )
 }
-

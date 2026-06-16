@@ -7,6 +7,8 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+export const dynamic = "force-dynamic"
+
 export default async function CertificateViewPage({ params }: { params: Promise<{ id: string }> }) {
   const auth = await requireRoleForPage("student")
   if (!auth) redirect("/")

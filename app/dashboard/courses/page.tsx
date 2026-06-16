@@ -7,6 +7,8 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { requireRoleForPage } from "@/lib/rbac"
 
+export const dynamic = "force-dynamic"
+
 export default async function DashboardCoursesPage() {
   const auth = await requireRoleForPage("student")
   if (!auth) redirect("/")

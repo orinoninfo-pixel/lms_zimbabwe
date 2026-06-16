@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CurrencyCode } from "@/lib/generated/prisma/enums"
 
+export const dynamic = "force-dynamic"
+
 const formatUsd = (amount: number) =>
   new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
 
