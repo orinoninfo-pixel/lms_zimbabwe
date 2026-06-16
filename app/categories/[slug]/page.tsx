@@ -8,6 +8,9 @@ import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
 
+const formatUsd = (amount: number) =>
+  new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
+
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
@@ -76,7 +79,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                       <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{course.description}</p>
                       <div className="mt-4 flex items-center justify-between">
                         <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-semibold text-foreground">R{course.price}</span>
+                          <span className="text-lg font-semibold text-foreground">{formatUsd(course.price)}</span>
                         </div>
                         <Button asChild size="sm" variant="secondary">
                           <Link href={`/course/${course.id}`}>View</Link>

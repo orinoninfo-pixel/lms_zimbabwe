@@ -5,10 +5,10 @@ const footerLinks = {
   Product: [
     { label: "Courses", href: "/courses" },
     { label: "Categories", href: "/categories" },
-    { label: "SA Learning Hub", href: "/sa-learning-hub" },
+    { label: "Zimbabwe Learning Hub", href: "/zimbabwe-learning-hub" },
     { label: "For Business", href: "/for-business" },
   ],
-  Learnify: [
+  "Zim Learning": [
     { label: "Home", href: "/" },
     { label: "Login", href: "/login" },
     { label: "Register", href: "/register" },
@@ -30,7 +30,7 @@ const quickLinks = [
   { name: "Courses", icon: BookOpen, href: "/courses" },
   { name: "Business", icon: Briefcase, href: "/for-business#request-training" },
   { name: "Support", icon: LifeBuoy, href: "/help" },
-  { name: "Email", icon: Mail, href: "mailto:support@learnify.co.za" },
+  { name: "Email", icon: Mail, href: "mailto:support@zimlearning.co.zw" },
 ]
 
 export function Footer() {
@@ -42,12 +42,12 @@ export function Footer() {
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                  <span className="text-lg font-bold text-primary-foreground">L</span>
+                  <span className="text-lg font-bold text-primary-foreground">Z</span>
                 </div>
-                <span className="text-xl font-semibold text-foreground">Learnify</span>
+                <span className="text-xl font-semibold text-foreground">Zim Learning</span>
               </Link>
               <p className="mt-4 text-sm text-muted-foreground max-w-xs leading-relaxed">
-                Empowering learners worldwide with high-quality online education. Start your journey today.
+                Supporting Zimbabwean learners with online courses, exam preparation, and flexible learning pathways.
               </p>
               <div className="mt-6 flex gap-4">
                 {quickLinks.map((item) => {
@@ -86,7 +86,7 @@ export function Footer() {
         </div>
         <div className="border-t border-border py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Learnify. All rights reserved.
+            &copy; {new Date().getFullYear()} Zim Learning. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

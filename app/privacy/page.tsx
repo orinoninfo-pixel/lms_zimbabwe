@@ -6,7 +6,7 @@ const sections = [
   {
     title: "Information We Collect",
     body:
-      "Learnify collects the information you provide when you create an account, enroll in courses, request business training, or contact support. This may include your name, email address, role, course activity, and billing-related records.",
+      "Zim Learning collects the information you provide when you create an account, enroll in courses, request business training, or contact support. This may include your name, email address, role, course activity, and billing-related records.",
   },
   {
     title: "How We Use Information",
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             <div className="text-center">
               <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Privacy Policy</h1>
               <p className="mt-3 text-muted-foreground">
-                Learn how Learnify collects, uses, and protects personal information across the platform.
+                Learn how Zim Learning collects, uses, and protects personal information across the platform.
               </p>
             </div>
 

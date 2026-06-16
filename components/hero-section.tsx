@@ -9,16 +9,16 @@ export function HeroSection() {
         <div className="flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-1.5 text-sm text-muted-foreground mb-6">
             <span className="flex h-2 w-2 rounded-full bg-accent" />
-            Over 50,000+ students enrolled
+            Built for Zimbabwean learners and ambitious professionals
           </div>
           <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl text-balance">
-            Master New Skills
+            Learn for School,
             <br />
-            <span className="text-muted-foreground">at Your Own Pace</span>
+            <span className="text-muted-foreground">Work, and Zimbabwe Exams</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed text-pretty">
-            Transform your career with world-class online courses. Learn from industry experts, 
-            earn certificates, and unlock new opportunities with our comprehensive learning platform.
+            Access online courses, Zimbabwe Learning Hub support, and practical training designed for students,
+            teachers, and working professionals across Zimbabwe.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
             <Link href="/courses">
@@ -28,9 +28,9 @@ export function HeroSection() {
               </Button>
             </Link>
             <Button asChild variant="outline" size="lg" className="gap-2 px-6">
-              <Link href="/sa-learning-hub">
+              <Link href="/zimbabwe-learning-hub">
                 <Play className="h-4 w-4" />
-                Explore Learning Hub
+                Explore Zimbabwe Hub
               </Link>
             </Button>
           </div>

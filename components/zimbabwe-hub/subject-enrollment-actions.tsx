@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
 
-export function SubjectEnrollmentActions({
+export function ZimbabweSubjectEnrollmentActions({
   packageId,
   initialStatus,
 }: {
@@ -83,7 +83,7 @@ export function SubjectEnrollmentActions({
         Start subscription
       </Button>
       <p className="text-xs text-muted-foreground">
-        You’ll be able to activate access after starting a subscription.
+        You&apos;ll be able to activate access after starting a subscription.
       </p>
     </div>
   )

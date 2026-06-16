@@ -20,8 +20,8 @@ type InstructorRow = {
   payoutsZar: number
 }
 
-const formatZar = (amount: number) =>
-  new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(amount)
+const formatUsd = (amount: number) =>
+  new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
 
 export function AdminInstructorsTable() {
   const [rows, setRows] = useState<InstructorRow[]>([])
@@ -148,7 +148,7 @@ export function AdminInstructorsTable() {
                   Students
                 </th>
                 <th className="px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Payouts (ZAR)
+                  Payouts (USD)
                 </th>
                 <th className="px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Actions
@@ -172,7 +172,7 @@ export function AdminInstructorsTable() {
                     <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{r.courses}</td>
                     <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{r.students}</td>
                     <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">
-                      {formatZar(r.payoutsZar)}
+                      {formatUsd(r.payoutsZar)}
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">

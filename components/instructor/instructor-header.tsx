@@ -73,7 +73,7 @@ export function InstructorHeader() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <GraduationCap className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-semibold text-foreground">Learnify</span>
+          <span className="text-lg font-semibold text-foreground">Zim Learning</span>
         </Link>
 
         {/* Search Bar */}
@@ -133,7 +133,7 @@ export function InstructorHeader() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <GraduationCap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-semibold text-foreground">Learnify</span>
+              <span className="text-lg font-semibold text-foreground">Zim Learning</span>
             </div>
             <button
               onClick={() => setMobileMenuOpen(false)}

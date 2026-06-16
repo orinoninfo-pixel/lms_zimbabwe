@@ -110,7 +110,7 @@ export default async function BusinessTrainingDetailsPage({ params }: { params: 
                         <Link href="/for-business#request-training">Request Corporate Training</Link>
                       </Button>
                       <Button asChild variant="outline" className="w-full">
-                        <a href={`mailto:sales@learnify.co.za?subject=${salesSubject}`}>Contact Sales</a>
+                        <a href={`mailto:sales@zimlearning.co.zw?subject=${salesSubject}`}>Contact Sales</a>
                       </Button>
                     </CardContent>
                   </Card>
@@ -218,7 +218,7 @@ export default async function BusinessTrainingDetailsPage({ params }: { params: 
                       <Link href="/for-business#request-training">Request Corporate Training</Link>
                     </Button>
                     <Button asChild variant="outline">
-                      <a href={`mailto:sales@learnify.co.za?subject=${salesSubject}`}>Contact Sales</a>
+                      <a href={`mailto:sales@zimlearning.co.zw?subject=${salesSubject}`}>Contact Sales</a>
                     </Button>
                   </div>
                 </CardContent>

@@ -8,13 +8,13 @@ const geist = Geist({ subsets: ["latin"] })
 const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://learnify.co.zw'),
-  applicationName: 'Learnify',
+  metadataBase: new URL('https://lms-zimbabwe.onrender.com'),
+  applicationName: 'Zim Learning',
   title: {
-    default: 'Learnify | Learn Online with Courses, Zimbabwe Learning Hub, and Corporate Training',
-    template: '%s | Learnify',
+    default: 'Zim Learning | Learn Online with Courses, Zimbabwe Learning Hub, and Corporate Training',
+    template: '%s | Zim Learning',
   },
-  description: 'Learnify helps students, professionals, and teams grow with online courses, school support, certificates, and corporate training.',
+  description: 'Zim Learning helps Zimbabwean students, professionals, and teams grow with online courses, school support, certificates, and corporate training.',
   icons: {
     icon: [
       {
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
   openGraph: {
-    title: 'Learnify',
-    description: 'Online learning for students, teams, and lifelong learners.',
+    title: 'Zim Learning',
+    description: 'Online learning for Zimbabwean students, teams, and lifelong learners.',
     type: 'website',
-    siteName: 'Learnify',
+    siteName: 'Zim Learning',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Learnify',
-    description: 'Online learning for students, teams, and lifelong learners.',
+    title: 'Zim Learning',
+    description: 'Online learning for Zimbabwean students, teams, and lifelong learners.',
   },
 }
 

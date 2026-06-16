@@ -159,7 +159,7 @@ export function AdminReportsTable() {
             <tbody className="divide-y divide-border">
               {rows.map((r) => {
                 const busy = busyId === r.id
-                const when = new Date(r.createdAt).toLocaleString("en-ZA")
+                const when = new Date(r.createdAt).toLocaleString("en-ZW")
                 const message = r.message.length > 140 ? `${r.message.slice(0, 140)}…` : r.message
                 return (
                   <tr key={r.id} className="hover:bg-muted/30 transition-colors align-top">

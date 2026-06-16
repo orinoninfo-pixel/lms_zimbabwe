@@ -16,7 +16,7 @@ type SubjectPackageRow = {
   grade: number
   term: number | null
   price: number
-  currency: "ZAR"
+  currency: "USD" | "ZWL" | "ZAR"
   billingPeriod: "monthly"
   isCapsAligned: boolean
   includesLiveLessons: boolean
@@ -27,7 +27,8 @@ type SubjectPackageRow = {
   enrollment: { status: string; endDate: string | null; price: number; billingPeriod: string } | null
 }
 
-const formatMonthly = (amount: number) => `R${amount}/month`
+const formatMonthly = (amount: number) =>
+  new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount) + "/month"
 
 const packageColors = [
   "bg-blue-100 text-blue-700",
@@ -38,7 +39,7 @@ const packageColors = [
   "bg-amber-100 text-amber-700",
 ] as const
 
-export function SaLearningHub() {
+export function ZimbabweLearningHub() {
   const [rows, setRows] = useState<SubjectPackageRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -98,7 +99,7 @@ export function SaLearningHub() {
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-medium text-foreground">CAPS-Aligned Subjects</p>
+              <p className="font-medium text-foreground">ZIMSEC-Aligned Subjects</p>
               <p className="text-sm text-muted-foreground">Structured support per grade and term</p>
             </div>
           </div>
@@ -253,7 +254,7 @@ export function SaLearningHub() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {p.isCapsAligned ? <Badge variant="secondary">CAPS-aligned</Badge> : null}
+                    {p.isCapsAligned ? <Badge variant="secondary">ZIMSEC-aligned</Badge> : null}
                     {p.includesLiveLessons ? <Badge>Live lessons</Badge> : null}
                     {p.isExamPrep ? <Badge variant="outline">Exam prep</Badge> : null}
                     {p.isHolidayLearning ? <Badge variant="outline">Holiday learning</Badge> : null}
@@ -281,11 +282,11 @@ export function SaLearningHub() {
                   </div>
                   <div className="flex gap-2">
                     <Button asChild className="flex-1">
-                      <Link href={`/sa-learning-hub/${p.id}`}>{active ? "View Details" : "View Details"}</Link>
+                      <Link href={`/zimbabwe-learning-hub/${p.id}`}>View Details</Link>
                     </Button>
                     {!active ? (
                       <Button asChild variant="outline">
-                        <Link href={`/sa-learning-hub/${p.id}`}>Subscribe</Link>
+                        <Link href={`/zimbabwe-learning-hub/${p.id}`}>Subscribe</Link>
                       </Button>
                     ) : null}
                   </div>

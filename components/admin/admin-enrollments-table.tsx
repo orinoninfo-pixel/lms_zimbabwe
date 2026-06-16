@@ -13,8 +13,8 @@ type EnrollmentRow = {
   progress: { totalLessons: number; completedLessons: number; percent: number }
 }
 
-const formatZar = (amount: number) =>
-  new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(amount)
+const formatUsd = (amount: number) =>
+  new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
 
 export function AdminEnrollmentsTable() {
   const [rows, setRows] = useState<EnrollmentRow[]>([])
@@ -153,7 +153,7 @@ export function AdminEnrollmentsTable() {
                       <p className="text-xs text-muted-foreground truncate">{r.course.instructor.email}</p>
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{formatZar(r.course.price)}</td>
+                  <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{formatUsd(r.course.price)}</td>
                   <td className="px-5 py-4">
                     <div className="space-y-2 min-w-[220px]">
                       <div className="flex items-center justify-between text-sm">

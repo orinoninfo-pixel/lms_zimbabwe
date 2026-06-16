@@ -37,7 +37,7 @@ export default async function AdminOverviewPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Platform Overview</h1>
-        <p className="text-muted-foreground">High-level statistics for the Learnify platform</p>
+        <p className="text-muted-foreground">High-level statistics for the Zim Learning platform</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

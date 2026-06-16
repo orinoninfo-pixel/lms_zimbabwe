@@ -72,8 +72,8 @@ const faqs = [
     a: "Applications are reviewed in order. We’ll email you with an update once a decision is made or if we need more details.",
   },
   {
-    q: "Do I need to have an existing Learnify account?",
-    a: "No. If your email isn’t registered, Learnify will create a learner account for you when you apply so we can track your application.",
+    q: "Do I need to have an existing Zim Learning account?",
+    a: "No. If your email isn’t registered, Zim Learning will create a learner account for you when you apply so we can track your application.",
   },
   {
     q: "What course topics perform best?",
@@ -205,7 +205,7 @@ export default function BecomeInstructorPage() {
                 </div>
               </div>
               <h1 className="mt-6 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Become an Instructor on Learnify
+                Become an Instructor on Zim Learning
               </h1>
               <p className="mt-4 text-lg text-muted-foreground">
                 Join a professional learning marketplace where qualified experts publish high-quality courses and help learners reach real outcomes.
@@ -238,7 +238,7 @@ export default function BecomeInstructorPage() {
 
             <div className="mt-10">
               <div className="text-center">
-                <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Why Teach on Learnify</h2>
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Why Teach on Zim Learning</h2>
                 <p className="mt-2 text-muted-foreground">A platform built for trust, quality, and learner outcomes.</p>
               </div>
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -294,7 +294,7 @@ export default function BecomeInstructorPage() {
                 <CardContent className="space-y-3 text-sm text-muted-foreground">
                   {[
                     { step: "Apply", text: "Share your experience, expertise, and a course proposal." },
-                    { step: "Review", text: "Our team validates applications to keep Learnify trusted." },
+                    { step: "Review", text: "Our team validates applications to keep Zim Learning trusted." },
                     { step: "Create Courses", text: "Build structured lessons with clear outcomes and resources." },
                     { step: "Earn Revenue", text: "Publish and earn as learners enroll and progress." },
                   ].map((row) => (
@@ -325,7 +325,7 @@ export default function BecomeInstructorPage() {
             <div className="mt-10">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Frequently Asked Questions</h2>
-                <p className="mt-2 text-muted-foreground">Quick answers about teaching on Learnify.</p>
+                <p className="mt-2 text-muted-foreground">Quick answers about teaching on Zim Learning.</p>
               </div>
               <div className="mt-6 mx-auto max-w-3xl rounded-xl border border-border bg-card p-2 shadow-sm">
                 <Accordion type="single" collapsible>
@@ -547,7 +547,7 @@ export default function BecomeInstructorPage() {
                   </div>
                   <div>
                     <p className="text-lg font-semibold text-foreground">Ready to teach?</p>
-                    <p className="mt-1 text-sm text-muted-foreground">Apply today and start building your instructor catalog on Learnify.</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Apply today and start building your instructor catalog on Zim Learning.</p>
                   </div>
                 </div>
                 <Button asChild>

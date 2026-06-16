@@ -3,14 +3,14 @@ import { BookOpen, Clock, Target, Trophy } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 
 function formatDateTime(value: Date) {
-  return value.toLocaleString("en-ZA")
+  return value.toLocaleString("en-ZW")
 }
 
 function formatMonthly(amount: number) {
-  return `R${amount}/month`
+  return new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount) + "/month"
 }
 
-export async function SaLearningHubSummary({ userId }: { userId: string }) {
+export async function ZimbabweLearningHubSummary({ userId }: { userId: string }) {
   const now = new Date()
 
   const enrollments = await prisma.subjectEnrollment.findMany({
@@ -70,15 +70,15 @@ export async function SaLearningHubSummary({ userId }: { userId: string }) {
   return (
     <div className="mt-6">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">SA Learning Hub</h2>
-        <Link href="/sa-learning-hub" className="text-sm text-accent hover:underline">
+        <h2 className="text-lg font-semibold text-foreground">Zimbabwe Learning Hub</h2>
+        <Link href="/zimbabwe-learning-hub" className="text-sm text-accent hover:underline">
           Open hub
         </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
-          href={upcoming?.subjectPackageId ? `/sa-learning-hub/${upcoming.subjectPackageId}` : "/sa-learning-hub"}
+          href={upcoming?.subjectPackageId ? `/zimbabwe-learning-hub/${upcoming.subjectPackageId}` : "/zimbabwe-learning-hub"}
           className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-start justify-between">
@@ -100,7 +100,7 @@ export async function SaLearningHubSummary({ userId }: { userId: string }) {
         </Link>
 
         <Link
-          href="/sa-learning-hub"
+          href="/zimbabwe-learning-hub"
           className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-start justify-between">
@@ -116,7 +116,7 @@ export async function SaLearningHubSummary({ userId }: { userId: string }) {
         </Link>
 
         <Link
-          href="/sa-learning-hub"
+          href="/zimbabwe-learning-hub"
           className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-start justify-between">
@@ -132,7 +132,7 @@ export async function SaLearningHubSummary({ userId }: { userId: string }) {
         </Link>
 
         <Link
-          href="/sa-learning-hub"
+          href="/zimbabwe-learning-hub"
           className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-start justify-between">
@@ -161,7 +161,7 @@ export async function SaLearningHubSummary({ userId }: { userId: string }) {
               {activeEnrollments.slice(0, 6).map((e) => (
                 <Link
                   key={e.id}
-                  href={`/sa-learning-hub/${e.subjectPackageId}`}
+                  href={`/zimbabwe-learning-hub/${e.subjectPackageId}`}
                   className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-3 py-2 hover:bg-muted/40 transition-colors"
                 >
                   <div className="min-w-0">
@@ -180,7 +180,7 @@ export async function SaLearningHubSummary({ userId }: { userId: string }) {
         <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-muted-foreground">Recommended subjects</p>
-            <Link href="/sa-learning-hub" className="text-sm text-accent hover:underline">
+            <Link href="/zimbabwe-learning-hub" className="text-sm text-accent hover:underline">
               Browse
             </Link>
           </div>
@@ -191,7 +191,7 @@ export async function SaLearningHubSummary({ userId }: { userId: string }) {
               {recommended.map((p) => (
                 <Link
                   key={p.id}
-                  href={`/sa-learning-hub/${p.id}`}
+                  href={`/zimbabwe-learning-hub/${p.id}`}
                   className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-3 py-2 hover:bg-muted/40 transition-colors"
                 >
                   <div className="min-w-0">

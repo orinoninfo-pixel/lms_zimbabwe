@@ -9,10 +9,10 @@ import { toast } from "@/hooks/use-toast"
 type SettingRow = { key: string; value: string; updatedAt: string }
 
 const fieldDefs = [
-  { key: "platformName", label: "Platform name", placeholder: "e.g. Learnify" },
-  { key: "supportEmail", label: "Support email", placeholder: "e.g. support@learnify.co.za" },
+  { key: "platformName", label: "Platform name", placeholder: "e.g. Zim Learning" },
+  { key: "supportEmail", label: "Support email", placeholder: "e.g. support@zimlearning.co.zw" },
   { key: "commissionRateBps", label: "Commission rate (bps)", placeholder: "e.g. 1500 for 15%" },
-  { key: "payoutMinimumZar", label: "Payout minimum (ZAR)", placeholder: "e.g. 500" },
+  { key: "payoutMinimumZar", label: "Payout minimum (USD)", placeholder: "e.g. 20" },
 ] as const
 
 export function AdminSettingsForm() {
@@ -101,7 +101,7 @@ export function AdminSettingsForm() {
                   />
                   {map.get(f.key)?.updatedAt ? (
                     <p className="text-xs text-muted-foreground">
-                      Updated {new Date(map.get(f.key)!.updatedAt).toLocaleString("en-ZA")}
+                      Updated {new Date(map.get(f.key)!.updatedAt).toLocaleString("en-ZW")}
                     </p>
                   ) : null}
                 </div>
@@ -123,7 +123,7 @@ export function AdminSettingsForm() {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>Commission rate is stored in basis points (bps). 1500 bps = 15%.</p>
-          <p>All monetary values are treated as ZAR integers.</p>
+          <p>All monetary values are treated as USD amounts for the Zimbabwe platform.</p>
         </CardContent>
       </Card>
     </div>

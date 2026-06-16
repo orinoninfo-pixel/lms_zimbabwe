@@ -40,9 +40,9 @@ export function Navbar() {
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <span className="text-lg font-bold text-primary-foreground">L</span>
+                <span className="text-lg font-bold text-primary-foreground">Z</span>
               </div>
-              <span className="text-xl font-semibold text-foreground">Learnify</span>
+              <span className="text-xl font-semibold text-foreground">Zim Learning</span>
             </Link>
             <div className="hidden md:flex items-center gap-6">
               <Link href="/courses" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -54,8 +54,8 @@ export function Navbar() {
               <Link href="/for-business" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 For Business
               </Link>
-              <Link href="/sa-learning-hub" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                SA Learning Hub
+              <Link href="/zimbabwe-learning-hub" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Zimbabwe Learning Hub
               </Link>
             </div>
           </div>
@@ -122,8 +122,8 @@ export function Navbar() {
             <Link href="/for-business" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2">
               For Business
             </Link>
-            <Link href="/sa-learning-hub" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2">
-              SA Learning Hub
+            <Link href="/zimbabwe-learning-hub" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-2">
+              Zimbabwe Learning Hub
             </Link>
             <div className="flex flex-col gap-2 pt-3 border-t border-border">
               {isLoggedIn ? (

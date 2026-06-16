@@ -24,8 +24,8 @@ type CourseRow = {
   _count: { enrollments: number; sections: number }
 }
 
-const formatZar = (amount: number) =>
-  new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(amount)
+const formatUsd = (amount: number) =>
+  new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
 
 export function AdminCoursesTable() {
   const [rows, setRows] = useState<CourseRow[]>([])
@@ -217,7 +217,7 @@ export function AdminCoursesTable() {
                         ))}
                       </select>
                     </td>
-                    <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{formatZar(c.price)}</td>
+                    <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{formatUsd(c.price)}</td>
                     <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{c._count.enrollments}</td>
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">

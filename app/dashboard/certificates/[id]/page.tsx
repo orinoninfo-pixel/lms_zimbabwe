@@ -20,7 +20,7 @@ export default async function CertificateViewPage({ params }: { params: Promise<
   })
   if (!cert || cert.userId !== auth.user.id) notFound()
 
-  const issuedAt = cert.issuedAt.toLocaleDateString("en-ZA", { year: "numeric", month: "long", day: "2-digit" })
+  const issuedAt = cert.issuedAt.toLocaleDateString("en-ZW", { year: "numeric", month: "long", day: "2-digit" })
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,7 +45,7 @@ export default async function CertificateViewPage({ params }: { params: Promise<
 
           <Card>
             <CardHeader>
-              <CardTitle>Learnify Certificate of Completion</CardTitle>
+              <CardTitle>Zim Learning Certificate of Completion</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -71,7 +71,7 @@ export default async function CertificateViewPage({ params }: { params: Promise<
 
               <div className="rounded-lg border border-border bg-muted/30 p-4">
                 <p className="text-sm text-muted-foreground">
-                  This certificate confirms that the learner has successfully completed the course on Learnify.
+                  This certificate confirms that the learner has successfully completed the course on Zim Learning.
                 </p>
               </div>
             </CardContent>

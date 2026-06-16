@@ -21,14 +21,14 @@ export async function GET(_req: Request, context: { params: Promise<{ id: string
   if (!cert || cert.userId !== user.id) return Response.json({ error: "Not found" }, { status: 404 })
 
   const content = [
-    "Learnify Certificate of Completion",
+    "Zim Learning Certificate of Completion",
     "",
     `Certificate ID: ${cert.certificateId}`,
     `Learner: ${user.name}`,
     `Course: ${cert.course.title}`,
-    `Completion date: ${cert.issuedAt.toLocaleDateString("en-ZA")}`,
+    `Completion date: ${cert.issuedAt.toLocaleDateString("en-ZW")}`,
     "",
-    "This certificate confirms that the learner has successfully completed the course on Learnify.",
+    "This certificate confirms that the learner has successfully completed the course on Zim Learning.",
   ].join("\n")
 
   return new Response(content, {

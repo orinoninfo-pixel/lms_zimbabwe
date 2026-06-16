@@ -10,13 +10,13 @@ const prisma = new PrismaClient({ adapter })
 async function main() {
   await prisma.platformSetting.upsert({
     where: { key: "platformName" },
-    update: { value: "Learnify" },
-    create: { key: "platformName", value: "Learnify" },
+    update: { value: "Zim Learning" },
+    create: { key: "platformName", value: "Zim Learning" },
   })
   await prisma.platformSetting.upsert({
     where: { key: "supportEmail" },
-    update: { value: "support@learnify.co.zw" },
-    create: { key: "supportEmail", value: "support@learnify.co.zw" },
+    update: { value: "support@zimlearning.co.zw" },
+    create: { key: "supportEmail", value: "support@zimlearning.co.zw" },
   })
   await prisma.platformSetting.upsert({
     where: { key: "commissionRateBps" },
@@ -905,7 +905,7 @@ async function main() {
       {
         id: "cccccccc-0000-0000-0000-000000000001",
         userId: student.id,
-        title: "Welcome to Learnify",
+        title: "Welcome to Zim Learning",
         body: "Start a course, track your progress, and earn certificates as you learn.",
         href: "/dashboard",
       },

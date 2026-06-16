@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button"
 
 export const dynamic = "force-dynamic"
 
-const formatZar = (amount: number) =>
-  new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(amount)
+const formatUsd = (amount: number) =>
+  new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
 
 export default async function BillingPage() {
   const auth = await requireRoleForPage("student")
@@ -104,14 +104,14 @@ export default async function BillingPage() {
                         {invoices.map((inv) => (
                           <tr key={inv.id} className="hover:bg-muted/30 transition-colors">
                             <td className="px-4 py-3 text-sm text-foreground whitespace-nowrap">
-                              {inv.issuedAt.toLocaleDateString("en-ZA")}
+                              {inv.issuedAt.toLocaleDateString("en-ZW")}
                             </td>
                             <td className="px-4 py-3 text-sm text-muted-foreground">
                               {inv.reference ?? inv.id.slice(0, 8).toUpperCase()}
                             </td>
                             <td className="px-4 py-3 text-sm text-foreground">{inv.status}</td>
                             <td className="px-4 py-3 text-sm text-foreground text-right tabular-nums whitespace-nowrap">
-                              {formatZar(inv.amount)}
+                              {formatUsd(inv.amount)}
                             </td>
                           </tr>
                         ))}

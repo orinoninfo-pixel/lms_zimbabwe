@@ -21,7 +21,7 @@ const defaultStyle: CategoryStyle = {
 const styleBySlug: Record<string, CategoryStyle> = {
   "mathematical-literacy": { icon: Target, meta: "Grades 10–12", color: "bg-blue-100 text-blue-700" },
   mathematics: { icon: Target, meta: "Grades 8–12", color: "bg-blue-100 text-blue-700" },
-  "physical-sciences": { icon: Trophy, meta: "CAPS-aligned", color: "bg-pink-100 text-pink-700" },
+  "physical-sciences": { icon: Trophy, meta: "ZIMSEC-aligned", color: "bg-pink-100 text-pink-700" },
   "life-sciences": { icon: Users, meta: "Grades 10–12", color: "bg-green-100 text-green-700" },
   accounting: { icon: TrendingUp, meta: "Grades 10–12", color: "bg-amber-100 text-amber-700" },
   "business-studies": { icon: Users, meta: "Grades 10–12", color: "bg-indigo-100 text-indigo-700" },

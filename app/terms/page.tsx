@@ -6,12 +6,12 @@ const sections = [
   {
     title: "Platform Use",
     body:
-      "By using Learnify, you agree to use the platform lawfully and responsibly. Accounts, course access, and learning resources must not be misused, redistributed, or accessed in a way that harms the platform or other users.",
+      "By using Zim Learning, you agree to use the platform lawfully and responsibly. Accounts, course access, and learning resources must not be misused, redistributed, or accessed in a way that harms the platform or other users.",
   },
   {
     title: "Accounts and Access",
     body:
-      "Users are responsible for maintaining accurate account information and protecting their login credentials. Learnify may suspend or restrict access where misuse, fraud, or policy violations are identified.",
+      "Users are responsible for maintaining accurate account information and protecting their login credentials. Zim Learning may suspend or restrict access where misuse, fraud, or policy violations are identified.",
   },
   {
     title: "Payments and Enrollments",
@@ -21,7 +21,7 @@ const sections = [
   {
     title: "Content and Intellectual Property",
     body:
-      "Course materials, recordings, downloads, and platform content remain the property of Learnify or its licensors. Content may not be copied, republished, shared, or resold without written permission.",
+      "Course materials, recordings, downloads, and platform content remain the property of Zim Learning or its licensors. Content may not be copied, republished, shared, or resold without written permission.",
   },
 ]
 
@@ -35,7 +35,7 @@ export default function TermsPage() {
             <div className="text-center">
               <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Terms of Service</h1>
               <p className="mt-3 text-muted-foreground">
-                These terms outline the rules, responsibilities, and conditions for using Learnify.
+                These terms outline the rules, responsibilities, and conditions for using Zim Learning.
               </p>
             </div>
 

@@ -63,7 +63,7 @@ export default async function HelpCenterPage() {
                   <p className="text-sm text-muted-foreground">
                     Need help with billing, access, or a course issue? Contact support and include your email address.
                   </p>
-                  <p className="mt-2 text-sm font-medium text-foreground">support@learnify.co.za</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">support@zimlearning.co.zw</p>
                 </div>
                 <Button asChild className="w-full">
                   <Link href="/dashboard/notifications">View notifications</Link>

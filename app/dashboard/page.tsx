@@ -1,7 +1,7 @@
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardStats } from "@/components/dashboard/dashboard-stats"
-import { SaLearningHubSummary } from "@/components/dashboard/sa-learning-hub-summary"
+import { ZimbabweLearningHubSummary } from "@/components/dashboard/zimbabwe-learning-hub-summary"
 import { ContinueLearning } from "@/components/dashboard/continue-learning"
 import { EnrolledCourses } from "@/components/dashboard/enrolled-courses"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
@@ -31,7 +31,7 @@ export default async function DashboardPage() {
           {/* Stats */}
           <DashboardStats />
 
-          <SaLearningHubSummary userId={auth.user.id} />
+          <ZimbabweLearningHubSummary userId={auth.user.id} />
 
           {/* Continue Learning */}
           <div className="mt-6">

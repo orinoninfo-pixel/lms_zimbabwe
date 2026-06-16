@@ -25,9 +25,9 @@ export default function HelpPage() {
                   <p className="text-sm text-muted-foreground">
                     Email support and include your account email address, the page you were on, and a short description of the issue.
                   </p>
-                  <p className="text-sm font-medium text-foreground">support@learnify.co.za</p>
+                  <p className="text-sm font-medium text-foreground">support@zimlearning.co.zw</p>
                   <Button asChild>
-                    <a href="mailto:support@learnify.co.za">Email Support</a>
+                    <a href="mailto:support@zimlearning.co.zw">Email Support</a>
                   </Button>
                 </CardContent>
               </Card>
@@ -38,7 +38,7 @@ export default function HelpPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Want to teach on Learnify? Apply and our team will review your details and course proposal.
+                    Want to teach on Zim Learning? Apply and our team will review your details and course proposal.
                   </p>
                   <Button asChild variant="outline">
                     <Link href="/become-instructor">Become an Instructor</Link>
