@@ -21,6 +21,27 @@ export function ZimbabweSubjectEnrollmentActions({
   const act = async (action: "start" | "activate" | "cancel") => {
     setBusy(true)
     try {
+      if (action === "start" || action === "activate") {
+        const res = await fetch("/api/checkout/prepare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemType: "training", itemId: packageId }),
+        }).catch(() => null)
+        const json = res ? await res.json().catch(() => null) : null
+        if (!res || !res.ok) throw new Error(json?.error ?? "Request failed")
+
+        if (json?.checkout?.redirectUrl) {
+          window.location.assign(json.checkout.redirectUrl)
+          return
+        }
+
+        toast({
+          title: "Checkout prepared",
+          description: json?.checkout?.message ?? "Training checkout is ready for payment.",
+        })
+        return
+      }
+
       const res = await fetch(`/api/sa-hub/packages/${packageId}/enrollment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

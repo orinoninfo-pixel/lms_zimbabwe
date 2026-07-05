@@ -55,10 +55,10 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
         return
       }
 
-      const res = await fetch("/api/enroll", {
+      const res = await fetch("/api/checkout/prepare", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId }),
+        body: JSON.stringify({ itemType: "course", itemId: courseId }),
       })
       const data = await res.json().catch(() => null)
       if (!res.ok) {
@@ -66,15 +66,28 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
           router.push(`/login?next=${encodeURIComponent(`/course/${courseId}`)}`)
           return
         }
-        const message = data?.error ?? "Failed to enroll"
+        const message = data?.error ?? "Failed to prepare payment"
         setEnrollError(message)
         return
       }
-      setIsEnrolled(true)
-      // go to learning page for this course
-      router.push(`/learn/${courseId}`)
+
+      if (data?.checkout?.redirectUrl) {
+        window.location.assign(data.checkout.redirectUrl)
+        return
+      }
+
+      if (data?.checkout?.configured) {
+        setEnrollError(data.checkout.message)
+      } else {
+        setEnrollError(data?.checkout?.message ?? "Checkout is ready for payment")
+      }
+
+      if (data?.success) {
+        setIsEnrolled(true)
+        router.push(`/learn/${courseId}`)
+      }
     } catch {
-      setEnrollError("Failed to enroll")
+      setEnrollError("Failed to prepare payment")
     } finally {
       setIsEnrolling(false)
     }

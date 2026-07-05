@@ -185,7 +185,7 @@ export default async function ZimbabweLearningHubPackagePage({ params }: { param
                     pkg.announcements.map((item) => (
                       <div key={item.id} className="rounded-lg border border-border bg-muted/20 p-4">
                         <p className="font-medium text-foreground">{item.title}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">{item.message}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{item.body}</p>
                         <p className="mt-2 text-xs text-muted-foreground">
                           {item.author?.name ?? "Zim Learning"} · {formatDateTime(item.createdAt)}
                         </p>
@@ -235,7 +235,7 @@ export default async function ZimbabweLearningHubPackagePage({ params }: { param
                       <div key={item.id} className="rounded-lg border border-border bg-muted/20 p-4">
                         <p className="font-medium text-foreground">{item.title}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {item.type} · {formatDateTime(item.createdAt)}
+                          {item.kind} · {formatDateTime(item.createdAt)}
                         </p>
                       </div>
                     ))
