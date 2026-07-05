@@ -19,6 +19,7 @@ export async function GET(req: Request) {
     where.OR = [
       { title: { contains: q, mode: "insensitive" } },
       { description: { contains: q, mode: "insensitive" } },
+      { moderationNote: { contains: q, mode: "insensitive" } },
       { instructor: { name: { contains: q, mode: "insensitive" } } },
     ]
   }
@@ -90,4 +91,3 @@ export async function PATCH(req: Request) {
 
   return Response.json({ success: true, course: updated })
 }
-

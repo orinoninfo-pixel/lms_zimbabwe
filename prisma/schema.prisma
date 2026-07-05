@@ -120,6 +120,7 @@ model User {
   name      String
   email     String     @unique
   passwordHash String?
+  mustChangePassword Boolean @default(false)
   resetToken String?
   resetTokenExpiresAt DateTime?
   role      UserRole
@@ -160,6 +161,7 @@ model Course {
   title        String
   description  String
   price        Int
+  moderationNote String?
   instructorId String   @db.Uuid
   status       CourseStatus @default(approved)
   featured     Boolean   @default(false)

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { randomBytes } from "crypto"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "No account found with that email." }, { status: 404 })
   }
+  const userWithPasswordPolicy = user as typeof user & { mustChangePassword?: boolean | null }
 
   if (user.status === "suspended") {
     return NextResponse.json({ error: "Your account is suspended." }, { status: 403 })
@@ -36,6 +38,25 @@ export async function POST(req: Request) {
   const isValidPassword = await import("bcryptjs").then((bcrypt) => bcrypt.compare(password, user.passwordHash!))
   if (!isValidPassword) {
     return NextResponse.json({ error: "Invalid email or password." }, { status: 401 })
+  }
+
+  if (userWithPasswordPolicy.mustChangePassword) {
+    const resetToken = randomBytes(24).toString("hex")
+    const resetTokenExpiresAt = new Date(Date.now() + 1000 * 60 * 15)
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken, resetTokenExpiresAt },
+    })
+
+    return NextResponse.json(
+      {
+        requiresPasswordChange: true,
+        resetToken,
+        user: { id: user.id, email: user.email, role: user.role, name: user.name, status: user.status },
+      },
+      { status: 403 }
+    )
   }
 
   const res = NextResponse.json({

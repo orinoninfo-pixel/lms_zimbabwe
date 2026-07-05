@@ -6,8 +6,10 @@ import { VideoPreview } from "@/components/course-detail/video-preview"
 import { CourseCurriculum } from "@/components/course-detail/course-curriculum"
 import { CourseSidebar } from "@/components/course-detail/course-sidebar"
 import { CourseDescription } from "@/components/course-detail/course-description"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { headers } from "next/headers"
 import { notFound } from "next/navigation"
+import { Eye } from "lucide-react"
 
 type ApiCourse = {
   id: string
@@ -35,6 +37,7 @@ type ApiCourse = {
 type SearchParams = {
   payment?: string | string[]
   reference?: string | string[]
+  adminPreview?: string | string[]
 }
 
 function getFirst(value: string | string[] | undefined) {
@@ -53,10 +56,12 @@ export default async function CourseDetailPage({
   const h = await headers()
   const host = h.get("x-forwarded-host") ?? h.get("host")
   const proto = h.get("x-forwarded-proto") ?? "http"
+  const cookie = h.get("cookie") ?? ""
   const baseUrl = host ? `${proto}://${host}` : ""
 
   const course: ApiCourse | null = await fetch(`${baseUrl}/api/courses/${slug}`, {
     cache: "no-store",
+    headers: cookie ? { cookie } : undefined,
   })
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null)
@@ -123,7 +128,9 @@ export default async function CourseDetailPage({
 
   const paymentStatus = getFirst(query.payment)
   const paymentReference = getFirst(query.reference)
+  const adminPreview = getFirst(query.adminPreview)
   const showPaymentBanner = paymentStatus === "confirmed"
+  const showAdminPreviewBanner = adminPreview === "1"
 
   return (
     <div className="min-h-screen bg-background">
@@ -132,6 +139,17 @@ export default async function CourseDetailPage({
         <CourseHeader course={courseHeaderData} />
         
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+          {showAdminPreviewBanner ? (
+            <div className="mb-6">
+              <Alert className="border-blue-200 bg-blue-50 text-blue-950 [&>svg]:text-blue-600">
+                <Eye className="h-4 w-4" />
+                <AlertTitle>Admin preview</AlertTitle>
+                <AlertDescription>
+                  You are previewing this course as an administrator, including content that may not be publicly approved yet.
+                </AlertDescription>
+              </Alert>
+            </div>
+          ) : null}
           {showPaymentBanner ? (
             <div className="mb-6">
               <CoursePaymentBanner courseId={course.id} reference={paymentReference} />

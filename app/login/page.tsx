@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 
 function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -33,13 +34,23 @@ function LoginForm() {
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json().catch(() => null)
+      if (data?.requiresPasswordChange && data?.resetToken) {
+        const next = searchParams.get("next")
+        const params = new URLSearchParams({
+          token: data.resetToken as string,
+          required: "1",
+        })
+        if (next) params.set("next", next)
+        router.push(`/reset-password?${params.toString()}`)
+        return
+      }
       if (!res.ok) {
         setError(data?.error ?? "Login failed")
         return
       }
 
       const actualRole = data?.user?.role as "student" | "instructor" | "admin" | undefined
-      const next = new URLSearchParams(window.location.search).get("next")
+      const next = searchParams.get("next")
       if (next) {
         router.push(next)
         return

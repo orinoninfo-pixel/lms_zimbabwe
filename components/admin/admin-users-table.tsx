@@ -1,7 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
-import { Trash2 } from "lucide-react"
+import { FilePenLine, Trash2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
@@ -15,6 +17,7 @@ type AdminUser = {
   email: string
   role: "student" | "instructor" | "admin"
   status: "active" | "suspended" | "banned"
+  mustChangePassword: boolean
   createdAt: string
 }
 
@@ -225,6 +228,11 @@ export function AdminUsersTable({ fixedRole }: { fixedRole?: "student" | "instru
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{u.name}</p>
                         <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                        {u.mustChangePassword ? (
+                          <Badge variant="outline" className="mt-2 border-amber-200 bg-amber-50 text-amber-800">
+                            Password change required
+                          </Badge>
+                        ) : null}
                       </div>
                     </td>
                     <td className="px-5 py-4">
@@ -245,6 +253,12 @@ export function AdminUsersTable({ fixedRole }: { fixedRole?: "student" | "instru
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/admin/users/${u.id}`}>
+                            <FilePenLine className="h-4 w-4" />
+                            Review
+                          </Link>
+                        </Button>
                         <Button
                           variant="secondary"
                           size="sm"

@@ -10,6 +10,8 @@ function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token") || ""
+  const required = searchParams.get("required") === "1"
+  const next = searchParams.get("next")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -46,8 +48,10 @@ function ResetPasswordForm() {
         setError(data?.error ?? "Reset failed")
         return
       }
-      setMessage("Your password has been reset. Redirecting to login...")
-      setTimeout(() => router.push("/login"), 1500)
+      setMessage(required ? "Password changed. Signing you in..." : "Your password has been reset. Signing you in...")
+      const actualRole = data?.user?.role as "student" | "instructor" | "admin" | undefined
+      const destination = next || (actualRole === "admin" ? "/admin" : actualRole === "instructor" ? "/instructor" : "/dashboard")
+      setTimeout(() => router.push(destination), 1200)
     } catch {
       setError("Reset failed")
     } finally {
@@ -60,7 +64,11 @@ function ResetPasswordForm() {
       <div className="max-w-md w-full p-8 bg-card rounded-lg border border-border space-y-6">
         <div>
           <h2 className="text-2xl font-semibold mb-2">Reset password</h2>
-          <p className="text-sm text-muted-foreground">Enter a new password to finish resetting your account.</p>
+          <p className="text-sm text-muted-foreground">
+            {required
+              ? "Your administrator has issued a temporary password. Choose a new password to continue."
+              : "Enter a new password to finish resetting your account."}
+          </p>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>

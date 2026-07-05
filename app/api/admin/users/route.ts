@@ -2,6 +2,16 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { requireAdmin } from "@/lib/rbac"
 
+const adminUserListSelect = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  status: true,
+  mustChangePassword: true,
+  createdAt: true,
+} as any
+
 export async function GET(req: Request) {
   const auth = await requireAdmin()
   if (auth instanceof Response) return auth
@@ -23,7 +33,7 @@ export async function GET(req: Request) {
 
   const users = await prisma.user.findMany({
     where,
-    select: { id: true, name: true, email: true, role: true, status: true, createdAt: true },
+    select: adminUserListSelect,
     orderBy: { createdAt: "desc" },
     take: 200,
   })
@@ -93,4 +103,3 @@ export async function DELETE(req: Request) {
   await prisma.user.delete({ where: { id: userId } })
   return Response.json({ success: true })
 }
-

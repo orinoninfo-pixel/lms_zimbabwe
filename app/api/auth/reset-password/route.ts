@@ -30,12 +30,20 @@ export async function POST(req: Request) {
   }
 
   const passwordHash = await hash(password, 10)
-  await prisma.user.update({
+  const updateData = {
+    passwordHash,
+    mustChangePassword: false,
+    resetToken: null,
+    resetTokenExpiresAt: null,
+  } as any
+
+  const updatedUser = await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash, resetToken: null, resetTokenExpiresAt: null },
+    data: updateData,
+    select: { id: true, email: true, role: true, name: true, status: true },
   })
 
-  const res = NextResponse.json({ success: true })
+  const res = NextResponse.json({ success: true, user: updatedUser })
   const maxAge = 60 * 60 * 24 * 30
   res.cookies.set("lms_user_id", user.id, { httpOnly: true, sameSite: "lax", path: "/", maxAge })
   res.cookies.set("lms_role", user.role, { httpOnly: true, sameSite: "lax", path: "/", maxAge })
