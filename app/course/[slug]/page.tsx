@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CourseHeader } from "@/components/course-detail/course-header"
+import { CoursePaymentBanner } from "@/components/course-detail/course-payment-banner"
 import { VideoPreview } from "@/components/course-detail/video-preview"
 import { CourseCurriculum } from "@/components/course-detail/course-curriculum"
 import { CourseSidebar } from "@/components/course-detail/course-sidebar"
@@ -31,8 +32,24 @@ type ApiCourse = {
   }>
 }
 
-export default async function CourseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+type SearchParams = {
+  payment?: string | string[]
+  reference?: string | string[]
+}
+
+function getFirst(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value
+}
+
+export default async function CourseDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<SearchParams>
+}) {
   const { slug } = await params
+  const query = await searchParams
   const h = await headers()
   const host = h.get("x-forwarded-host") ?? h.get("host")
   const proto = h.get("x-forwarded-proto") ?? "http"
@@ -104,6 +121,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     },
   }
 
+  const paymentStatus = getFirst(query.payment)
+  const paymentReference = getFirst(query.reference)
+  const showPaymentBanner = paymentStatus === "confirmed"
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -111,6 +132,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         <CourseHeader course={courseHeaderData} />
         
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+          {showPaymentBanner ? (
+            <div className="mb-6">
+              <CoursePaymentBanner courseId={course.id} reference={paymentReference} />
+            </div>
+          ) : null}
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
             <div className="lg:col-span-2 space-y-10">
               <div className="lg:hidden">

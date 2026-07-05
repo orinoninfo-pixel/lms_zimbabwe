@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { PlayCircle, Clock, FileText, Award, Download, RefreshCcw, Smartphone } from "lucide-react"
@@ -76,15 +77,16 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
         return
       }
 
+      if (data?.alreadyEnrolled) {
+        setIsEnrolled(true)
+        router.push(`/learn/${courseId}`)
+        return
+      }
+
       if (data?.checkout?.configured) {
         setEnrollError(data.checkout.message)
       } else {
         setEnrollError(data?.checkout?.message ?? "Checkout is ready for payment")
-      }
-
-      if (data?.success) {
-        setIsEnrolled(true)
-        router.push(`/learn/${courseId}`)
       }
     } catch {
       setEnrollError("Failed to prepare payment")
@@ -134,9 +136,15 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
         </p>
 
         <div className="space-y-3 mb-6">
-          <Button className="w-full" size="lg" onClick={handleEnroll} disabled={isEnrolling || isEnrolled}>
-            {isEnrolled ? "Enrolled" : isEnrolling ? "Enrolling..." : "Enroll Now"}
-          </Button>
+          {isEnrolled ? (
+            <Button asChild className="w-full" size="lg">
+              <Link href={`/learn/${courseId}`}>Open Course</Link>
+            </Button>
+          ) : (
+            <Button className="w-full" size="lg" onClick={handleEnroll} disabled={isEnrolling}>
+              {isEnrolling ? "Preparing Paynow..." : "Pay with Paynow"}
+            </Button>
+          )}
           <Button
             variant="outline"
             className="w-full"

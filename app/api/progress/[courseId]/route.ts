@@ -22,6 +22,14 @@ export async function GET(_req: Request, context: { params: Promise<{ courseId: 
     return Response.json({ error: "Course not found" }, { status: 404 })
   }
 
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { userId_courseId: { userId, courseId } },
+    select: { id: true },
+  })
+  if (!enrollment) {
+    return Response.json({ error: "Course payment is required before viewing progress" }, { status: 403 })
+  }
+
   const lessons = await prisma.lesson.findMany({
     where: { section: { courseId } },
     select: { id: true },

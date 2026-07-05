@@ -14,10 +14,21 @@ function buildReference(prefix: string, itemId: string) {
   return `${prefix}-${short}-${Date.now().toString(36).toUpperCase()}`
 }
 
+function buildReturnUrl(appUrl: string, params: { reference: string; itemType: "course" | "training"; itemId: string }) {
+  const url = new URL("/payment-status", appUrl)
+  url.searchParams.set("reference", params.reference)
+  url.searchParams.set("itemType", params.itemType)
+  url.searchParams.set("itemId", params.itemId)
+  return url.toString()
+}
+
 export async function POST(req: Request) {
   const session = await getSession()
   if (!session) {
     return Response.json({ error: "Not logged in" }, { status: 401 })
+  }
+  if (session.role !== "student") {
+    return Response.json({ error: "Only students can make course purchases" }, { status: 403 })
   }
 
   const json = await req.json().catch(() => null)
@@ -48,18 +59,32 @@ export async function POST(req: Request) {
         return Response.json({ error: "Course is not available for purchase" }, { status: 400 })
       }
 
+      const existingEnrollment = await prisma.enrollment.findUnique({
+        where: { userId_courseId: { userId: session.userId, courseId: course.id } },
+        select: { id: true },
+      })
+      if (existingEnrollment) {
+        return Response.json({
+          success: true,
+          requiresPayment: false,
+          alreadyEnrolled: true,
+          item: { type: "course", id: course.id, title: course.title, price: course.price },
+        })
+      }
+
       const requiresPayment = course.price > 0
       const reference = buildReference("COURSE", course.id)
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
       const checkout = await preparePaynowCheckout({
         reference,
         description: `Enrollment for ${course.title}`,
         amount: course.price,
         customerEmail: customerEmail ?? user?.email,
-        returnUrl: process.env.PAYNOW_RETURN_URL || `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/dashboard/billing`,
-        resultUrl: process.env.PAYNOW_RESULT_URL || `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/payments/paynow/callback`,
+        returnUrl: buildReturnUrl(appUrl, { reference, itemType: "course", itemId: course.id }),
+        resultUrl: process.env.PAYNOW_RESULT_URL || `${appUrl}/api/payments/paynow/callback`,
       })
 
-      if (requiresPayment) {
+      if (requiresPayment && checkout.success) {
         await prisma.transaction.create({
           data: {
             type: "enrollment",
@@ -93,16 +118,17 @@ export async function POST(req: Request) {
 
     const requiresPayment = pkg.price > 0
     const reference = buildReference("TRAIN", pkg.id)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
     const checkout = await preparePaynowCheckout({
       reference,
       description: `Training access for ${pkg.title}`,
       amount: pkg.price,
       customerEmail: customerEmail ?? user?.email,
-      returnUrl: process.env.PAYNOW_RETURN_URL || `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/dashboard/billing`,
-      resultUrl: process.env.PAYNOW_RESULT_URL || `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/payments/paynow/callback`,
+      returnUrl: buildReturnUrl(appUrl, { reference, itemType: "training", itemId: pkg.id }),
+      resultUrl: process.env.PAYNOW_RESULT_URL || `${appUrl}/api/payments/paynow/callback`,
     })
 
-    if (requiresPayment) {
+    if (requiresPayment && checkout.success) {
       await prisma.transaction.create({
         data: {
           type: "adjustment",

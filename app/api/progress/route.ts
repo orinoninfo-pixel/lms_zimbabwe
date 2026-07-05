@@ -37,13 +37,21 @@ export async function POST(req: Request) {
       return Response.json({ error: "Lesson not found" }, { status: 404 })
     }
 
+    const courseId = lesson.section.courseId
+    const enrollment = await prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId, courseId } },
+      select: { id: true },
+    })
+    if (!enrollment) {
+      return Response.json({ error: "Course payment is required before tracking progress" }, { status: 403 })
+    }
+
     const progressEntry = await prisma.progress.upsert({
       where: { userId_lessonId: { userId, lessonId } },
       update: { completed },
       create: { userId, lessonId, completed },
     })
 
-    const courseId = lesson.section.courseId
     const totalLessons = await prisma.lesson.count({
       where: { section: { courseId } },
     })

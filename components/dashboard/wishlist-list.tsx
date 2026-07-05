@@ -74,20 +74,31 @@ export function WishlistList() {
     }
   }
 
-  const enroll = async (courseId: string) => {
+  const startCheckout = async (courseId: string) => {
     setBusyId(courseId)
     try {
-      const res = await fetch("/api/enroll", {
+      const res = await fetch("/api/checkout/prepare", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId }),
+        body: JSON.stringify({ itemType: "course", itemId: courseId }),
       }).catch(() => null)
       const json = res ? await res.json().catch(() => null) : null
-      if (!res || !res.ok) throw new Error(json?.error ?? "Failed to enroll")
-      toast({ title: "Enrolled successfully" })
-      await load()
+      if (!res || !res.ok) throw new Error(json?.error ?? "Failed to prepare payment")
+      if (json?.checkout?.redirectUrl) {
+        window.location.assign(json.checkout.redirectUrl)
+        return
+      }
+      if (json?.alreadyEnrolled) {
+        toast({ title: "Course already unlocked" })
+        await load()
+        return
+      }
+      toast({
+        title: "Checkout prepared",
+        description: json?.checkout?.message ?? "Paynow checkout is ready for payment.",
+      })
     } catch (e) {
-      toast({ title: "Enrollment failed", description: e instanceof Error ? e.message : "Unknown error" })
+      toast({ title: "Payment failed", description: e instanceof Error ? e.message : "Unknown error" })
     } finally {
       setBusyId(null)
     }
@@ -170,8 +181,8 @@ export function WishlistList() {
                     </Link>
                   </Button>
                 ) : (
-                  <Button size="sm" onClick={() => void enroll(course.id)} disabled={busy}>
-                    Enroll
+                  <Button size="sm" onClick={() => void startCheckout(course.id)} disabled={busy}>
+                    Buy Now
                   </Button>
                 )}
               </div>
