@@ -119,6 +119,9 @@ model User {
   id        String     @id @default(uuid()) @db.Uuid
   name      String
   email     String     @unique
+  passwordHash String?
+  resetToken String?
+  resetTokenExpiresAt DateTime?
   role      UserRole
   status    UserStatus @default(active)
   createdAt DateTime   @default(now())

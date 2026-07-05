@@ -1,47 +1,41 @@
 "use client"
 
-import { Suspense, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-function RegisterForm() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    setMessage(null)
     if (!email || !email.includes("@")) {
       setError("Please enter a valid email")
       return
     }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.")
-      return
-    }
+
     setIsSubmitting(true)
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }),
       })
       const data = await res.json().catch(() => null)
       if (!res.ok) {
-        setError(data?.error ?? "Registration failed")
+        setError(data?.error ?? "Request failed")
         return
       }
-      const next = searchParams.get("next")
-      router.push(next || "/dashboard")
+      setMessage("If an account exists for that email, we sent reset instructions.")
     } catch {
-      setError("Registration failed")
+      setError("Request failed")
     } finally {
       setIsSubmitting(false)
     }
@@ -51,41 +45,24 @@ function RegisterForm() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="max-w-md w-full p-8 bg-card rounded-lg border border-border space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Register</h2>
-          <p className="text-sm text-muted-foreground">Create an account with email and password.</p>
+          <h2 className="text-2xl font-semibold mb-2">Forgot password</h2>
+          <p className="text-sm text-muted-foreground">Enter your email and we will send password reset instructions.</p>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <Label>Email</Label>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" />
           </div>
-          <div>
-            <Label>Password</Label>
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="••••••••" />
-          </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
+          {message && <p className="text-sm text-foreground">{message}</p>}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Creating account..." : "Create account"}
+            {isSubmitting ? "Submitting..." : "Send reset link"}
           </Button>
           <div className="text-sm text-muted-foreground">
-            Already have an account? <Link href="/login" className="underline">Sign in</Link>
+            <Link href="/login" className="underline">Back to login</Link>
           </div>
         </form>
       </div>
     </div>
-  )
-}
-
-export default function RegisterPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      }
-    >
-      <RegisterForm />
-    </Suspense>
   )
 }

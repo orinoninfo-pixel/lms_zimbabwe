@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { hash } from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 
 const BodySchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
+  name: z.string().min(1).optional(),
 })
 
 export async function POST(req: Request) {
@@ -16,27 +18,30 @@ export async function POST(req: Request) {
 
   const email = parsed.data.email.toLowerCase()
   const password = parsed.data.password
+  const name = parsed.data.name?.trim() ||
+    email.split("@")[0].replace(/[._-]+/g, " ").trim() ||
+    "Student"
 
-  const user = await prisma.user.findUnique({ where: { email } })
-  if (!user) {
-    return NextResponse.json({ error: "No account found with that email." }, { status: 404 })
-  }
-
-  if (user.status === "suspended") {
-    return NextResponse.json({ error: "Your account is suspended." }, { status: 403 })
-  }
-  if (user.status === "banned") {
-    return NextResponse.json({ error: "Your account is banned." }, { status: 403 })
-  }
-
-  if (!user.passwordHash) {
-    return NextResponse.json({ error: "This account does not support password login. Please reset your password." }, { status: 403 })
+  const existing = await prisma.user.findUnique({ where: { email } })
+  if (existing) {
+    if (existing.status === "suspended") {
+      return NextResponse.json({ error: "Your account is suspended." }, { status: 403 })
+    }
+    if (existing.status === "banned") {
+      return NextResponse.json({ error: "Your account is banned." }, { status: 403 })
+    }
+    return NextResponse.json({ error: "Email already in use. Please log in." }, { status: 400 })
   }
 
-  const isValidPassword = await import("bcryptjs").then((bcrypt) => bcrypt.compare(password, user.passwordHash!))
-  if (!isValidPassword) {
-    return NextResponse.json({ error: "Invalid email or password." }, { status: 401 })
-  }
+  const passwordHash = await hash(password, 10)
+  const user = await prisma.user.create({
+    data: {
+      email,
+      name,
+      role: "student",
+      passwordHash,
+    },
+  })
 
   const res = NextResponse.json({
     success: true,
