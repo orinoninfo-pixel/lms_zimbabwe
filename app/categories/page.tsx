@@ -4,7 +4,9 @@ import { Footer } from "@/components/footer"
 import { prisma } from "@/lib/prisma"
 import { BookOpen, ClipboardCheck, Cpu, Map, Target, TrendingUp, Trophy, Users } from "lucide-react"
 
-export const dynamic = "force-dynamic"
+// Public, non-personalized listing (Navbar hydrates session client-side) —
+// ISR instead of force-dynamic so this doesn't hit Postgres on every request.
+export const revalidate = 300
 
 type CategoryStyle = {
   icon: typeof BookOpen

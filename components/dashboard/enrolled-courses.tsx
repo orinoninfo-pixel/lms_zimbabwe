@@ -4,6 +4,7 @@ import { Play, Clock, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { headers } from "next/headers"
+import { THUMBNAIL_BLUR_DATA_URL } from "@/lib/utils"
 
 type MyCoursesResponse = {
   userId: string
@@ -79,6 +80,9 @@ export async function EnrolledCourses() {
                 src={course.thumbnail}
                 alt={course.title}
                 fill
+                sizes="(min-width: 640px) 50vw, 100vw"
+                placeholder="blur"
+                blurDataURL={THUMBNAIL_BLUR_DATA_URL}
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

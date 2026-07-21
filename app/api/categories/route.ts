@@ -7,5 +7,12 @@ export async function GET() {
     take: 200,
   })
 
-  return Response.json({ categories })
+  return Response.json(
+    { categories },
+    {
+      // Categories change rarely — cache an hour at the edge, serve stale
+      // for up to a day while revalidating in the background.
+      headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
+    }
+  )
 }

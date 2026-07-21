@@ -16,6 +16,12 @@ export async function GET() {
       instructorId: course.instructorId,
       thumbnail: "/placeholder.jpg",
       instructorName: course.instructor.name,
-    }))
+    })),
+    {
+      // Public, identical for every visitor — safe to cache at the CDN edge.
+      // 2 min fresh + 5 min stale-while-revalidate means most browsing on a
+      // mobile bundle never re-hits the database.
+      headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" },
+    }
   )
 }

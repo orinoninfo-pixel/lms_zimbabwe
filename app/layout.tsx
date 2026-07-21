@@ -4,8 +4,10 @@ import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
-const geist = Geist({ subsets: ["latin"] })
-const geistMono = Geist_Mono({ subsets: ["latin"] })
+// next/font self-hosts and inlines these at build time — no runtime request
+// to fonts.googleapis.com, and `swap` avoids invisible-text on slow links.
+const geist = Geist({ subsets: ["latin"], display: "swap", variable: "--font-geist-sans" })
+const geistMono = Geist_Mono({ subsets: ["latin"], display: "swap", variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://lms-zimbabwe.onrender.com'),

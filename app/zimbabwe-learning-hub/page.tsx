@@ -2,7 +2,8 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ZimbabweLearningHub } from "@/components/zimbabwe-hub/zimbabwe-learning-hub"
 
-export const dynamic = "force-dynamic"
+// Static marketing content, no session/DB read at this level.
+export const revalidate = 3600
 
 export default function ZimbabweLearningHubPage() {
   return (

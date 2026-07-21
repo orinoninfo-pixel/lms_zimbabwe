@@ -4,6 +4,7 @@ import { Play, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { headers } from "next/headers"
+import { THUMBNAIL_BLUR_DATA_URL } from "@/lib/utils"
 
 type MyCoursesResponse = {
   userId: string
@@ -46,6 +47,9 @@ export async function ContinueLearning() {
             src={currentCourse.thumbnail}
             alt={currentCourse.title}
             fill
+            sizes="(min-width: 768px) 320px, 100vw"
+            placeholder="blur"
+            blurDataURL={THUMBNAIL_BLUR_DATA_URL}
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-foreground/60 to-transparent flex items-center justify-center md:justify-start md:pl-8">

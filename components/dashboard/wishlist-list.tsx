@@ -7,6 +7,7 @@ import { HeartOff, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { toast } from "@/hooks/use-toast"
+import { THUMBNAIL_BLUR_DATA_URL } from "@/lib/utils"
 
 type WishlistCourse = {
   id: string
@@ -149,7 +150,15 @@ export function WishlistList() {
             className="group bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow"
           >
             <div className="relative aspect-video overflow-hidden">
-              <Image src={course.thumbnail} alt={course.title} fill className="object-cover" />
+              <Image
+                src={course.thumbnail}
+                alt={course.title}
+                fill
+                sizes="(min-width: 640px) 50vw, 100vw"
+                placeholder="blur"
+                blurDataURL={THUMBNAIL_BLUR_DATA_URL}
+                className="object-cover"
+              />
             </div>
             <div className="p-4">
               <h3 className="font-semibold text-foreground line-clamp-1">{course.title}</h3>

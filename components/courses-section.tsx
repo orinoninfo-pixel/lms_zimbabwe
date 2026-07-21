@@ -1,26 +1,28 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { headers } from "next/headers"
-
-type ApiCourse = {
-  id: string
-  title: string
-  description: string
-  price: number
-  thumbnail: string
-  instructorName: string
-}
+import { prisma } from "@/lib/prisma"
+import { THUMBNAIL_BLUR_DATA_URL } from "@/lib/utils"
 
 export async function CoursesSection() {
-  const h = await headers()
-  const host = h.get("x-forwarded-host") ?? h.get("host")
-  const proto = h.get("x-forwarded-proto") ?? "http"
-  const baseUrl = host ? `${proto}://${host}` : ""
-
-  const courses: ApiCourse[] = await fetch(`${baseUrl}/api/courses`, { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : []))
-    .catch(() => [])
+  // Query Prisma directly instead of self-fetching /api/courses: calling
+  // headers() to build that request's URL forced the whole homepage into
+  // dynamic (per-request) rendering, which defeats ISR for the most-visited
+  // page on the site.
+  const courses = await prisma.course.findMany({
+    where: { status: "approved" },
+    include: { instructor: { select: { name: true } } },
+    orderBy: { title: "asc" },
+  }).then((rows) =>
+    rows.map((course) => ({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      price: course.price,
+      thumbnail: "/placeholder.jpg",
+      instructorName: course.instructor.name,
+    }))
+  ).catch(() => [])
 
   if (!courses || courses.length === 0) {
     return (
@@ -65,6 +67,9 @@ export async function CoursesSection() {
                     src={course.thumbnail}
                     alt={course.title}
                     fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    placeholder="blur"
+                    blurDataURL={THUMBNAIL_BLUR_DATA_URL}
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

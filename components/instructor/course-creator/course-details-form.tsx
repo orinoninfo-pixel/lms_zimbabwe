@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Upload, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -166,12 +167,15 @@ export function CourseDetailsForm({ data, onChange }: CourseDetailsFormProps) {
         <h3 className="text-lg font-semibold text-foreground mb-4">Course Thumbnail</h3>
         
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex h-40 w-full sm:w-64 items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/50">
+          <div className="relative flex h-40 w-full sm:w-64 items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/50 overflow-hidden">
             {data.thumbnail ? (
-              <img
+              <Image
                 src={data.thumbnail}
                 alt="Course thumbnail"
-                className="h-full w-full rounded-lg object-cover"
+                fill
+                sizes="256px"
+                className="rounded-lg object-cover"
+                unoptimized={data.thumbnail.startsWith("blob:") || data.thumbnail.startsWith("data:")}
               />
             ) : (
               <div className="text-center">

@@ -4,8 +4,11 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { prisma } from "@/lib/prisma"
+import { THUMBNAIL_BLUR_DATA_URL } from "@/lib/utils"
 
-export const dynamic = "force-dynamic"
+// Public, non-personalized listing (Navbar hydrates session client-side) —
+// ISR instead of force-dynamic so this doesn't hit Postgres on every request.
+export const revalidate = 120
 
 export default async function CoursesPage() {
   const courses = await prisma.course.findMany({
@@ -48,6 +51,9 @@ export default async function CoursesPage() {
                           src="/placeholder.jpg"
                           alt={course.title}
                           fill
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                          placeholder="blur"
+                          blurDataURL={THUMBNAIL_BLUR_DATA_URL}
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>

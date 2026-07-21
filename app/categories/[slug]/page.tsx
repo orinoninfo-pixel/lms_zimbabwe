@@ -5,8 +5,11 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { prisma } from "@/lib/prisma"
+import { THUMBNAIL_BLUR_DATA_URL } from "@/lib/utils"
 
-export const dynamic = "force-dynamic"
+// Public, non-personalized listing (Navbar hydrates session client-side) —
+// ISR instead of force-dynamic so this doesn't hit Postgres on every request.
+export const revalidate = 120
 
 const formatUsd = (amount: number) =>
   new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
@@ -65,6 +68,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                           src="/placeholder.jpg"
                           alt={course.title}
                           fill
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                          placeholder="blur"
+                          blurDataURL={THUMBNAIL_BLUR_DATA_URL}
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
