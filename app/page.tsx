@@ -10,7 +10,7 @@ export const revalidate = 120
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-slate-50/50">
       <Navbar />
       <HeroSection />
       <CategoriesSection />
