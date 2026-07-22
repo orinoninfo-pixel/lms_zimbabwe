@@ -14,7 +14,8 @@
     "db:generate": "prisma generate",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "auth:set-admin-password": "tsx scripts/set-admin-password.ts"
+    "auth:set-admin-password": "tsx scripts/set-admin-password.ts",
+    "auth:set-content-manager-password": "tsx scripts/set-content-manager-password.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
