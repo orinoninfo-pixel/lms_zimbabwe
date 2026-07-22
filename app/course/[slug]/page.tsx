@@ -4,6 +4,7 @@ import { CourseHeader } from "@/components/course-detail/course-header"
 import { CoursePaymentBanner } from "@/components/course-detail/course-payment-banner"
 import { VideoPreview } from "@/components/course-detail/video-preview"
 import { CourseCurriculum } from "@/components/course-detail/course-curriculum"
+import { CourseLiveLessons } from "@/components/course-detail/course-live-lessons"
 import { CourseSidebar } from "@/components/course-detail/course-sidebar"
 import { CourseDescription } from "@/components/course-detail/course-description"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -168,11 +169,13 @@ export default async function CourseDetailPage({
               
               <CourseDescription {...descriptionData} />
               
-              <CourseCurriculum 
+              <CourseCurriculum
                 sections={curriculumSections}
                 totalLessons={totalLessons}
                 totalDuration="52h 30m"
               />
+
+              <CourseLiveLessons courseId={course.id} />
             </div>
             
             <div className="hidden lg:block">

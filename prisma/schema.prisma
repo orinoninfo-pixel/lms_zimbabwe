@@ -178,6 +178,7 @@ model Course {
   transactions Transaction[] @relation("TransactionCourse")
   reports     Report[]
   certificates Certificate[]
+  liveLessons LiveLesson[] @relation("LiveLessonCourse")
 }
 
 model Section {
@@ -403,7 +404,7 @@ model LiveLesson {
   id              String           @id @default(uuid()) @db.Uuid
   title           String
   subject         String
-  grade           Int
+  grade           Int?
   status          LiveLessonStatus @default(upcoming)
   startsAt        DateTime
   durationMinutes Int
@@ -412,11 +413,13 @@ model LiveLesson {
   teacherId       String           @db.Uuid
   categoryId      String?          @db.Uuid
   subjectPackageId String?         @db.Uuid
+  courseId        String?          @db.Uuid
   createdAt       DateTime         @default(now())
 
   teacher    User      @relation("LiveLessonTeacher", fields: [teacherId], references: [id])
   category   Category? @relation(fields: [categoryId], references: [id])
   subjectPackage SubjectPackage? @relation(fields: [subjectPackageId], references: [id])
+  course     Course?   @relation("LiveLessonCourse", fields: [courseId], references: [id])
   attendance Attendance[]
 
   @@index([startsAt])

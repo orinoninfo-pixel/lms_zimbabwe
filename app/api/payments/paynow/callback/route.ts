@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
-import { CurrencyCode, TransactionStatus } from "@/lib/generated/prisma/client"
+import { CurrencyCode, TransactionStatus, Prisma } from "@/lib/generated/prisma/client"
 
 const CallbackSchema = z.object({
   reference: z.string().min(1).optional(),
@@ -34,7 +34,7 @@ async function parseCallbackPayload(req: Request) {
   return (await req.json().catch(() => null)) as Record<string, unknown> | null
 }
 
-async function getCommissionRateBps(tx: typeof prisma) {
+async function getCommissionRateBps(tx: Prisma.TransactionClient) {
   const row = await tx.platformSetting.findUnique({ where: { key: "commissionRateBps" }, select: { value: true } })
   const parsed = row?.value ? Number.parseInt(row.value, 10) : Number.NaN
   if (!Number.isFinite(parsed)) return 1500

@@ -2,6 +2,7 @@ import { randomBytes } from "crypto"
 import { hash } from "bcryptjs"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { Prisma } from "@/lib/generated/prisma/client"
 import { requireAdmin } from "@/lib/rbac"
 
 const userDetailSelect = {
@@ -23,7 +24,7 @@ const userDetailSelect = {
     },
   },
   courses: {
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "desc" as const },
     take: 5,
     select: {
       id: true,
@@ -34,7 +35,7 @@ const userDetailSelect = {
     },
   },
   enrollments: {
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "desc" as const },
     take: 5,
     select: {
       id: true,
@@ -60,9 +61,7 @@ const userDetailSelect = {
   },
 }
 
-function toResponseUser(
-  user: Awaited<ReturnType<typeof prisma.user.findUnique>>
-) {
+function toResponseUser(user: Prisma.UserGetPayload<{ select: typeof userDetailSelect }> | null) {
   if (!user) return null
 
   const { passwordHash, ...rest } = user
