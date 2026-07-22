@@ -7,6 +7,7 @@ import {
   Layers,
   LayoutDashboard,
   BookOpen,
+  GraduationCap,
   Tags,
   ListChecks,
   BarChart3,
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils"
 const navigation = [
   { name: "Overview", href: "/internal-instructor", icon: LayoutDashboard },
   { name: "My Courses", href: "/internal-instructor/courses", icon: BookOpen },
+  { name: "My Subjects", href: "/internal-instructor/subjects", icon: GraduationCap },
   { name: "Categories", href: "/internal-instructor/categories", icon: Tags },
   { name: "Enrollments", href: "/internal-instructor/enrollments", icon: ListChecks },
   { name: "Reports", href: "/internal-instructor/reports", icon: BarChart3 },

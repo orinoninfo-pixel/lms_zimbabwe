@@ -1,178 +1,267 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, Save, Send } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ArrowLeft, ArrowRight, Save, Send, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { StepIndicator } from "@/components/instructor/course-creator/step-indicator"
+import { CourseDetailsForm } from "@/components/instructor/course-creator/course-details-form"
+import { CurriculumBuilder, Section } from "@/components/instructor/course-creator/curriculum-builder"
+import { PublishSettings } from "@/components/instructor/course-creator/publish-settings"
 
-type Category = { id: string; name: string }
+const steps = [
+  { id: 1, name: "Course Details", description: "Basic information" },
+  { id: 2, name: "Curriculum", description: "Sections & lessons" },
+  { id: 3, name: "Publish", description: "Review & publish" },
+]
 
 export default function NewInternalCoursePage() {
   const router = useRouter()
-  const [categories, setCategories] = useState<Category[]>([])
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [price, setPrice] = useState("")
-  const [categoryId, setCategoryId] = useState<string>("")
+  const [currentStep, setCurrentStep] = useState(1)
   const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [publishError, setPublishError] = useState<string | null>(null)
+  const [draftCourseId, setDraftCourseId] = useState<string | null>(null)
+  const [savedNotice, setSavedNotice] = useState<string | null>(null)
 
-  useEffect(() => {
-    let cancelled = false
-    const load = async () => {
-      const res = await fetch("/api/admin/categories", { cache: "no-store" }).catch(() => null)
-      const json = res ? await res.json().catch(() => null) : null
-      if (!cancelled) setCategories((json?.categories ?? []) as Category[])
-    }
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const [courseDetails, setCourseDetails] = useState({
+    title: "",
+    subtitle: "",
+    description: "",
+    category: "",
+    level: "",
+    language: "",
+    price: "",
+    thumbnail: null as string | null,
+  })
 
-  const isValid = title.trim().length > 0 && description.trim().length >= 20 && price.trim().length > 0
+  const [sections, setSections] = useState<Section[]>([])
 
-  const createCourse = async (submitForApproval: boolean) => {
-    setError(null)
-    if (!isValid) {
-      setError("Add a title, a description of at least 20 characters, and a price.")
-      return
-    }
+  const handleSave = async () => {
     setIsSaving(true)
+    setPublishError(null)
+    setSavedNotice(null)
     try {
-      const priceValue = Number(price)
-      const res = await fetch("/api/internal-instructor/courses", {
-        method: "POST",
+      const price = Number(courseDetails.price)
+      const roundedPrice = Number.isFinite(price) ? Math.round(price) : 0
+
+      if (!draftCourseId) {
+        const res = await fetch("/api/internal-instructor/courses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: courseDetails.title || "Untitled course",
+            description: courseDetails.description || "No description yet.",
+            price: roundedPrice,
+            sections: sections.map((s) => ({
+              title: s.title,
+              lessons: s.lessons.map((l) => ({ title: l.title })),
+            })),
+          }),
+        })
+        const data = await res.json().catch(() => null)
+        if (!res.ok) {
+          setPublishError(data?.error ?? "Failed to save draft")
+          return
+        }
+        setDraftCourseId(data.courseId)
+        setSavedNotice("Draft saved. You can keep editing or submit it for review when ready.")
+        return
+      }
+
+      const res = await fetch(`/api/internal-instructor/courses/${draftCourseId}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-          price: Number.isFinite(priceValue) ? Math.round(priceValue) : 0,
-          categoryId: categoryId || null,
+          title: courseDetails.title || "Untitled course",
+          description: courseDetails.description || "No description yet.",
+          price: roundedPrice,
+          sections: sections.map((s) => ({
+            title: s.title,
+            lessons: s.lessons.map((l) => ({ title: l.title })),
+          })),
         }),
       })
       const data = await res.json().catch(() => null)
       if (!res.ok) {
-        setError(data?.error ?? "Failed to create course")
+        setPublishError(data?.error ?? "Failed to save draft")
         return
       }
+      setSavedNotice("Draft saved.")
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
-      if (submitForApproval && data?.courseId) {
+  const handlePublish = async () => {
+    setIsSaving(true)
+    setPublishError(null)
+    setSavedNotice(null)
+    try {
+      const price = Number(courseDetails.price)
+      const roundedPrice = Number.isFinite(price) ? Math.round(price) : 0
+
+      if (!draftCourseId) {
+        const res = await fetch("/api/internal-instructor/courses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: courseDetails.title,
+            description: courseDetails.description,
+            price: roundedPrice,
+            sections: sections.map((s) => ({
+              title: s.title,
+              lessons: s.lessons.map((l) => ({ title: l.title })),
+            })),
+          }),
+        })
+        const data = await res.json().catch(() => null)
+        if (!res.ok) {
+          setPublishError(data?.error ?? "Failed to submit course for review")
+          return
+        }
         await fetch(`/api/internal-instructor/courses/${data.courseId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "submit" }),
         }).catch(() => null)
+        router.push("/internal-instructor/courses")
+        return
       }
 
+      const res = await fetch(`/api/internal-instructor/courses/${draftCourseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: courseDetails.title,
+          description: courseDetails.description,
+          price: roundedPrice,
+          sections: sections.map((s) => ({
+            title: s.title,
+            lessons: s.lessons.map((l) => ({ title: l.title })),
+          })),
+          action: "submit",
+        }),
+      })
+      const data = await res.json().catch(() => null)
+      if (!res.ok) {
+        setPublishError(data?.error ?? "Failed to submit course for review")
+        return
+      }
       router.push("/internal-instructor/courses")
     } finally {
       setIsSaving(false)
     }
   }
 
+  const totalLessons = sections.reduce((acc, s) => acc + s.lessons.length, 0)
+  const isReadyToPublish =
+    courseDetails.title.length > 0 &&
+    courseDetails.description.length > 50 &&
+    courseDetails.category.length > 0 &&
+    courseDetails.level.length > 0 &&
+    courseDetails.price.length > 0 &&
+    sections.length > 0 &&
+    totalLessons >= 3
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/internal-instructor/courses"
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          <span className="hidden sm:inline">Back to My Courses</span>
-        </Link>
-      </div>
-
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">New Course</h1>
-        <p className="text-muted-foreground">
-          Create a platform-owned course. It stays in Draft until you submit it, and only goes live once an admin
-          approves it.
-        </p>
-      </div>
-
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-base">Course Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Course Title</Label>
-            <Input
-              id="title"
-              placeholder="e.g., Grade 12 Mathematics: Term 2 Revision"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              rows={5}
-              placeholder="Describe what students will learn in this course..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Select value={categoryId} onValueChange={setCategoryId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="price">Price (USD)</Label>
-              <Input
-                id="price"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="199"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => void createCourse(false)}
-              disabled={isSaving}
-              className="gap-2"
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-border bg-card">
+        <div className="flex h-16 items-center justify-between px-4 lg:px-8">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/internal-instructor/courses"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <Save className="h-4 w-4" />
-              Save as Draft
-            </Button>
-            <Button onClick={() => void createCourse(true)} disabled={isSaving} className="gap-2">
-              <Send className="h-4 w-4" />
-              Save & Submit for Approval
-            </Button>
+              <ArrowLeft className="h-5 w-5" />
+              <span className="hidden sm:inline">Back to My Courses</span>
+            </Link>
+            <div className="hidden sm:block h-6 w-px bg-border" />
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <GraduationCap className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="font-semibold text-foreground hidden sm:inline">Create Course</span>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={handleSave} disabled={isSaving} className="gap-2">
+              <Save className="h-4 w-4" />
+              <span className="hidden sm:inline">Save Draft</span>
+            </Button>
+            {currentStep === 3 && (
+              <Button onClick={handlePublish} disabled={!isReadyToPublish || isSaving} className="gap-2">
+                <Send className="h-4 w-4" />
+                Submit for Review
+              </Button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="mx-auto max-w-4xl px-4 py-8 lg:px-8">
+        <div className="mb-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+          Submitting sends this platform-owned course to an admin for review. It only becomes visible and
+          purchasable by students once approved — you&apos;ll see the status and any requested changes on your
+          course list.
+        </div>
+        {savedNotice ? (
+          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+            {savedNotice}
+          </div>
+        ) : null}
+        <StepIndicator steps={steps} currentStep={currentStep} />
+
+        {/* Step Content */}
+        <div className="mt-8">
+          {currentStep === 1 && <CourseDetailsForm data={courseDetails} onChange={setCourseDetails} />}
+
+          {currentStep === 2 && <CurriculumBuilder sections={sections} onChange={setSections} />}
+
+          {currentStep === 3 && <PublishSettings courseDetails={courseDetails} sections={sections} />}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="mt-8 flex items-center justify-between border-t border-border pt-8">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+            disabled={currentStep === 1}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Previous
+          </Button>
+
+          <div className="flex items-center gap-2">
+            {steps.map((step) => (
+              <button
+                key={step.id}
+                onClick={() => setCurrentStep(step.id)}
+                className={`h-2.5 w-2.5 rounded-full transition-colors ${
+                  currentStep === step.id ? "bg-primary" : currentStep > step.id ? "bg-accent" : "bg-border"
+                }`}
+              />
+            ))}
+          </div>
+
+          {currentStep < 3 ? (
+            <Button onClick={() => setCurrentStep((prev) => Math.min(3, prev + 1))} className="gap-2">
+              Next
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button onClick={handlePublish} disabled={!isReadyToPublish || isSaving} className="gap-2">
+              <Send className="h-4 w-4" />
+              Submit for Review
+            </Button>
+          )}
+        </div>
+        {publishError ? <p className="mt-3 text-sm text-destructive">{publishError}</p> : null}
+      </main>
     </div>
   )
 }

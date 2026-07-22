@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 const mobileNavigation = [
   { name: "Overview", href: "/internal-instructor" },
   { name: "My Courses", href: "/internal-instructor/courses" },
+  { name: "My Subjects", href: "/internal-instructor/subjects" },
   { name: "Categories", href: "/internal-instructor/categories" },
   { name: "Enrollments", href: "/internal-instructor/enrollments" },
   { name: "Reports", href: "/internal-instructor/reports" },

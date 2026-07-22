@@ -10,6 +10,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   BookOpen,
+  Layers,
   Users,
   DollarSign,
   Settings,
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils"
 const mobileNavigation = [
   { name: "Dashboard", href: "/instructor", icon: LayoutDashboard },
   { name: "My Courses", href: "/instructor/courses", icon: BookOpen },
+  { name: "My Subjects", href: "/instructor/subjects", icon: Layers },
   { name: "Students", href: "/instructor/students", icon: Users },
   { name: "Earnings", href: "/instructor/earnings", icon: DollarSign },
   { name: "Profile Settings", href: "/instructor/settings", icon: Settings },
