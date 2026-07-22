@@ -2,13 +2,26 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/auth"
 
+const SectionInputSchema = z.object({
+  title: z.string().min(1),
+  lessons: z.array(
+    z.object({
+      title: z.string().min(1),
+      videoUrl: z.string().url().optional(),
+    })
+  ),
+})
+
 const UpdateSchema = z.object({
   title: z.string().trim().min(1).optional(),
   description: z.string().trim().min(1).optional(),
   price: z.number().int().min(0).optional(),
   categoryId: z.string().uuid().nullable().optional(),
+  sections: z.array(SectionInputSchema).optional(),
   action: z.enum(["submit"]).optional(),
 })
+
+const placeholderVideo = "https://www.w3schools.com/html/mov_bbb.mp4"
 
 async function requireInstructor() {
   const session = await getSession()
@@ -63,18 +76,41 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
 
   const course = await prisma.course.findUnique({
     where: { id },
-    select: { id: true, instructorId: true, status: true },
+    select: {
+      id: true,
+      instructorId: true,
+      status: true,
+      _count: { select: { enrollments: true } },
+    },
   })
   if (!course || course.instructorId !== instructor.id) {
     return Response.json({ error: "Course not found" }, { status: 404 })
   }
 
-  const { action, ...fields } = parsed.data
+  const { action, sections, ...fields } = parsed.data
   const updateData: Record<string, unknown> = {}
   if (fields.title !== undefined) updateData.title = fields.title
   if (fields.description !== undefined) updateData.description = fields.description
   if (fields.price !== undefined) updateData.price = fields.price
   if (fields.categoryId !== undefined) updateData.categoryId = fields.categoryId
+
+  if (sections !== undefined) {
+    // Rewriting the curriculum is a full replace, which is only safe while
+    // nobody has ever been able to enroll — i.e. the course was never (and
+    // isn't currently) approved and has no enrollments to orphan.
+    if (course.status === "approved" || course.status === "suspended") {
+      return Response.json(
+        { error: "Curriculum can't be edited once a course has been approved. Contact an admin." },
+        { status: 400 }
+      )
+    }
+    if (course._count.enrollments > 0) {
+      return Response.json(
+        { error: "This course already has enrolled students, so its curriculum can no longer be replaced." },
+        { status: 400 }
+      )
+    }
+  }
 
   if (action === "submit") {
     if (course.status !== "draft" && course.status !== "rejected") {
@@ -90,13 +126,47 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
     updateData.moderationNote = null
   }
 
-  const updated = await prisma.course.update({
-    where: { id },
-    data: updateData,
-    include: {
-      category: { select: { id: true, name: true } },
-      _count: { select: { enrollments: true, sections: true } },
-    },
+  const updated = await prisma.$transaction(async (tx) => {
+    if (sections !== undefined) {
+      await tx.progress.deleteMany({ where: { lesson: { section: { courseId: id } } } })
+      await tx.lesson.deleteMany({ where: { section: { courseId: id } } })
+      await tx.section.deleteMany({ where: { courseId: id } })
+
+      for (const [sectionIndex, sectionInput] of sections.entries()) {
+        const section = await tx.section.create({
+          data: { title: sectionInput.title, courseId: id, order: sectionIndex },
+        })
+
+        if (sectionInput.lessons.length) {
+          await tx.lesson.createMany({
+            data: sectionInput.lessons.map((l, lessonIndex) => ({
+              title: l.title,
+              videoUrl: l.videoUrl ?? placeholderVideo,
+              sectionId: section.id,
+              order: lessonIndex,
+            })),
+          })
+        }
+      }
+    }
+
+    return tx.course.update({
+      where: { id },
+      data: updateData,
+      include: {
+        category: { select: { id: true, name: true } },
+        sections: {
+          orderBy: [{ order: "asc" }, { title: "asc" }],
+          include: {
+            lessons: {
+              orderBy: [{ order: "asc" }, { title: "asc" }],
+              select: { id: true, title: true, videoUrl: true, order: true },
+            },
+          },
+        },
+        _count: { select: { enrollments: true, sections: true } },
+      },
+    })
   })
 
   return Response.json({ success: true, course: updated })

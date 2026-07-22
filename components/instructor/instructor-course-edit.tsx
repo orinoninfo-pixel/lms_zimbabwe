@@ -12,9 +12,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { StatusBadge } from "@/components/admin/status-badge"
+import { CurriculumBuilder, Section } from "@/components/instructor/course-creator/curriculum-builder"
 
 type Category = { id: string; name: string }
 type CourseStatus = "draft" | "pending" | "approved" | "rejected" | "suspended"
+
+type ApiLesson = { id: string; title: string; videoUrl: string; order: number }
+type ApiSection = { id: string; title: string; order: number; lessons: ApiLesson[] }
+
+function toBuilderSections(apiSections: ApiSection[]): Section[] {
+  return apiSections.map((s) => ({
+    id: s.id,
+    title: s.title,
+    isExpanded: true,
+    lessons: s.lessons.map((l) => ({
+      id: l.id,
+      title: l.title,
+      type: "video" as const,
+      duration: "",
+      isPreview: false,
+    })),
+  }))
+}
 
 export function InstructorCourseEdit({ courseId }: { courseId: string }) {
   const router = useRouter()
@@ -26,6 +45,8 @@ export function InstructorCourseEdit({ courseId }: { courseId: string }) {
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
   const [categoryId, setCategoryId] = useState<string>("")
+  const [sections, setSections] = useState<Section[]>([])
+  const [enrollmentsCount, setEnrollmentsCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -61,6 +82,8 @@ export function InstructorCourseEdit({ courseId }: { courseId: string }) {
       setCategoryId(course.categoryId ?? "")
       setStatus(course.status)
       setModerationNote(course.moderationNote ?? null)
+      setSections(toBuilderSections((course.sections ?? []) as ApiSection[]))
+      setEnrollmentsCount(course._count?.enrollments ?? 0)
       setIsLoading(false)
     }
     void load()
@@ -71,6 +94,8 @@ export function InstructorCourseEdit({ courseId }: { courseId: string }) {
 
   const isValid = title.trim().length > 0 && description.trim().length >= 20 && price.trim().length > 0
   const canSubmit = status === "draft" || status === "rejected"
+  const curriculumLocked = status === "approved" || status === "suspended" || enrollmentsCount > 0
+  const totalLessons = sections.reduce((sum, s) => sum + s.lessons.length, 0)
 
   const save = async (submitForApproval: boolean) => {
     setError(null)
@@ -89,6 +114,14 @@ export function InstructorCourseEdit({ courseId }: { courseId: string }) {
           description: description.trim(),
           price: Number.isFinite(priceValue) ? Math.round(priceValue) : 0,
           categoryId: categoryId || null,
+          ...(curriculumLocked
+            ? {}
+            : {
+                sections: sections.map((s) => ({
+                  title: s.title,
+                  lessons: s.lessons.map((l) => ({ title: l.title })),
+                })),
+              }),
           ...(submitForApproval ? { action: "submit" } : {}),
         }),
       })
@@ -190,10 +223,39 @@ export function InstructorCourseEdit({ courseId }: { courseId: string }) {
               <Input id="price" type="number" min="0" step="1" value={price} onChange={(e) => setPrice(e.target.value)} />
             </div>
           </div>
+        </CardContent>
+      </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Curriculum</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {curriculumLocked ? (
+            <Alert>
+              <AlertTitle>Curriculum is locked</AlertTitle>
+              <AlertDescription>
+                {enrollmentsCount > 0
+                  ? "This course already has enrolled students, so its sections and lessons can no longer be replaced here. Contact an admin for structural changes."
+                  : "Curriculum can only be edited before a course is approved. Contact an admin if this course needs structural changes."}
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <CurriculumBuilder sections={sections} onChange={setSections} />
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="max-w-2xl">
+        <CardContent className="pt-6 space-y-3">
+          {!curriculumLocked && sections.length > 0 && totalLessons === 0 ? (
+            <p className="text-sm text-amber-700">
+              Your sections don&apos;t have any lessons yet — add at least one lesson before submitting.
+            </p>
+          ) : null}
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-wrap gap-3">
             <Button variant="outline" onClick={() => void save(false)} disabled={isSaving} className="gap-2">
               <Save className="h-4 w-4" />
               Save Changes

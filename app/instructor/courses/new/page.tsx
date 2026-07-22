@@ -92,6 +92,10 @@ export default function CreateCoursePage() {
           title: courseDetails.title || "Untitled course",
           description: courseDetails.description || "No description yet.",
           price: roundedPrice,
+          sections: sections.map((s) => ({
+            title: s.title,
+            lessons: s.lessons.map((l) => ({ title: l.title })),
+          })),
         }),
       })
       const data = await res.json().catch(() => null)
@@ -144,6 +148,10 @@ export default function CreateCoursePage() {
           title: courseDetails.title,
           description: courseDetails.description,
           price: roundedPrice,
+          sections: sections.map((s) => ({
+            title: s.title,
+            lessons: s.lessons.map((l) => ({ title: l.title })),
+          })),
           action: "submit",
         }),
       })
