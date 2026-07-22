@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils"
 type InstructorCourse = {
   id: string
   title: string
-  status: "Published" | "Draft" | "Under Review"
+  status: "Published" | "Draft" | "Under Review" | "Rejected" | "Suspended"
   students: number
   rating: number
   reviews: number
@@ -32,6 +32,8 @@ const statusColors: Record<string, string> = {
   Published: "bg-emerald-100 text-emerald-700",
   Draft: "bg-muted text-muted-foreground",
   "Under Review": "bg-amber-100 text-amber-700",
+  Rejected: "bg-rose-100 text-rose-700",
+  Suspended: "bg-rose-100 text-rose-700",
 }
 
 export function InstructorCoursesTable() {
@@ -84,7 +86,7 @@ export function InstructorCoursesTable() {
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setOpenDropdown(null)} />
                 <div className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-border bg-card shadow-lg z-20">
-                  {["All", "Published", "Draft", "Under Review"].map((status) => (
+                  {["All", "Published", "Draft", "Under Review", "Rejected", "Suspended"].map((status) => (
                     <button
                       key={status}
                       onClick={() => {

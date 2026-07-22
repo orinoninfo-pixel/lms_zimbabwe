@@ -36,8 +36,28 @@ export async function GET() {
     include: {
       _count: { select: { enrollments: true, sections: true } },
     },
-    orderBy: { title: "asc" },
+    orderBy: { updatedAt: "desc" },
   })
+
+  const payoutTotals = await prisma.transaction.groupBy({
+    by: ["courseId"],
+    where: {
+      type: "payout",
+      userId: instructor.id,
+      status: { in: ["succeeded", "pending"] },
+      courseId: { in: courses.map((c) => c.id) },
+    },
+    _sum: { amount: true },
+  })
+  const earningsByCourseId = new Map(payoutTotals.map((row) => [row.courseId, row._sum.amount ?? 0]))
+
+  const statusLabel: Record<string, "Published" | "Draft" | "Under Review" | "Rejected" | "Suspended"> = {
+    approved: "Published",
+    draft: "Draft",
+    pending: "Under Review",
+    rejected: "Rejected",
+    suspended: "Suspended",
+  }
 
   return Response.json({
     courses: courses.map((c) => ({
@@ -46,11 +66,11 @@ export async function GET() {
       price: c.price,
       students: c._count.enrollments,
       sections: c._count.sections,
-      status: "Published",
+      status: statusLabel[c.status] ?? "Draft",
       rating: 0,
       reviews: 0,
-      earnings: c._count.enrollments * c.price,
-      lastUpdated: "N/A",
+      earnings: earningsByCourseId.get(c.id) ?? 0,
+      lastUpdated: c.updatedAt.toLocaleDateString("en-ZW", { year: "numeric", month: "short", day: "numeric" }),
     })),
   })
 }
