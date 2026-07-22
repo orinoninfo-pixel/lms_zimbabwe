@@ -16,7 +16,7 @@ type ReviewUser = {
   id: string
   name: string
   email: string
-  role: "student" | "instructor" | "admin"
+  role: "student" | "instructor" | "admin" | "internal_instructor"
   status: "active" | "suspended" | "banned"
   mustChangePassword: boolean
   hasPassword: boolean
@@ -438,6 +438,7 @@ export function AdminUserReviewPage({ userId }: { userId: string }) {
                     >
                       <option value="student">student</option>
                       <option value="instructor">instructor</option>
+                      <option value="internal_instructor">internal_instructor</option>
                       <option value="admin">admin</option>
                     </select>
                   </div>

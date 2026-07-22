@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
-import { requireAdmin } from "@/lib/rbac"
+import { requireAdmin, requireAdminOrInternalInstructor } from "@/lib/rbac"
 
 const slugify = (input: string) =>
   input
@@ -10,7 +10,7 @@ const slugify = (input: string) =>
     .replace(/^-+|-+$/g, "")
 
 export async function GET() {
-  const auth = await requireAdmin()
+  const auth = await requireAdminOrInternalInstructor()
   if (auth instanceof Response) return auth
 
   const categories = await prisma.category.findMany({
@@ -26,7 +26,7 @@ const CreateSchema = z.object({
 })
 
 export async function POST(req: Request) {
-  const auth = await requireAdmin()
+  const auth = await requireAdminOrInternalInstructor()
   if (auth instanceof Response) return auth
 
   const json = await req.json().catch(() => null)

@@ -49,8 +49,16 @@ function ResetPasswordForm() {
         return
       }
       setMessage(required ? "Password changed. Signing you in..." : "Your password has been reset. Signing you in...")
-      const actualRole = data?.user?.role as "student" | "instructor" | "admin" | undefined
-      const destination = next || (actualRole === "admin" ? "/admin" : actualRole === "instructor" ? "/instructor" : "/dashboard")
+      const actualRole = data?.user?.role as "student" | "instructor" | "admin" | "internal_instructor" | undefined
+      const destination =
+        next ||
+        (actualRole === "admin"
+          ? "/admin"
+          : actualRole === "internal_instructor"
+          ? "/internal-instructor"
+          : actualRole === "instructor"
+          ? "/instructor"
+          : "/dashboard")
       setTimeout(() => router.push(destination), 1200)
     } catch {
       setError("Reset failed")

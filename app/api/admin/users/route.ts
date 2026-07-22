@@ -22,7 +22,7 @@ export async function GET(req: Request) {
   const q = url.searchParams.get("q")?.trim() ?? ""
 
   const where: Record<string, unknown> = {}
-  if (role && ["student", "instructor", "admin"].includes(role)) where.role = role
+  if (role && ["student", "instructor", "admin", "internal_instructor"].includes(role)) where.role = role
   if (status && ["active", "suspended", "banned"].includes(status)) where.status = status
   if (q) {
     where.OR = [
@@ -44,7 +44,7 @@ export async function GET(req: Request) {
 const PatchSchema = z.object({
   userId: z.string().uuid(),
   action: z.enum(["activate", "suspend", "ban", "setRole"]),
-  role: z.enum(["student", "instructor", "admin"]).optional(),
+  role: z.enum(["student", "instructor", "admin", "internal_instructor"]).optional(),
 })
 
 export async function PATCH(req: Request) {

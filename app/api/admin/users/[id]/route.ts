@@ -104,7 +104,7 @@ function randomIndex(max: number) {
 
 const UpdateSchema = z
   .object({
-    role: z.enum(["student", "instructor", "admin"]).optional(),
+    role: z.enum(["student", "instructor", "admin", "internal_instructor"]).optional(),
     status: z.enum(["active", "suspended", "banned"]).optional(),
     action: z.enum(["resetPassword"]).optional(),
   })

@@ -15,7 +15,7 @@ type AdminUser = {
   id: string
   name: string
   email: string
-  role: "student" | "instructor" | "admin"
+  role: "student" | "instructor" | "admin" | "internal_instructor"
   status: "active" | "suspended" | "banned"
   mustChangePassword: boolean
   createdAt: string
@@ -25,6 +25,7 @@ const roleOptions: Array<{ value: string; label: string }> = [
   { value: "", label: "All roles" },
   { value: "student", label: "Students" },
   { value: "instructor", label: "Instructors" },
+  { value: "internal_instructor", label: "Content Managers" },
   { value: "admin", label: "Admins" },
 ]
 
@@ -35,7 +36,11 @@ const statusOptions: Array<{ value: string; label: string }> = [
   { value: "banned", label: "Banned" },
 ]
 
-export function AdminUsersTable({ fixedRole }: { fixedRole?: "student" | "instructor" | "admin" }) {
+export function AdminUsersTable({
+  fixedRole,
+}: {
+  fixedRole?: "student" | "instructor" | "admin" | "internal_instructor"
+}) {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -141,7 +146,13 @@ export function AdminUsersTable({ fixedRole }: { fixedRole?: "student" | "instru
       <div className="flex flex-col gap-4 p-5 border-b border-border">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
-            {fixedRole === "instructor" ? "Instructors" : fixedRole === "student" ? "Students" : "Users"}
+            {fixedRole === "instructor"
+              ? "Instructors"
+              : fixedRole === "student"
+              ? "Students"
+              : fixedRole === "internal_instructor"
+              ? "Content Managers"
+              : "Users"}
           </h2>
           <p className="text-sm text-muted-foreground">Manage accounts, roles, and access</p>
         </div>
@@ -245,6 +256,7 @@ export function AdminUsersTable({ fixedRole }: { fixedRole?: "student" | "instru
                       >
                         <option value="student">student</option>
                         <option value="instructor">instructor</option>
+                        <option value="internal_instructor">internal_instructor</option>
                         <option value="admin">admin</option>
                       </select>
                     </td>

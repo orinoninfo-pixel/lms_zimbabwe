@@ -49,14 +49,22 @@ function LoginForm() {
         return
       }
 
-      const actualRole = data?.user?.role as "student" | "instructor" | "admin" | undefined
+      const actualRole = data?.user?.role as "student" | "instructor" | "admin" | "internal_instructor" | undefined
       const next = searchParams.get("next")
       if (next) {
         router.push(next)
         return
       }
 
-      router.push(actualRole === "admin" ? "/admin" : actualRole === "instructor" ? "/instructor" : "/dashboard")
+      router.push(
+        actualRole === "admin"
+          ? "/admin"
+          : actualRole === "internal_instructor"
+          ? "/internal-instructor"
+          : actualRole === "instructor"
+          ? "/instructor"
+          : "/dashboard"
+      )
     } catch {
       setError("Login failed")
     } finally {
