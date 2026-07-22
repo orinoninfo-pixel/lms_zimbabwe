@@ -77,7 +77,7 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
         return
       }
 
-      if (data?.alreadyEnrolled) {
+      if (data?.alreadyEnrolled || data?.enrolledFree) {
         setIsEnrolled(true)
         router.push(`/learn/${courseId}`)
         return
@@ -142,7 +142,13 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
             </Button>
           ) : (
             <Button className="w-full" size="lg" onClick={handleEnroll} disabled={isEnrolling}>
-              {isEnrolling ? "Preparing Paynow..." : "Pay with Paynow"}
+              {price === 0
+                ? isEnrolling
+                  ? "Enrolling..."
+                  : "Enroll for Free"
+                : isEnrolling
+                ? "Preparing Paynow..."
+                : "Pay with Paynow"}
             </Button>
           )}
           <Button

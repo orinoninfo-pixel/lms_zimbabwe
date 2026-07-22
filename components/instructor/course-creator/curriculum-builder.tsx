@@ -79,7 +79,7 @@ export function CurriculumBuilder({ sections, onChange }: CurriculumBuilderProps
             id: `lesson-${Date.now()}`,
             title: type === "video" ? "New Video Lesson" : "New Text Lesson",
             type,
-            duration: type === "video" ? "0:00" : "5 min read",
+            duration: "",
             isPreview: false,
           }
           return { ...s, lessons: [...s.lessons, newLesson] }

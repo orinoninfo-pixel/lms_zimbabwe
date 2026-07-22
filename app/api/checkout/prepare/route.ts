@@ -73,6 +73,42 @@ export async function POST(req: Request) {
       }
 
       const requiresPayment = course.price > 0
+
+      if (!requiresPayment) {
+        // Free course — enroll immediately, no Paynow round-trip. Still record
+        // a $0 "enrollment" transaction so free enrollments show up in the
+        // same auditable ledger as paid ones.
+        const refBase = `FREE-${course.id.replace(/-/g, "").slice(0, 8).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`
+        await prisma.$transaction(async (tx) => {
+          const enrollment = await tx.enrollment.upsert({
+            where: { userId_courseId: { userId: session.userId, courseId: course.id } },
+            update: {},
+            create: { userId: session.userId, courseId: course.id },
+            select: { id: true },
+          })
+          await tx.transaction.create({
+            data: {
+              type: "enrollment",
+              status: "succeeded",
+              currency: "USD",
+              amount: 0,
+              userId: session.userId,
+              courseId: course.id,
+              enrollmentId: enrollment.id,
+              reference: refBase,
+              description: `Free enrollment for ${course.title}`,
+            },
+          })
+        })
+
+        return Response.json({
+          success: true,
+          requiresPayment: false,
+          enrolledFree: true,
+          item: { type: "course", id: course.id, title: course.title, price: course.price },
+        })
+      }
+
       const reference = buildReference("COURSE", course.id)
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
       const checkout = await preparePaynowCheckout({

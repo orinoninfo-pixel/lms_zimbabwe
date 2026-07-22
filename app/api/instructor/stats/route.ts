@@ -29,7 +29,15 @@ export async function GET() {
     suspended: courses.filter((c) => c.status === "suspended").length,
   }
 
-  const [distinctStudents, totalEnrollments, payoutAgg, pendingPayoutAgg, recentEnrollments] = await Promise.all([
+  const [
+    distinctStudents,
+    totalEnrollments,
+    payoutAgg,
+    pendingPayoutAgg,
+    recentEnrollments,
+    commissionSetting,
+    payoutHistory,
+  ] = await Promise.all([
     prisma.enrollment.findMany({
       where: { courseId: { in: courseIds } },
       select: { userId: true },
@@ -53,10 +61,22 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
+    prisma.platformSetting.findUnique({ where: { key: "commissionRateBps" }, select: { value: true } }),
+    prisma.transaction.findMany({
+      where: { type: "payout", userId: instructor.id },
+      include: { course: { select: { id: true, title: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    }),
   ])
 
   const paidOut = payoutAgg._sum?.amount ?? 0
   const pendingPayout = pendingPayoutAgg._sum?.amount ?? 0
+
+  const parsedBps = commissionSetting?.value ? Number.parseInt(commissionSetting.value, 10) : Number.NaN
+  const commissionRateBps = Number.isFinite(parsedBps) ? Math.max(0, Math.min(10_000, parsedBps)) : 1500
+  const platformCommissionPercent = commissionRateBps / 100
+  const instructorSharePercent = 100 - platformCommissionPercent
 
   return Response.json({
     totalStudents: distinctStudents.length,
@@ -67,12 +87,25 @@ export async function GET() {
       paidOut,
       pending: pendingPayout,
     },
+    revenueSplit: {
+      commissionRateBps,
+      platformCommissionPercent,
+      instructorSharePercent,
+    },
     recentEnrollments: recentEnrollments.map((e) => ({
       id: e.id,
       studentName: e.user.name,
       courseTitle: e.course.title,
       amount: e.course.price,
       createdAt: e.createdAt,
+    })),
+    payoutHistory: payoutHistory.map((t) => ({
+      id: t.id,
+      courseTitle: t.course?.title ?? "—",
+      amount: t.amount,
+      status: t.status,
+      reference: t.reference,
+      createdAt: t.createdAt,
     })),
   })
 }

@@ -164,7 +164,7 @@ model Course {
   price        Int
   moderationNote String?
   instructorId String   @db.Uuid
-  status       CourseStatus @default(approved)
+  status       CourseStatus @default(draft)
   featured     Boolean   @default(false)
   categoryId   String?   @db.Uuid
   createdAt    DateTime  @default(now())

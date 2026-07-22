@@ -86,9 +86,9 @@ export function PublishSettings({ courseDetails, sections }: PublishSettingsProp
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-2">Publish Checklist</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Submission Checklist</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          Complete all items before publishing your course
+          Complete all items before submitting your course for admin review
         </p>
 
         {/* Progress */}
@@ -213,14 +213,14 @@ export function PublishSettings({ courseDetails, sections }: PublishSettingsProp
           </div>
           <div>
             <h4 className="font-semibold text-foreground">
-              {isReadyToPublish ? "Ready to publish!" : "Not ready to publish"}
+              {isReadyToPublish ? "Ready to submit!" : "Not ready to submit"}
             </h4>
             <p className="text-sm text-muted-foreground mt-1">
               {isReadyToPublish
-                ? "Your course meets all requirements. Click Publish to make it live."
+                ? "Your course meets all requirements. Click Submit for Review to send it to the Zim Learning team — it goes live once approved."
                 : `Complete ${checklist.length - completedCount} more item${
                     checklist.length - completedCount > 1 ? "s" : ""
-                  } before publishing.`}
+                  } before submitting.`}
             </p>
           </div>
         </div>

@@ -55,6 +55,12 @@ export function AdminSettingsForm() {
   }, [])
 
   const save = async () => {
+    const commissionBps = Number.parseInt(values.commissionRateBps ?? "", 10)
+    if (!Number.isFinite(commissionBps) || commissionBps < 0 || commissionBps > 10_000) {
+      toast({ title: "Commission rate must be a whole number between 0 and 10000 basis points" })
+      return
+    }
+
     setBusy(true)
     try {
       const payload = {
@@ -88,24 +94,35 @@ export function AdminSettingsForm() {
 
           {!isLoading ? (
             <div className="grid gap-4 sm:grid-cols-2">
-              {fieldDefs.map((f) => (
-                <div key={f.key} className="space-y-2">
-                  <label className="text-sm font-medium text-foreground" htmlFor={f.key}>
-                    {f.label}
-                  </label>
-                  <Input
-                    id={f.key}
-                    value={values[f.key] ?? ""}
-                    onChange={(e) => setValues((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                    placeholder={f.placeholder}
-                  />
-                  {map.get(f.key)?.updatedAt ? (
-                    <p className="text-xs text-muted-foreground">
-                      Updated {new Date(map.get(f.key)!.updatedAt).toLocaleString("en-ZW")}
-                    </p>
-                  ) : null}
-                </div>
-              ))}
+              {fieldDefs.map((f) => {
+                const commissionBps = Number.parseInt(values.commissionRateBps ?? "", 10)
+                const isValidCommission = Number.isFinite(commissionBps) && commissionBps >= 0 && commissionBps <= 10_000
+                return (
+                  <div key={f.key} className="space-y-2">
+                    <label className="text-sm font-medium text-foreground" htmlFor={f.key}>
+                      {f.label}
+                    </label>
+                    <Input
+                      id={f.key}
+                      value={values[f.key] ?? ""}
+                      onChange={(e) => setValues((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                      placeholder={f.placeholder}
+                    />
+                    {f.key === "commissionRateBps" ? (
+                      <p className="text-xs text-muted-foreground">
+                        {isValidCommission
+                          ? `= ${(commissionBps / 100).toFixed(2)}% platform commission, instructors keep ${(100 - commissionBps / 100).toFixed(2)}% of every sale.`
+                          : "Enter a whole number of basis points between 0 and 10000."}
+                      </p>
+                    ) : null}
+                    {map.get(f.key)?.updatedAt ? (
+                      <p className="text-xs text-muted-foreground">
+                        Updated {new Date(map.get(f.key)!.updatedAt).toLocaleString("en-ZW")}
+                      </p>
+                    ) : null}
+                  </div>
+                )
+              })}
             </div>
           ) : null}
 

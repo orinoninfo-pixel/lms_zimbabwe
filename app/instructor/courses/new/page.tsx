@@ -21,6 +21,8 @@ export default function CreateCoursePage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSaving, setIsSaving] = useState(false)
   const [publishError, setPublishError] = useState<string | null>(null)
+  const [draftCourseId, setDraftCourseId] = useState<string | null>(null)
+  const [savedNotice, setSavedNotice] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -52,37 +54,105 @@ export default function CreateCoursePage() {
 
   const handleSave = async () => {
     setIsSaving(true)
-    // Simulate save
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSaving(false)
+    setPublishError(null)
+    setSavedNotice(null)
+    try {
+      const price = Number(courseDetails.price)
+      const roundedPrice = Number.isFinite(price) ? Math.round(price) : 0
+
+      if (!draftCourseId) {
+        const res = await fetch("/api/instructor/courses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: courseDetails.title || "Untitled course",
+            description: courseDetails.description || "No description yet.",
+            price: roundedPrice,
+            status: "draft",
+            sections: sections.map((s) => ({
+              title: s.title,
+              lessons: s.lessons.map((l) => ({ title: l.title })),
+            })),
+          }),
+        })
+        const data = await res.json().catch(() => null)
+        if (!res.ok) {
+          setPublishError(data?.error ?? "Failed to save draft")
+          return
+        }
+        setDraftCourseId(data.courseId)
+        setSavedNotice("Draft saved. You can keep editing or submit it for review when ready.")
+        return
+      }
+
+      const res = await fetch(`/api/instructor/courses/${draftCourseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: courseDetails.title || "Untitled course",
+          description: courseDetails.description || "No description yet.",
+          price: roundedPrice,
+        }),
+      })
+      const data = await res.json().catch(() => null)
+      if (!res.ok) {
+        setPublishError(data?.error ?? "Failed to save draft")
+        return
+      }
+      setSavedNotice("Draft saved.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handlePublish = async () => {
     setIsSaving(true)
     setPublishError(null)
+    setSavedNotice(null)
     try {
       const price = Number(courseDetails.price)
-      const res = await fetch("/api/instructor/courses", {
-        method: "POST",
+      const roundedPrice = Number.isFinite(price) ? Math.round(price) : 0
+
+      if (!draftCourseId) {
+        const res = await fetch("/api/instructor/courses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: courseDetails.title,
+            description: courseDetails.description,
+            price: roundedPrice,
+            status: "pending",
+            sections: sections.map((s) => ({
+              title: s.title,
+              lessons: s.lessons.map((l) => ({ title: l.title })),
+            })),
+          }),
+        })
+        const data = await res.json().catch(() => null)
+        if (!res.ok) {
+          setPublishError(data?.error ?? "Failed to submit course for review")
+          return
+        }
+        router.push("/instructor/courses")
+        return
+      }
+
+      const res = await fetch(`/api/instructor/courses/${draftCourseId}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: courseDetails.title,
           description: courseDetails.description,
-          price: Number.isFinite(price) ? Math.round(price) : 0,
-          sections: sections.map((s) => ({
-            title: s.title,
-            lessons: s.lessons.map((l) => ({
-              title: l.title,
-            })),
-          })),
+          price: roundedPrice,
+          action: "submit",
         }),
       })
       const data = await res.json().catch(() => null)
       if (!res.ok) {
-        setPublishError(data?.error ?? "Failed to publish course")
+        setPublishError(data?.error ?? "Failed to submit course for review")
         return
       }
-      router.push("/instructor")
+      router.push("/instructor/courses")
     } finally {
       setIsSaving(false)
     }
@@ -137,7 +207,7 @@ export default function CreateCoursePage() {
                 className="gap-2"
               >
                 <Send className="h-4 w-4" />
-                Publish
+                Submit for Review
               </Button>
             )}
           </div>
@@ -146,6 +216,16 @@ export default function CreateCoursePage() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-4 py-8 lg:px-8">
+        <div className="mb-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+          Submitting sends your course to the Zim Learning team for review. It only becomes visible and purchasable
+          by students once an admin approves it — you&apos;ll see the status and any requested changes on your
+          course list.
+        </div>
+        {savedNotice ? (
+          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+            {savedNotice}
+          </div>
+        ) : null}
         <StepIndicator steps={steps} currentStep={currentStep} />
 
         {/* Step Content */}
@@ -206,7 +286,7 @@ export default function CreateCoursePage() {
               className="gap-2"
             >
               <Send className="h-4 w-4" />
-              Publish Course
+              Submit for Review
             </Button>
           )}
         </div>

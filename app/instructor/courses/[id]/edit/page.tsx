@@ -2,11 +2,19 @@ import { redirect } from "next/navigation"
 import { requireRoleForPage } from "@/lib/rbac"
 import { InstructorSidebar } from "@/components/instructor/instructor-sidebar"
 import { InstructorHeader } from "@/components/instructor/instructor-header"
-import { InstructorEarnings } from "@/components/instructor/instructor-earnings"
+import { InstructorCourseEdit } from "@/components/instructor/instructor-course-edit"
 
-export default async function InstructorEarningsPage() {
+export const dynamic = "force-dynamic"
+
+export default async function EditInstructorCourseRoute({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const auth = await requireRoleForPage("instructor")
   if (!auth) redirect("/")
+
+  const { id } = await params
 
   return (
     <div className="min-h-screen bg-background">
@@ -14,13 +22,7 @@ export default async function InstructorEarningsPage() {
       <div className="lg:pl-64">
         <InstructorHeader />
         <main className="p-4 lg:p-6">
-          <div className="space-y-4">
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground">Earnings</h1>
-              <p className="text-sm text-muted-foreground">Track revenue, the platform split, and payout history.</p>
-            </div>
-            <InstructorEarnings />
-          </div>
+          <InstructorCourseEdit courseId={id} />
         </main>
       </div>
     </div>

@@ -6,6 +6,8 @@ const CreateCourseSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   price: z.number().int().nonnegative(),
+  categoryId: z.string().uuid().nullable().optional(),
+  status: z.enum(["draft", "pending"]).default("pending"),
   sections: z
     .array(
       z.object({
@@ -67,6 +69,8 @@ export async function GET() {
       students: c._count.enrollments,
       sections: c._count.sections,
       status: statusLabel[c.status] ?? "Draft",
+      rawStatus: c.status,
+      moderationNote: c.moderationNote,
       rating: 0,
       reviews: 0,
       earnings: earningsByCourseId.get(c.id) ?? 0,
@@ -91,17 +95,22 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 })
   }
 
-  const { title, description, price, sections } = parsed.data
+  const { title, description, price, categoryId, status, sections } = parsed.data
 
   const placeholderVideo = "https://www.w3schools.com/html/mov_bbb.mp4"
 
   const created = await prisma.$transaction(async (tx) => {
+    // Instructor-submitted courses always start as draft/pending — only an
+    // admin approval (see /api/admin/courses) can ever make a course "approved"
+    // and therefore purchasable/visible to students.
     const course = await tx.course.create({
       data: {
         title,
         description,
         price,
+        categoryId: categoryId ?? null,
         instructorId: instructor.id,
+        status,
       },
     })
 
@@ -129,6 +138,5 @@ export async function POST(req: Request) {
     return course
   })
 
-  return Response.json({ success: true, courseId: created.id })
+  return Response.json({ success: true, courseId: created.id, status: created.status })
 }
-

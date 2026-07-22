@@ -12,14 +12,20 @@ import {
   DollarSign,
   ChevronDown,
   Plus,
+  Send,
+  AlertTriangle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ConfirmDialog } from "@/components/admin/confirm-dialog"
+import { toast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
 type InstructorCourse = {
   id: string
   title: string
   status: "Published" | "Draft" | "Under Review" | "Rejected" | "Suspended"
+  rawStatus: "draft" | "pending" | "approved" | "rejected" | "suspended"
+  moderationNote: string | null
   students: number
   rating: number
   reviews: number
@@ -41,28 +47,61 @@ export function InstructorCoursesTable() {
   const [filter, setFilter] = useState<string>("All")
   const [courses, setCourses] = useState<InstructorCourse[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [busyId, setBusyId] = useState<string | null>(null)
+
+  const load = async (signal?: AbortSignal) => {
+    setIsLoading(true)
+    const res = await fetch("/api/instructor/courses", { cache: "no-store", signal }).catch(() => null)
+    const json = res ? await res.json().catch(() => null) : null
+    setCourses((json?.courses ?? []) as InstructorCourse[])
+    setIsLoading(false)
+  }
 
   useEffect(() => {
-    let cancelled = false
-    const load = async () => {
-      setIsLoading(true)
-      const res = await fetch("/api/instructor/courses", { cache: "no-store" }).catch(() => null)
-      const json = res ? await res.json().catch(() => null) : null
-      if (!cancelled) {
-        setCourses(json?.courses ?? [])
-        setIsLoading(false)
-      }
-    }
-    load()
-    return () => {
-      cancelled = true
-    }
+    const controller = new AbortController()
+    void load(controller.signal)
+    return () => controller.abort()
   }, [])
 
   const filteredCourses = useMemo(
     () => (filter === "All" ? courses : courses.filter((c) => c.status === filter)),
     [courses, filter]
   )
+
+  const submitForApproval = async (id: string) => {
+    setBusyId(id)
+    setOpenDropdown(null)
+    try {
+      const res = await fetch(`/api/instructor/courses/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "submit" }),
+      }).catch(() => null)
+      const json = res ? await res.json().catch(() => null) : null
+      if (!res || !res.ok) throw new Error(json?.error ?? "Failed to submit course")
+      toast({ title: "Submitted for review" })
+      await load()
+    } catch (e) {
+      toast({ title: "Failed to submit course", description: e instanceof Error ? e.message : "Unknown error" })
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const deleteCourse = async (id: string) => {
+    setBusyId(id)
+    try {
+      const res = await fetch(`/api/instructor/courses/${id}`, { method: "DELETE" }).catch(() => null)
+      const json = res ? await res.json().catch(() => null) : null
+      if (!res || !res.ok) throw new Error(json?.error ?? "Failed to delete course")
+      toast({ title: "Draft deleted" })
+      await load()
+    } catch (e) {
+      toast({ title: "Failed to delete course", description: e instanceof Error ? e.message : "Unknown error" })
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   return (
     <div className="bg-card rounded-xl border border-border shadow-sm">
@@ -150,94 +189,145 @@ export function InstructorCoursesTable() {
                 </td>
               </tr>
             ) : null}
-            {filteredCourses.map((course) => (
-              <tr key={course.id} className="hover:bg-muted/30 transition-colors">
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-20 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
-                      <div className="h-full w-full bg-gradient-to-br from-accent/20 to-muted flex items-center justify-center">
-                        <span className="text-xs text-muted-foreground">Thumbnail</span>
+            {filteredCourses.map((course) => {
+              const busy = busyId === course.id
+              const canSubmit = course.rawStatus === "draft" || course.rawStatus === "rejected"
+              const canDelete = course.rawStatus === "draft"
+              return (
+                <tr key={course.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-20 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
+                        <div className="h-full w-full bg-gradient-to-br from-accent/20 to-muted flex items-center justify-center">
+                          <span className="text-xs text-muted-foreground">Thumbnail</span>
+                        </div>
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-medium text-foreground truncate max-w-[200px] lg:max-w-[300px]">
+                            {course.title}
+                          </p>
+                          {course.rawStatus === "rejected" && course.moderationNote ? (
+                            <span title="Changes requested — see Edit Course">
+                              <AlertTriangle className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          ${course.price} &middot; Updated {course.lastUpdated}
+                        </p>
+                        {/* Mobile status badge */}
+                        <span className={cn(
+                          "inline-flex md:hidden mt-1 px-2 py-0.5 rounded-full text-xs font-medium",
+                          statusColors[course.status]
+                        )}>
+                          {course.status}
+                        </span>
                       </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground truncate max-w-[200px] lg:max-w-[300px]">
-                        {course.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        ${course.price} &middot; Updated {course.lastUpdated}
-                      </p>
-                      {/* Mobile status badge */}
-                      <span className={cn(
-                        "inline-flex md:hidden mt-1 px-2 py-0.5 rounded-full text-xs font-medium",
-                        statusColors[course.status]
-                      )}>
-                        {course.status}
-                      </span>
+                  </td>
+                  <td className="px-5 py-4 hidden md:table-cell">
+                    <span className={cn(
+                      "inline-flex px-2.5 py-1 rounded-full text-xs font-medium",
+                      statusColors[course.status]
+                    )}>
+                      {course.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 hidden lg:table-cell">
+                    <div className="flex items-center gap-1.5 text-sm text-foreground">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      {course.students.toLocaleString()}
                     </div>
-                  </div>
-                </td>
-                <td className="px-5 py-4 hidden md:table-cell">
-                  <span className={cn(
-                    "inline-flex px-2.5 py-1 rounded-full text-xs font-medium",
-                    statusColors[course.status]
-                  )}>
-                    {course.status}
-                  </span>
-                </td>
-                <td className="px-5 py-4 hidden lg:table-cell">
-                  <div className="flex items-center gap-1.5 text-sm text-foreground">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    {course.students.toLocaleString()}
-                  </div>
-                </td>
-                <td className="px-5 py-4 hidden lg:table-cell">
-                  {course.rating > 0 ? (
-                    <div className="flex items-center gap-1.5">
-                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                      <span className="text-sm font-medium text-foreground">{course.rating}</span>
-                      <span className="text-xs text-muted-foreground">({course.reviews})</span>
-                    </div>
-                  ) : (
-                    <span className="text-sm text-muted-foreground">-</span>
-                  )}
-                </td>
-                <td className="px-5 py-4 hidden sm:table-cell">
-                  <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                    <DollarSign className="h-4 w-4 text-emerald-600" />
-                    {course.earnings > 0 ? course.earnings.toLocaleString() : "-"}
-                  </div>
-                </td>
-                <td className="px-5 py-4 text-right">
-                  <div className="relative">
-                    <button
-                      onClick={() => setOpenDropdown(openDropdown === course.id ? null : course.id)}
-                      className="p-2 rounded-lg hover:bg-muted transition-colors"
-                    >
-                      <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
-                    </button>
-                    {openDropdown === course.id && (
-                      <>
-                        <div className="fixed inset-0 z-10" onClick={() => setOpenDropdown(null)} />
-                        <div className="absolute right-0 top-full mt-1 w-40 rounded-lg border border-border bg-card shadow-lg z-20">
-                          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors rounded-t-lg">
-                            <Edit className="h-4 w-4" />
-                            Edit Course
-                          </button>
-                          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors">
-                            <Eye className="h-4 w-4" />
-                            Preview
-                          </button>
-                          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors rounded-b-lg">
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </button>
-                        </div>
-                      </>
+                  </td>
+                  <td className="px-5 py-4 hidden lg:table-cell">
+                    {course.rating > 0 ? (
+                      <div className="flex items-center gap-1.5">
+                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                        <span className="text-sm font-medium text-foreground">{course.rating}</span>
+                        <span className="text-xs text-muted-foreground">({course.reviews})</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">-</span>
                     )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="px-5 py-4 hidden sm:table-cell">
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                      <DollarSign className="h-4 w-4 text-emerald-600" />
+                      {course.earnings > 0 ? course.earnings.toLocaleString() : "-"}
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <div className="relative flex items-center justify-end gap-1">
+                      {canSubmit ? (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={busy}
+                          onClick={() => void submitForApproval(course.id)}
+                          className="gap-2"
+                        >
+                          <Send className="h-4 w-4" />
+                          <span className="hidden lg:inline">
+                            {course.rawStatus === "rejected" ? "Resubmit" : "Submit"}
+                          </span>
+                        </Button>
+                      ) : null}
+                      <button
+                        onClick={() => setOpenDropdown(openDropdown === course.id ? null : course.id)}
+                        className="p-2 rounded-lg hover:bg-muted transition-colors"
+                        disabled={busy}
+                      >
+                        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+                      </button>
+                      {openDropdown === course.id && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setOpenDropdown(null)} />
+                          <div className="absolute right-0 top-full mt-1 w-44 rounded-lg border border-border bg-card shadow-lg z-20">
+                            <Link
+                              href={`/instructor/courses/${course.id}/edit`}
+                              onClick={() => setOpenDropdown(null)}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors rounded-t-lg"
+                            >
+                              <Edit className="h-4 w-4" />
+                              Edit Course
+                            </Link>
+                            <Link
+                              href={`/course/${course.id}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => setOpenDropdown(null)}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                            >
+                              <Eye className="h-4 w-4" />
+                              Preview
+                            </Link>
+                            {canDelete ? (
+                              <ConfirmDialog
+                                trigger={
+                                  <button
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors rounded-b-lg"
+                                    onClick={() => setOpenDropdown(null)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    Delete
+                                  </button>
+                                }
+                                title="Delete draft course?"
+                                description="This permanently deletes the draft course and its curriculum."
+                                confirmText="Delete"
+                                onConfirm={() => void deleteCourse(course.id)}
+                                disabled={busy}
+                              />
+                            ) : null}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
