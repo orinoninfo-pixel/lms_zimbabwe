@@ -18,7 +18,7 @@ const ApplySchema = z.object({
   professionalCertifications: z.string().max(500).optional(),
   biography: z.string().min(50).max(2000),
   sampleCourseProposal: z.string().min(50).max(3000),
-  preferredCourseCategories: z.array(z.string().min(1).max(80)).min(1).max(12),
+  preferredCourseCategories: z.array(z.string().min(1).max(80)).max(12).default([]),
 })
 
 export async function POST(req: Request) {

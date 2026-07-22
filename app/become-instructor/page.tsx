@@ -129,19 +129,39 @@ export default function BecomeInstructorPage() {
     }
   }, [])
 
-  const canSubmit = useMemo(() => {
-    if (!fullName.trim()) return false
-    if (!email.trim()) return false
-    if (!phoneNumber.trim()) return false
-    if (!linkedinProfile.trim()) return false
-    if (!areaOfExpertise.trim()) return false
-    if (!yearsOfExperience.trim()) return false
-    if (biography.trim().length < 50) return false
-    if (!resume) return false
-    if (sampleCourseProposal.trim().length < 50) return false
-    if (preferredCourseCategories.length === 0) return false
-    return true
-  }, [fullName, email, phoneNumber, linkedinProfile, areaOfExpertise, yearsOfExperience, biography, resume, sampleCourseProposal, preferredCourseCategories])
+  const missingRequirements = useMemo(() => {
+    const missing: string[] = []
+    if (!fullName.trim()) missing.push("Full name")
+    if (!email.trim()) missing.push("Email")
+    if (!phoneNumber.trim()) missing.push("Phone number")
+    if (!linkedinProfile.trim()) missing.push("LinkedIn profile")
+    if (!areaOfExpertise.trim()) missing.push("Area of expertise")
+    if (!yearsOfExperience.trim()) missing.push("Years of experience")
+    if (biography.trim().length < 50) missing.push("Biography (min. 50 characters)")
+    if (!resume) missing.push("CV/Resume upload")
+    if (sampleCourseProposal.trim().length < 50) missing.push("Sample course proposal (min. 50 characters)")
+    // Categories are only required when the platform actually has some to choose from —
+    // an empty category list would otherwise permanently block submission.
+    if (!isLoadingCategories && categories.length > 0 && preferredCourseCategories.length === 0) {
+      missing.push("At least one preferred category")
+    }
+    return missing
+  }, [
+    fullName,
+    email,
+    phoneNumber,
+    linkedinProfile,
+    areaOfExpertise,
+    yearsOfExperience,
+    biography,
+    resume,
+    sampleCourseProposal,
+    preferredCourseCategories,
+    categories,
+    isLoadingCategories,
+  ])
+
+  const canSubmit = missingRequirements.length === 0
 
   const toggleCategory = (slug: string) => {
     setPreferredCourseCategories((prev) => (prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]))
@@ -512,6 +532,13 @@ export default function BecomeInstructorPage() {
                         <div className="rounded-lg border border-border bg-card p-4">
                           <p className="text-sm text-destructive">{categoriesError}</p>
                         </div>
+                      ) : categories.length === 0 ? (
+                        <div className="rounded-lg border border-border bg-muted/30 p-4">
+                          <p className="text-sm text-muted-foreground">
+                            No categories are configured yet — you can skip this and mention your focus area in your
+                            biography instead.
+                          </p>
+                        </div>
                       ) : (
                         <div className="grid gap-2 sm:grid-cols-2">
                           {categories.map((c) => (
@@ -526,10 +553,22 @@ export default function BecomeInstructorPage() {
                           ))}
                         </div>
                       )}
-                      <p className="text-xs text-muted-foreground">Select at least one category.</p>
+                      {categories.length > 0 ? (
+                        <p className="text-xs text-muted-foreground">Select at least one category.</p>
+                      ) : null}
                     </div>
 
-                    <div className="sm:col-span-2 pt-2">
+                    <div className="sm:col-span-2 pt-2 space-y-3">
+                      {!canSubmit && !busy && missingRequirements.length > 0 ? (
+                        <div className="rounded-lg border border-border bg-muted/30 p-3">
+                          <p className="text-xs font-medium text-foreground">Complete these before submitting:</p>
+                          <ul className="mt-1 list-inside list-disc text-xs text-muted-foreground">
+                            {missingRequirements.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
                       <Button type="submit" className="w-full" disabled={!canSubmit || busy}>
                         {busy ? "Submitting..." : "Submit Instructor Application"}
                       </Button>
