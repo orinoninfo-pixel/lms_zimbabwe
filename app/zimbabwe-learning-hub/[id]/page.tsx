@@ -7,8 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ZimbabweSubjectEnrollmentActions } from "@/components/zimbabwe-hub/subject-enrollment-actions"
+import { SubjectCurriculum } from "@/components/zimbabwe-hub/subject-curriculum"
+import { SubjectHomeworkList } from "@/components/zimbabwe-hub/subject-homework-list"
 import { getSession } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { formatZimLevel, formatExaminingBody } from "@/lib/zim-education"
 
 export const dynamic = "force-dynamic"
 
@@ -23,22 +26,37 @@ function formatDateTime(value: Date) {
 export default async function ZimbabweLearningHubPackagePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
+  const session = await getSession()
+  const studentId = session?.role === "student" ? session.userId : null
+
   const pkg = await prisma.subjectPackage.findUnique({
     where: { id },
     include: {
       teacher: { select: { id: true, name: true } },
       liveLessons: { orderBy: { startsAt: "asc" }, take: 50 },
-      homework: { orderBy: { dueAt: "asc" }, take: 50 },
+      homework: {
+        orderBy: { dueAt: "asc" },
+        take: 50,
+        include: {
+          submissions: { where: { studentId: studentId ?? "no-session" }, take: 1 },
+        },
+      },
       examResources: { orderBy: [{ year: "desc" }, { createdAt: "desc" }], take: 100 },
       resources: { orderBy: { createdAt: "desc" }, take: 100 },
       announcements: { include: { author: { select: { id: true, name: true } } }, orderBy: { createdAt: "desc" }, take: 20 },
+      sections: {
+        orderBy: [{ order: "asc" as const }, { title: "asc" as const }],
+        include: {
+          lessons: {
+            orderBy: [{ order: "asc" as const }, { title: "asc" as const }],
+            select: { id: true, title: true, quiz: { select: { id: true } } },
+          },
+        },
+      },
     },
   })
 
   if (!pkg) notFound()
-
-  const session = await getSession()
-  const studentId = session?.role === "student" ? session.userId : null
 
   let enrollment: { status: string; endDate: string | null; price: number; billingPeriod: string } | null = null
   let hasActiveAccess = false
@@ -69,18 +87,18 @@ export default async function ZimbabweLearningHubPackagePage({ params }: { param
               <div className="max-w-3xl">
                 <div className="mb-3 flex flex-wrap gap-2">
                   <Badge variant="secondary">Zimbabwe Learning Hub</Badge>
-                  {pkg.isCapsAligned ? <Badge variant="outline">ZIMSEC-aligned</Badge> : null}
+                  <Badge variant="outline">{formatExaminingBody(pkg.examiningBody)}</Badge>
                   {pkg.includesLiveLessons ? <Badge>Live lessons</Badge> : null}
                   {pkg.isExamPrep ? <Badge variant="outline">Exam prep</Badge> : null}
                   {pkg.isHolidayLearning ? <Badge variant="outline">Holiday learning</Badge> : null}
                 </div>
                 <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                  {pkg.title || `${pkg.subject} · Grade ${pkg.grade}`}
+                  {pkg.title || `${pkg.subject} · ${formatZimLevel(pkg.grade)}`}
                 </h1>
                 <p className="mt-4 text-base text-muted-foreground">{pkg.description}</p>
                 <div className="mt-6 flex flex-wrap gap-6 text-sm text-muted-foreground">
                   <span>Subject: {pkg.subject}</span>
-                  <span>Grade: {pkg.grade}</span>
+                  <span>Level: {formatZimLevel(pkg.grade)}</span>
                   <span>Term: {pkg.term ?? "Flexible"}</span>
                   <span>Teacher: {pkg.teacher?.name ?? "To be announced"}</span>
                 </div>
@@ -121,6 +139,18 @@ export default async function ZimbabweLearningHubPackagePage({ params }: { param
         <section className="py-8 md:py-10">
           <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
             <div className="space-y-6 lg:col-span-2">
+              {pkg.sections.length > 0 ? (
+                <Card>
+                  <CardContent className="pt-6">
+                    <SubjectCurriculum
+                      subjectPackageId={pkg.id}
+                      sections={pkg.sections}
+                      hasActiveAccess={hasActiveAccess}
+                    />
+                  </CardContent>
+                </Card>
+              ) : null}
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -157,17 +187,26 @@ export default async function ZimbabweLearningHubPackagePage({ params }: { param
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {pkg.homework.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No homework has been posted yet.</p>
-                  ) : (
-                    pkg.homework.map((item) => (
-                      <div key={item.id} className="rounded-lg border border-border bg-muted/20 p-4">
-                        <p className="font-medium text-foreground">{item.title}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">Due: {formatDateTime(item.dueAt)}</p>
-                      </div>
-                    ))
-                  )}
+                  <SubjectHomeworkList
+                    canSubmit={Boolean(studentId) && hasActiveAccess}
+                    items={pkg.homework.map((item) => ({
+                      id: item.id,
+                      title: item.title,
+                      description: item.description,
+                      dueAt: item.dueAt.toISOString(),
+                      submission: item.submissions[0]
+                        ? {
+                            id: item.submissions[0].id,
+                            status: item.submissions[0].status,
+                            answerText: item.submissions[0].answerText,
+                            feedback: item.submissions[0].feedback,
+                            submittedAt: item.submissions[0].submittedAt
+                              ? item.submissions[0].submittedAt.toISOString()
+                              : null,
+                          }
+                        : null,
+                    }))}
+                  />
                 </CardContent>
               </Card>
 

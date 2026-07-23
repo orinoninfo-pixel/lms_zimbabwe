@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { ConfirmDialog } from "@/components/admin/confirm-dialog"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { toast } from "@/hooks/use-toast"
+import { formatZimLevel, formatExaminingBody } from "@/lib/zim-education"
 
 type SubjectRow = {
   id: string
@@ -15,6 +16,7 @@ type SubjectRow = {
   subject: string
   grade: number
   term: number | null
+  examiningBody: string
   price: number
   includesLiveLessons: boolean
   isExamPrep: boolean
@@ -143,6 +145,7 @@ export function SubjectsTable({
                           {s.price}/mo &middot; {s.subject}
                         </p>
                         <div className="mt-1.5 flex flex-wrap gap-1">
+                          <Badge variant="outline">{formatExaminingBody(s.examiningBody)}</Badge>
                           {s.includesLiveLessons ? <Badge variant="secondary">Live lessons</Badge> : null}
                           {s.isExamPrep ? <Badge variant="secondary">Exam prep</Badge> : null}
                           {s.isHolidayLearning ? <Badge variant="secondary">Holiday</Badge> : null}
@@ -150,7 +153,7 @@ export function SubjectsTable({
                       </div>
                     </td>
                     <td className="px-5 py-4 hidden md:table-cell text-sm text-muted-foreground">
-                      Grade {s.grade}
+                      {formatZimLevel(s.grade)}
                       {s.term ? ` · Term ${s.term}` : ""}
                     </td>
                     <td className="px-5 py-4 hidden lg:table-cell">

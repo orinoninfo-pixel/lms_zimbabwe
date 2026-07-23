@@ -2,7 +2,7 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/auth"
 
-const GradeSchema = z.coerce.number().int().min(1).max(12)
+const GradeSchema = z.coerce.number().int().min(1).max(13)
 
 export async function GET(req: Request) {
   const session = await getSession()

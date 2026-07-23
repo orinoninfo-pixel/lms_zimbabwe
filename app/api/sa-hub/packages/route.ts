@@ -4,8 +4,9 @@ import { getSession } from "@/lib/auth"
 
 const QuerySchema = z.object({
   subject: z.string().optional(),
-  grade: z.coerce.number().int().min(1).max(12).optional(),
+  grade: z.coerce.number().int().min(1).max(13).optional(),
   term: z.coerce.number().int().min(1).max(4).optional(),
+  examiningBody: z.enum(["zimsec", "cambridge"]).optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
   includesLiveLessons: z.coerce.boolean().optional(),
@@ -19,6 +20,7 @@ export async function GET(req: Request) {
     subject: url.searchParams.get("subject") ?? undefined,
     grade: url.searchParams.get("grade") ?? undefined,
     term: url.searchParams.get("term") ?? undefined,
+    examiningBody: url.searchParams.get("examiningBody") ?? undefined,
     minPrice: url.searchParams.get("minPrice") ?? undefined,
     maxPrice: url.searchParams.get("maxPrice") ?? undefined,
     includesLiveLessons: url.searchParams.get("includesLiveLessons") ?? undefined,
@@ -31,6 +33,7 @@ export async function GET(req: Request) {
   if (parsed.data.subject) where.subject = { contains: parsed.data.subject.trim(), mode: "insensitive" }
   if (parsed.data.grade) where.grade = parsed.data.grade
   if (parsed.data.term) where.term = parsed.data.term
+  if (parsed.data.examiningBody) where.examiningBody = parsed.data.examiningBody
   if (typeof parsed.data.includesLiveLessons === "boolean") where.includesLiveLessons = parsed.data.includesLiveLessons
   if (typeof parsed.data.isExamPrep === "boolean") where.isExamPrep = parsed.data.isExamPrep
   if (typeof parsed.data.isHolidayLearning === "boolean") where.isHolidayLearning = parsed.data.isHolidayLearning
@@ -83,6 +86,7 @@ export async function GET(req: Request) {
       currency: p.currency,
       billingPeriod: p.billingPeriod,
       isCapsAligned: p.isCapsAligned,
+      examiningBody: p.examiningBody,
       includesLiveLessons: p.includesLiveLessons,
       isExamPrep: p.isExamPrep,
       isHolidayLearning: p.isHolidayLearning,

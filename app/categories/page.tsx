@@ -21,13 +21,13 @@ const defaultStyle: CategoryStyle = {
 }
 
 const styleBySlug: Record<string, CategoryStyle> = {
-  "mathematical-literacy": { icon: Target, meta: "Grades 10–12", color: "bg-blue-100 text-blue-700" },
-  mathematics: { icon: Target, meta: "Grades 8–12", color: "bg-blue-100 text-blue-700" },
+  "mathematical-literacy": { icon: Target, meta: "Form 3–6", color: "bg-blue-100 text-blue-700" },
+  mathematics: { icon: Target, meta: "Form 1–6", color: "bg-blue-100 text-blue-700" },
   "physical-sciences": { icon: Trophy, meta: "ZIMSEC-aligned", color: "bg-pink-100 text-pink-700" },
-  "life-sciences": { icon: Users, meta: "Grades 10–12", color: "bg-green-100 text-green-700" },
-  accounting: { icon: TrendingUp, meta: "Grades 10–12", color: "bg-amber-100 text-amber-700" },
-  "business-studies": { icon: Users, meta: "Grades 10–12", color: "bg-indigo-100 text-indigo-700" },
-  economics: { icon: TrendingUp, meta: "Grades 10–12", color: "bg-emerald-100 text-emerald-700" },
+  "life-sciences": { icon: Users, meta: "Form 3–6", color: "bg-green-100 text-green-700" },
+  accounting: { icon: TrendingUp, meta: "Form 3–6", color: "bg-amber-100 text-amber-700" },
+  "business-studies": { icon: Users, meta: "Form 3–6", color: "bg-indigo-100 text-indigo-700" },
+  economics: { icon: TrendingUp, meta: "Form 3–6", color: "bg-emerald-100 text-emerald-700" },
   english: { icon: BookOpen, meta: "Language & writing", color: "bg-red-100 text-red-700" },
   afrikaans: { icon: BookOpen, meta: "Language & writing", color: "bg-rose-100 text-rose-700" },
   geography: { icon: Map, meta: "Maps & revision", color: "bg-cyan-100 text-cyan-700" },

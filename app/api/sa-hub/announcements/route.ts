@@ -2,7 +2,7 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 
 const QuerySchema = z.object({
-  grade: z.coerce.number().int().min(1).max(12).optional(),
+  grade: z.coerce.number().int().min(1).max(13).optional(),
   subject: z.string().optional(),
 })
 

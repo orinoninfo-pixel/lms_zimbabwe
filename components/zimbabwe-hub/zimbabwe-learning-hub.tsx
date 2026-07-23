@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { ZIM_LEVELS, EXAMINING_BODIES, formatZimLevel, formatExaminingBody } from "@/lib/zim-education"
 
 type SubjectPackageRow = {
   id: string
@@ -19,6 +20,7 @@ type SubjectPackageRow = {
   currency: "USD" | "ZWL" | "ZAR"
   billingPeriod: "monthly"
   isCapsAligned: boolean
+  examiningBody: string
   includesLiveLessons: boolean
   isExamPrep: boolean
   isHolidayLearning: boolean
@@ -47,6 +49,7 @@ export function ZimbabweLearningHub() {
   const [subject, setSubject] = useState<string>("")
   const [grade, setGrade] = useState<string>("")
   const [term, setTerm] = useState<string>("")
+  const [examiningBody, setExaminingBody] = useState<string>("")
   const [minPrice, setMinPrice] = useState<string>("")
   const [maxPrice, setMaxPrice] = useState<string>("")
   const [includesLiveLessons, setIncludesLiveLessons] = useState(false)
@@ -58,6 +61,7 @@ export function ZimbabweLearningHub() {
     if (subject.trim()) params.set("subject", subject.trim())
     if (grade) params.set("grade", grade)
     if (term) params.set("term", term)
+    if (examiningBody) params.set("examiningBody", examiningBody)
     if (minPrice) params.set("minPrice", minPrice)
     if (maxPrice) params.set("maxPrice", maxPrice)
     if (includesLiveLessons) params.set("includesLiveLessons", "true")
@@ -65,7 +69,7 @@ export function ZimbabweLearningHub() {
     if (isHolidayLearning) params.set("isHolidayLearning", "true")
     const s = params.toString()
     return s ? `?${s}` : ""
-  }, [subject, grade, term, minPrice, maxPrice, includesLiveLessons, isExamPrep, isHolidayLearning])
+  }, [subject, grade, term, examiningBody, minPrice, maxPrice, includesLiveLessons, isExamPrep, isHolidayLearning])
 
   useEffect(() => {
     let cancelled = false
@@ -99,8 +103,8 @@ export function ZimbabweLearningHub() {
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-medium text-foreground">ZIMSEC-Aligned Subjects</p>
-              <p className="text-sm text-muted-foreground">Structured support per grade and term</p>
+              <p className="font-medium text-foreground">ZIMSEC & Cambridge Subjects</p>
+              <p className="text-sm text-muted-foreground">Structured support per grade/form and term</p>
             </div>
           </div>
         </div>
@@ -156,10 +160,10 @@ export function ZimbabweLearningHub() {
               onChange={(e) => setGrade(e.target.value)}
               className="h-9 rounded-lg border border-input bg-background px-3 text-sm"
             >
-              <option value="">Any grade</option>
-              {[8, 9, 10, 11, 12].map((g) => (
-                <option key={g} value={String(g)}>
-                  Grade {g}
+              <option value="">Any grade / form</option>
+              {ZIM_LEVELS.map((level) => (
+                <option key={level.value} value={String(level.value)}>
+                  {level.label}
                 </option>
               ))}
             </select>
@@ -173,6 +177,18 @@ export function ZimbabweLearningHub() {
               <option value="2">Term 2</option>
               <option value="3">Term 3</option>
               <option value="4">Term 4</option>
+            </select>
+            <select
+              value={examiningBody}
+              onChange={(e) => setExaminingBody(e.target.value)}
+              className="h-9 rounded-lg border border-input bg-background px-3 text-sm"
+            >
+              <option value="">Any examining body</option>
+              {EXAMINING_BODIES.map((body) => (
+                <option key={body.value} value={body.value}>
+                  {body.label}
+                </option>
+              ))}
             </select>
             <div className="grid grid-cols-2 gap-3">
               <input
@@ -238,7 +254,7 @@ export function ZimbabweLearningHub() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((p, index) => {
             const active = p.enrollment?.status === "active"
-            const title = p.title || `${p.subject} · Grade ${p.grade}`
+            const title = p.title || `${p.subject} · ${formatZimLevel(p.grade)}`
             const color = packageColors[index % packageColors.length]
             return (
               <Card key={p.id} className="overflow-hidden">
@@ -254,7 +270,7 @@ export function ZimbabweLearningHub() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {p.isCapsAligned ? <Badge variant="secondary">ZIMSEC-aligned</Badge> : null}
+                    <Badge variant="secondary">{formatExaminingBody(p.examiningBody)}</Badge>
                     {p.includesLiveLessons ? <Badge>Live lessons</Badge> : null}
                     {p.isExamPrep ? <Badge variant="outline">Exam prep</Badge> : null}
                     {p.isHolidayLearning ? <Badge variant="outline">Holiday learning</Badge> : null}
@@ -268,8 +284,8 @@ export function ZimbabweLearningHub() {
                   <p className="text-sm text-muted-foreground line-clamp-3">{p.description}</p>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-xs text-muted-foreground">Grade</p>
-                      <p className="font-medium text-foreground">Grade {p.grade}</p>
+                      <p className="text-xs text-muted-foreground">Grade / Form</p>
+                      <p className="font-medium text-foreground">{formatZimLevel(p.grade)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Lessons</p>

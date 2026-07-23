@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma"
 
 const QuerySchema = z.object({
   subject: z.string().optional(),
-  grade: z.coerce.number().int().min(1).max(12).optional(),
+  grade: z.coerce.number().int().min(1).max(13).optional(),
   year: z.coerce.number().int().min(2000).max(2100).optional(),
   term: z.coerce.number().int().min(1).max(4).optional(),
   examType: z.string().optional(),

@@ -27,7 +27,7 @@ export async function GET() {
         submissions: { none: { studentId: user.id, status: { in: ["submitted", "graded"] } } },
       },
     }),
-    prisma.examResource.count({ where: { grade: { in: [12, 11, 10] } } }),
+    prisma.examResource.count({ where: { grade: { in: [10, 11, 12, 13] } } }), // Form 3-6
     prisma.course.count({
       where: {
         status: "approved",

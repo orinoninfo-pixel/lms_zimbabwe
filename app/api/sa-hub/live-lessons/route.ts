@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   const where: Record<string, unknown> = {}
   if (status && ["upcoming", "completed", "canceled"].includes(status)) where.status = status
   if (grade) {
-    const parsed = z.coerce.number().int().min(1).max(12).safeParse(grade)
+    const parsed = z.coerce.number().int().min(1).max(13).safeParse(grade)
     if (parsed.success) where.grade = parsed.data
   }
   if (subject) where.subject = { contains: subject, mode: "insensitive" }

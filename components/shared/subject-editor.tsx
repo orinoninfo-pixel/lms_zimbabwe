@@ -11,10 +11,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { ZIM_LEVELS, EXAMINING_BODIES } from "@/lib/zim-education"
+import { CurriculumBuilder, type Section as BuilderSection } from "@/components/instructor/course-creator/curriculum-builder"
+import { SubjectQuizManager } from "@/components/shared/subject-quiz-manager"
 
 type Category = { id: string; name: string }
 
-const grades = Array.from({ length: 12 }, (_, i) => i + 1)
+const isPersistedLessonId = (id: string) => !id.startsWith("lesson-")
+
 const terms = [1, 2, 3, 4]
 
 export function SubjectEditor({
@@ -38,13 +43,21 @@ export function SubjectEditor({
   const [price, setPrice] = useState("")
   const [categoryId, setCategoryId] = useState<string>("")
   const [isCapsAligned, setIsCapsAligned] = useState(true)
+  const [examiningBody, setExaminingBody] = useState<string>("zimsec")
   const [includesLiveLessons, setIncludesLiveLessons] = useState(true)
   const [isExamPrep, setIsExamPrep] = useState(false)
   const [isHolidayLearning, setIsHolidayLearning] = useState(false)
+  const [sections, setSections] = useState<BuilderSection[]>([])
+  const [enrollmentsCount, setEnrollmentsCount] = useState(0)
   const [isLoading, setIsLoading] = useState(isEdit)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
+
+  const curriculumLocked = isEdit && enrollmentsCount > 0
+  const persistedLessons = sections
+    .flatMap((section) => section.lessons)
+    .filter((lesson) => isPersistedLessonId(lesson.id))
 
   useEffect(() => {
     let cancelled = false
@@ -72,9 +85,29 @@ export function SubjectEditor({
       setPrice(String(s.price))
       setCategoryId(s.categoryId ?? "")
       setIsCapsAligned(s.isCapsAligned)
+      setExaminingBody(s.examiningBody ?? "zimsec")
       setIncludesLiveLessons(s.includesLiveLessons)
       setIsExamPrep(s.isExamPrep)
       setIsHolidayLearning(s.isHolidayLearning)
+      setEnrollmentsCount(s._count?.enrollments ?? 0)
+      setSections(
+        ((s.sections ?? []) as Array<{
+          id: string
+          title: string
+          lessons: Array<{ id: string; title: string }>
+        }>).map((section) => ({
+          id: section.id,
+          title: section.title,
+          isExpanded: false,
+          lessons: section.lessons.map((lesson) => ({
+            id: lesson.id,
+            title: lesson.title,
+            type: "video" as const,
+            duration: "",
+            isPreview: false,
+          })),
+        }))
+      )
       setIsLoading(false)
     }
     void load()
@@ -113,9 +146,18 @@ export function SubjectEditor({
         price: Number.isFinite(priceValue) ? Math.round(priceValue) : 0,
         categoryId: categoryId || null,
         isCapsAligned,
+        examiningBody,
         includesLiveLessons,
         isExamPrep,
         isHolidayLearning,
+        ...(curriculumLocked
+          ? {}
+          : {
+              sections: sections.map((section) => ({
+                title: section.title,
+                lessons: section.lessons.map((lesson) => ({ title: lesson.title })),
+              })),
+            }),
       }
 
       const res = await fetch(isEdit ? `${apiBasePath}/${subjectId}` : apiBasePath, {
@@ -204,15 +246,15 @@ export function SubjectEditor({
             </div>
 
             <div className="space-y-2">
-              <Label>Grade</Label>
+              <Label>Grade / Form</Label>
               <Select value={grade} onValueChange={setGrade}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select grade" />
+                  <SelectValue placeholder="Select grade or form" />
                 </SelectTrigger>
                 <SelectContent>
-                  {grades.map((g) => (
-                    <SelectItem key={g} value={String(g)}>
-                      Grade {g}
+                  {ZIM_LEVELS.map((level) => (
+                    <SelectItem key={level.value} value={String(level.value)}>
+                      {level.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -237,6 +279,22 @@ export function SubjectEditor({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Examining Body</Label>
+              <Select value={examiningBody} onValueChange={setExaminingBody}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select examining body" />
+                </SelectTrigger>
+                <SelectContent>
+                  {EXAMINING_BODIES.map((body) => (
+                    <SelectItem key={body.value} value={body.value}>
+                      {body.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-2">
               <Label>Category</Label>
               <Select value={categoryId} onValueChange={setCategoryId}>
@@ -270,8 +328,8 @@ export function SubjectEditor({
           <div className="space-y-3 rounded-lg border border-border p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-foreground">CAPS/ZIMSEC aligned</p>
-                <p className="text-xs text-muted-foreground">This package follows the official curriculum.</p>
+                <p className="text-sm font-medium text-foreground">Curriculum aligned</p>
+                <p className="text-xs text-muted-foreground">This package follows the official school curriculum.</p>
               </div>
               <Switch checked={isCapsAligned} onCheckedChange={setIsCapsAligned} />
             </div>
@@ -312,6 +370,54 @@ export function SubjectEditor({
           </p>
         </CardContent>
       </Card>
+
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle className="text-base">Curriculum (optional)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {curriculumLocked ? (
+            <Alert>
+              <AlertTitle>Curriculum locked</AlertTitle>
+              <AlertDescription>
+                This subject already has enrolled students, so its curriculum can no longer be changed.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <CurriculumBuilder sections={sections} onChange={setSections} />
+          )}
+        </CardContent>
+      </Card>
+
+      {isEdit ? (
+        <Card className="max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-base">Lesson Quizzes (optional)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {persistedLessons.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Save this subject with at least one lesson, then reload this page to add quizzes.
+              </p>
+            ) : (
+              persistedLessons.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"
+                >
+                  <p className="text-sm font-medium text-foreground">{lesson.title}</p>
+                  <SubjectQuizManager
+                    lessonId={lesson.id}
+                    lessonTitle={lesson.title}
+                    quizApiBasePath={apiBasePath.replace("/subjects", "/lessons")}
+                    quizAttemptsApiBasePath={apiBasePath.replace("/subjects", "/quiz-attempts")}
+                  />
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   )
 }

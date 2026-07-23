@@ -6,15 +6,31 @@ const CreateSubjectSchema = z.object({
   title: z.string().trim().min(1),
   description: z.string().trim().min(1),
   subject: z.string().trim().min(1),
-  grade: z.number().int().min(1).max(12),
+  grade: z.number().int().min(1).max(13),
   term: z.number().int().min(1).max(4).nullable().optional(),
   price: z.number().int().nonnegative(),
   categoryId: z.string().uuid().nullable().optional(),
   isCapsAligned: z.boolean().optional(),
+  examiningBody: z.enum(["zimsec", "cambridge"]).optional(),
   includesLiveLessons: z.boolean().optional(),
   isExamPrep: z.boolean().optional(),
   isHolidayLearning: z.boolean().optional(),
+  sections: z
+    .array(
+      z.object({
+        title: z.string().min(1),
+        lessons: z.array(
+          z.object({
+            title: z.string().min(1),
+            videoUrl: z.string().url().optional(),
+          })
+        ),
+      })
+    )
+    .optional(),
 })
+
+const placeholderVideo = "https://www.w3schools.com/html/mov_bbb.mp4"
 
 async function requireInstructor() {
   const session = await getSession()
@@ -52,25 +68,49 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid request body" }, { status: 400 })
   }
 
-  const { title, description, subject, grade, term, price, categoryId, ...flags } = parsed.data
+  const { title, description, subject, grade, term, price, categoryId, sections, ...flags } = parsed.data
 
-  const created = await prisma.subjectPackage.create({
-    data: {
-      title,
-      description,
-      subject,
-      grade,
-      term: term ?? null,
-      price,
-      currency: "USD",
-      billingPeriod: "monthly",
-      categoryId: categoryId ?? null,
-      teacherId: instructor.id,
-      isCapsAligned: flags.isCapsAligned ?? true,
-      includesLiveLessons: flags.includesLiveLessons ?? true,
-      isExamPrep: flags.isExamPrep ?? false,
-      isHolidayLearning: flags.isHolidayLearning ?? false,
-    },
+  const created = await prisma.$transaction(async (tx) => {
+    const subjectPackage = await tx.subjectPackage.create({
+      data: {
+        title,
+        description,
+        subject,
+        grade,
+        term: term ?? null,
+        price,
+        currency: "USD",
+        billingPeriod: "monthly",
+        categoryId: categoryId ?? null,
+        teacherId: instructor.id,
+        isCapsAligned: flags.isCapsAligned ?? true,
+        examiningBody: flags.examiningBody ?? "zimsec",
+        includesLiveLessons: flags.includesLiveLessons ?? true,
+        isExamPrep: flags.isExamPrep ?? false,
+        isHolidayLearning: flags.isHolidayLearning ?? false,
+      },
+    })
+
+    if (sections?.length) {
+      for (const [sectionIndex, sectionInput] of sections.entries()) {
+        const section = await tx.subjectSection.create({
+          data: { title: sectionInput.title, subjectPackageId: subjectPackage.id, order: sectionIndex },
+        })
+
+        if (sectionInput.lessons.length) {
+          await tx.subjectLesson.createMany({
+            data: sectionInput.lessons.map((l, lessonIndex) => ({
+              title: l.title,
+              videoUrl: l.videoUrl ?? placeholderVideo,
+              sectionId: section.id,
+              order: lessonIndex,
+            })),
+          })
+        }
+      }
+    }
+
+    return subjectPackage
   })
 
   return Response.json({ success: true, subjectId: created.id })

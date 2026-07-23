@@ -26,6 +26,11 @@ enum InstructorApplicationStatus {
   rejected
 }
 
+enum ExaminingBody {
+  zimsec
+  cambridge
+}
+
 enum CourseStatus {
   draft
   pending
@@ -155,6 +160,8 @@ model User {
 
   subjectPackagesTeaching SubjectPackage[] @relation("SubjectPackageTeacher")
   subjectEnrollments SubjectEnrollment[]
+  subjectLessonProgress SubjectLessonProgress[]
+  subjectQuizAttempts SubjectQuizAttempt[]
 }
 
 model Course {
@@ -531,6 +538,7 @@ model SubjectPackage {
   currency           CurrencyCode @default(USD)
   billingPeriod      BillingPeriod @default(monthly)
   isCapsAligned      Boolean @default(true)
+  examiningBody      ExaminingBody @default(zimsec)
   includesLiveLessons Boolean @default(true)
   isExamPrep         Boolean @default(false)
   isHolidayLearning  Boolean @default(false)
@@ -547,9 +555,108 @@ model SubjectPackage {
   examResources ExamResource[]
   resources     LearningResource[]
   announcements Announcement[]
+  sections      SubjectSection[]
 
   @@index([grade, subject])
   @@index([term])
+}
+
+model SubjectSection {
+  id               String @id @default(uuid()) @db.Uuid
+  title            String
+  subjectPackageId String @db.Uuid
+  order            Int    @default(0)
+
+  subjectPackage SubjectPackage   @relation(fields: [subjectPackageId], references: [id])
+  lessons        SubjectLesson[]
+}
+
+model SubjectLesson {
+  id        String @id @default(uuid()) @db.Uuid
+  title     String
+  videoUrl  String
+  sectionId String @db.Uuid
+  order     Int    @default(0)
+
+  section  SubjectSection          @relation(fields: [sectionId], references: [id])
+  progress SubjectLessonProgress[]
+  quiz     SubjectQuiz?
+}
+
+model SubjectLessonProgress {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  lessonId    String    @db.Uuid
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+
+  user   User          @relation(fields: [userId], references: [id])
+  lesson SubjectLesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, lessonId])
+}
+
+enum SubjectQuizQuestionType {
+  multiple_choice
+  short_answer
+}
+
+model SubjectQuiz {
+  id        String   @id @default(uuid()) @db.Uuid
+  lessonId  String   @unique @db.Uuid
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  lesson    SubjectLesson         @relation(fields: [lessonId], references: [id])
+  questions SubjectQuizQuestion[]
+  attempts  SubjectQuizAttempt[]
+}
+
+model SubjectQuizQuestion {
+  id            String                  @id @default(uuid()) @db.Uuid
+  quizId        String                  @db.Uuid
+  type          SubjectQuizQuestionType
+  prompt        String
+  order         Int                     @default(0)
+  options       Json?
+  correctOption Int?
+
+  quiz    SubjectQuiz          @relation(fields: [quizId], references: [id])
+  answers SubjectQuizAnswer[]
+}
+
+model SubjectQuizAttempt {
+  id           String    @id @default(uuid()) @db.Uuid
+  quizId       String    @db.Uuid
+  studentId    String    @db.Uuid
+  score        Int?
+  submittedAt  DateTime?
+  gradedAt     DateTime?
+  createdAt    DateTime  @default(now())
+
+  quiz    SubjectQuiz         @relation(fields: [quizId], references: [id])
+  student User                @relation(fields: [studentId], references: [id])
+  answers SubjectQuizAnswer[]
+
+  @@unique([quizId, studentId])
+}
+
+model SubjectQuizAnswer {
+  id               String  @id @default(uuid()) @db.Uuid
+  attemptId        String  @db.Uuid
+  questionId       String  @db.Uuid
+  selectedOption   Int?
+  textAnswer       String?
+  isCorrect        Boolean?
+  reviewerFeedback String?
+
+  attempt  SubjectQuizAttempt  @relation(fields: [attemptId], references: [id])
+  question SubjectQuizQuestion @relation(fields: [questionId], references: [id])
+
+  @@unique([attemptId, questionId])
 }
 
 model SubjectEnrollment {
