@@ -18,3 +18,8 @@ node_modules
 lib/generated/prisma/
 .DS_Store
 /lib/generated/prisma
+
+# Playwright
+/playwright-report/
+/test-results/
+/playwright/.auth/

@@ -16,7 +16,13 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:seed-categories": "tsx scripts/seed-categories.ts",
     "auth:set-admin-password": "tsx scripts/set-admin-password.ts",
-    "auth:set-content-manager-password": "tsx scripts/set-content-manager-password.ts"
+    "auth:set-content-manager-password": "tsx scripts/set-content-manager-password.ts",
+    "seed:e2e": "tsx scripts/seed-e2e-users.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report",
+    "db:resilience-check": "tsx scripts/db-resilience-check.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -76,6 +82,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^22",
     "@types/nodemailer": "^8.0.1",
