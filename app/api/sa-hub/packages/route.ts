@@ -29,7 +29,7 @@ export async function GET(req: Request) {
   })
   if (!parsed.success) return Response.json({ error: "Invalid query" }, { status: 400 })
 
-  const where: Record<string, unknown> = {}
+  const where: Record<string, unknown> = { status: "approved" }
   if (parsed.data.subject) where.subject = { contains: parsed.data.subject.trim(), mode: "insensitive" }
   if (parsed.data.grade) where.grade = parsed.data.grade
   if (parsed.data.term) where.term = parsed.data.term

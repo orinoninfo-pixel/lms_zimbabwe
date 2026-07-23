@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ConfirmDialog } from "@/components/admin/confirm-dialog"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { StatusBadge } from "@/components/admin/status-badge"
 import { toast } from "@/hooks/use-toast"
 import { formatZimLevel, formatExaminingBody } from "@/lib/zim-education"
 
@@ -17,6 +18,7 @@ type SubjectRow = {
   grade: number
   term: number | null
   examiningBody: string
+  status: "draft" | "pending" | "approved" | "rejected" | "suspended"
   price: number
   includesLiveLessons: boolean
   isExamPrep: boolean
@@ -115,6 +117,9 @@ export function SubjectsTable({
                 <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Subject
                 </th>
+                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Status
+                </th>
                 <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground hidden md:table-cell">
                   Grade / Term
                 </th>
@@ -151,6 +156,9 @@ export function SubjectsTable({
                           {s.isHolidayLearning ? <Badge variant="secondary">Holiday</Badge> : null}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <StatusBadge kind="subject" value={s.status} />
                     </td>
                     <td className="px-5 py-4 hidden md:table-cell text-sm text-muted-foreground">
                       {formatZimLevel(s.grade)}

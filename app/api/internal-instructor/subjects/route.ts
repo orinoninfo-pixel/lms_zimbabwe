@@ -60,48 +60,57 @@ export async function POST(req: Request) {
 
   const { title, description, subject, grade, term, price, categoryId, sections, ...flags } = parsed.data
 
-  const created = await prisma.$transaction(async (tx) => {
-    const subjectPackage = await tx.subjectPackage.create({
-      data: {
-        title,
-        description,
-        subject,
-        grade,
-        term: term ?? null,
-        price,
-        currency: "USD",
-        billingPeriod: "monthly",
-        categoryId: categoryId ?? null,
-        teacherId: auth.user.id,
-        isCapsAligned: flags.isCapsAligned ?? true,
-        examiningBody: flags.examiningBody ?? "zimsec",
-        includesLiveLessons: flags.includesLiveLessons ?? true,
-        isExamPrep: flags.isExamPrep ?? false,
-        isHolidayLearning: flags.isHolidayLearning ?? false,
-      },
-    })
+  try {
+    const created = await prisma.$transaction(async (tx) => {
+      const subjectPackage = await tx.subjectPackage.create({
+        data: {
+          title,
+          description,
+          subject,
+          grade,
+          term: term ?? null,
+          price,
+          currency: "USD",
+          billingPeriod: "monthly",
+          categoryId: categoryId ?? null,
+          teacherId: auth.user.id,
+          isCapsAligned: flags.isCapsAligned ?? true,
+          examiningBody: flags.examiningBody ?? "zimsec",
+          includesLiveLessons: flags.includesLiveLessons ?? true,
+          isExamPrep: flags.isExamPrep ?? false,
+          isHolidayLearning: flags.isHolidayLearning ?? false,
+          // New subjects always start as a draft — only an admin approval
+          // (see /api/admin/subjects) can make one "approved" and therefore
+          // visible/enrollable by students.
+          status: "draft",
+        },
+      })
 
-    if (sections?.length) {
-      for (const [sectionIndex, sectionInput] of sections.entries()) {
-        const section = await tx.subjectSection.create({
-          data: { title: sectionInput.title, subjectPackageId: subjectPackage.id, order: sectionIndex },
-        })
-
-        if (sectionInput.lessons.length) {
-          await tx.subjectLesson.createMany({
-            data: sectionInput.lessons.map((l, lessonIndex) => ({
-              title: l.title,
-              videoUrl: l.videoUrl ?? placeholderVideo,
-              sectionId: section.id,
-              order: lessonIndex,
-            })),
+      if (sections?.length) {
+        for (const [sectionIndex, sectionInput] of sections.entries()) {
+          const section = await tx.subjectSection.create({
+            data: { title: sectionInput.title, subjectPackageId: subjectPackage.id, order: sectionIndex },
           })
+
+          if (sectionInput.lessons.length) {
+            await tx.subjectLesson.createMany({
+              data: sectionInput.lessons.map((l, lessonIndex) => ({
+                title: l.title,
+                videoUrl: l.videoUrl ?? placeholderVideo,
+                sectionId: section.id,
+                order: lessonIndex,
+              })),
+            })
+          }
         }
       }
-    }
 
-    return subjectPackage
-  })
+      return subjectPackage
+    })
 
-  return Response.json({ success: true, subjectId: created.id })
+    return Response.json({ success: true, subjectId: created.id })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to create subject"
+    return Response.json({ error: message }, { status: 500 })
+  }
 }

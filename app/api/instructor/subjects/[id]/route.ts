@@ -28,6 +28,7 @@ const UpdateSubjectSchema = z.object({
   isExamPrep: z.boolean().optional(),
   isHolidayLearning: z.boolean().optional(),
   sections: z.array(SectionInputSchema).optional(),
+  action: z.enum(["submit"]).optional(),
 })
 
 const curriculumInclude = {
@@ -85,13 +86,13 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
 
   const subject = await prisma.subjectPackage.findUnique({
     where: { id },
-    select: { id: true, teacherId: true, _count: { select: { enrollments: true } } },
+    select: { id: true, teacherId: true, status: true, _count: { select: { enrollments: true } } },
   })
   if (!subject || subject.teacherId !== instructor.id) {
     return Response.json({ error: "Subject not found" }, { status: 404 })
   }
 
-  const { sections, ...fields } = parsed.data
+  const { sections, action, ...fields } = parsed.data
 
   if (sections !== undefined && subject._count.enrollments > 0) {
     return Response.json(
@@ -100,38 +101,57 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
     )
   }
 
-  const updated = await prisma.$transaction(async (tx) => {
-    if (sections !== undefined) {
-      await tx.subjectLessonProgress.deleteMany({ where: { lesson: { section: { subjectPackageId: id } } } })
-      await tx.subjectLesson.deleteMany({ where: { section: { subjectPackageId: id } } })
-      await tx.subjectSection.deleteMany({ where: { subjectPackageId: id } })
+  if (action === "submit" && subject.status !== "draft" && subject.status !== "rejected") {
+    return Response.json(
+      { error: "Only draft or rejected subjects can be submitted for approval." },
+      { status: 400 }
+    )
+  }
 
-      for (const [sectionIndex, sectionInput] of sections.entries()) {
-        const section = await tx.subjectSection.create({
-          data: { title: sectionInput.title, subjectPackageId: id, order: sectionIndex },
-        })
+  // Resubmitting clears the previous rejection note and always re-enters the
+  // admin review queue as "pending" — tutors can never set "approved" themselves.
+  const updateData = {
+    ...fields,
+    ...(action === "submit" ? { status: "pending" as const, moderationNote: null } : {}),
+  }
 
-        if (sectionInput.lessons.length) {
-          await tx.subjectLesson.createMany({
-            data: sectionInput.lessons.map((l, lessonIndex) => ({
-              title: l.title,
-              videoUrl: l.videoUrl ?? placeholderVideo,
-              sectionId: section.id,
-              order: lessonIndex,
-            })),
+  try {
+    const updated = await prisma.$transaction(async (tx) => {
+      if (sections !== undefined) {
+        await tx.subjectLessonProgress.deleteMany({ where: { lesson: { section: { subjectPackageId: id } } } })
+        await tx.subjectLesson.deleteMany({ where: { section: { subjectPackageId: id } } })
+        await tx.subjectSection.deleteMany({ where: { subjectPackageId: id } })
+
+        for (const [sectionIndex, sectionInput] of sections.entries()) {
+          const section = await tx.subjectSection.create({
+            data: { title: sectionInput.title, subjectPackageId: id, order: sectionIndex },
           })
+
+          if (sectionInput.lessons.length) {
+            await tx.subjectLesson.createMany({
+              data: sectionInput.lessons.map((l, lessonIndex) => ({
+                title: l.title,
+                videoUrl: l.videoUrl ?? placeholderVideo,
+                sectionId: section.id,
+                order: lessonIndex,
+              })),
+            })
+          }
         }
       }
-    }
 
-    return tx.subjectPackage.update({
-      where: { id },
-      data: fields,
-      include: curriculumInclude,
+      return tx.subjectPackage.update({
+        where: { id },
+        data: updateData,
+        include: curriculumInclude,
+      })
     })
-  })
 
-  return Response.json({ success: true, subject: updated })
+    return Response.json({ success: true, subject: updated })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to save subject"
+    return Response.json({ error: message }, { status: 500 })
+  }
 }
 
 export async function DELETE(_: Request, context: { params: Promise<{ id: string }> }) {

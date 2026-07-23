@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Save } from "lucide-react"
+import { ArrowLeft, Save, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,9 +12,12 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { StatusBadge } from "@/components/admin/status-badge"
 import { ZIM_LEVELS, EXAMINING_BODIES } from "@/lib/zim-education"
 import { CurriculumBuilder, type Section as BuilderSection } from "@/components/instructor/course-creator/curriculum-builder"
 import { SubjectQuizManager } from "@/components/shared/subject-quiz-manager"
+
+type SubjectStatus = "draft" | "pending" | "approved" | "rejected" | "suspended"
 
 type Category = { id: string; name: string }
 
@@ -49,10 +52,15 @@ export function SubjectEditor({
   const [isHolidayLearning, setIsHolidayLearning] = useState(false)
   const [sections, setSections] = useState<BuilderSection[]>([])
   const [enrollmentsCount, setEnrollmentsCount] = useState(0)
+  const [status, setStatus] = useState<SubjectStatus>("draft")
+  const [moderationNote, setModerationNote] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(isEdit)
   const [isSaving, setIsSaving] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
+
+  const canSubmitForReview = isEdit && (status === "draft" || status === "rejected")
 
   const curriculumLocked = isEdit && enrollmentsCount > 0
   const persistedLessons = sections
@@ -90,6 +98,8 @@ export function SubjectEditor({
       setIsExamPrep(s.isExamPrep)
       setIsHolidayLearning(s.isHolidayLearning)
       setEnrollmentsCount(s._count?.enrollments ?? 0)
+      setStatus(s.status ?? "draft")
+      setModerationNote(s.moderationNote ?? null)
       setSections(
         ((s.sections ?? []) as Array<{
           id: string
@@ -125,13 +135,14 @@ export function SubjectEditor({
     grade.trim().length > 0 &&
     price.trim().length > 0
 
-  const save = async () => {
+  const save = async (submitForReview?: boolean) => {
     setError(null)
     if (!isValid) {
       setError("Add a title, subject name, grade, a description of at least 20 characters, and a price.")
       return
     }
-    setIsSaving(true)
+    const setBusy = submitForReview ? setIsSubmitting : setIsSaving
+    setBusy(true)
     try {
       const priceValue = Number(price)
       const gradeValue = Number(grade)
@@ -158,6 +169,7 @@ export function SubjectEditor({
                 lessons: section.lessons.map((lesson) => ({ title: lesson.title })),
               })),
             }),
+        ...(submitForReview ? { action: "submit" as const } : {}),
       }
 
       const res = await fetch(isEdit ? `${apiBasePath}/${subjectId}` : apiBasePath, {
@@ -170,9 +182,14 @@ export function SubjectEditor({
         setError(data?.error ?? "Failed to save subject")
         return
       }
+      if (submitForReview) {
+        setStatus("pending")
+        setModerationNote(null)
+        return
+      }
       router.push(backHref)
     } finally {
-      setIsSaving(false)
+      setBusy(false)
     }
   }
 
@@ -201,11 +218,20 @@ export function SubjectEditor({
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-foreground">{isEdit ? "Edit Subject" : "New Subject"}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-bold text-foreground">{isEdit ? "Edit Subject" : "New Subject"}</h1>
+          {isEdit ? <StatusBadge kind="subject" value={status} /> : null}
+        </div>
         <p className="text-muted-foreground">
           Subjects power the Zimbabwe Learning Hub — ZIMSEC/Cambridge-aligned support by grade and term, with
           live lessons, homework, and exam resources.
         </p>
+        {isEdit && status === "rejected" && moderationNote ? (
+          <Alert className="mt-3 border-destructive/30 bg-destructive/5">
+            <AlertTitle>Rejected by admin</AlertTitle>
+            <AlertDescription>{moderationNote}</AlertDescription>
+          </Alert>
+        ) : null}
       </div>
 
       <Card className="max-w-2xl">
@@ -359,14 +385,21 @@ export function SubjectEditor({
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button onClick={() => void save()} disabled={isSaving} className="gap-2">
+            <Button onClick={() => void save()} disabled={isSaving || isSubmitting} variant={canSubmitForReview ? "outline" : "default"} className="gap-2">
               <Save className="h-4 w-4" />
               {isEdit ? "Save Changes" : "Create Subject"}
             </Button>
+            {canSubmitForReview ? (
+              <Button onClick={() => void save(true)} disabled={isSaving || isSubmitting} className="gap-2">
+                <Send className="h-4 w-4" />
+                {isSubmitting ? "Submitting..." : "Submit for Review"}
+              </Button>
+            ) : null}
           </div>
           <p className="text-xs text-muted-foreground">
-            Subjects go live immediately for students to browse and enroll in the Zimbabwe Learning Hub — there is
-            no separate admin approval step for subjects today.
+            {isEdit
+              ? "Subjects must be approved by an admin before students can browse or subscribe to them."
+              : "Your new subject saves as a draft — submit it for admin review once you're ready to publish."}
           </p>
         </CardContent>
       </Card>

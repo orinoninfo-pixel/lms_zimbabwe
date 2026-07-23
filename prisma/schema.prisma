@@ -31,6 +31,14 @@ enum ExaminingBody {
   cambridge
 }
 
+enum SubjectPackageStatus {
+  draft
+  pending
+  approved
+  rejected
+  suspended
+}
+
 enum CourseStatus {
   draft
   pending
@@ -542,6 +550,8 @@ model SubjectPackage {
   includesLiveLessons Boolean @default(true)
   isExamPrep         Boolean @default(false)
   isHolidayLearning  Boolean @default(false)
+  status             SubjectPackageStatus @default(approved)
+  moderationNote     String?
   teacherId          String? @db.Uuid
   categoryId         String? @db.Uuid
   createdAt          DateTime @default(now())

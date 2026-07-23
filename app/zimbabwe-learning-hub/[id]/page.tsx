@@ -58,6 +58,13 @@ export default async function ZimbabweLearningHubPackagePage({ params }: { param
 
   if (!pkg) notFound()
 
+  if (pkg.status !== "approved") {
+    const canPreview =
+      session?.role === "admin" ||
+      ((session?.role === "instructor" || session?.role === "internal_instructor") && session.userId === pkg.teacherId)
+    if (!canPreview) notFound()
+  }
+
   let enrollment: { status: string; endDate: string | null; price: number; billingPeriod: string } | null = null
   let hasActiveAccess = false
 

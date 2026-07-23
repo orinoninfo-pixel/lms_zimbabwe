@@ -19,6 +19,14 @@ export async function GET(_req: Request, context: { params: Promise<{ id: string
   if (!pkg) return Response.json({ error: "Not found" }, { status: 404 })
 
   const session = await getSession()
+
+  if (pkg.status !== "approved") {
+    const canPreview =
+      session?.role === "admin" ||
+      ((session?.role === "instructor" || session?.role === "internal_instructor") && session.userId === pkg.teacherId)
+    if (!canPreview) return Response.json({ error: "Not found" }, { status: 404 })
+  }
+
   const studentId = session?.role === "student" ? session.userId : null
 
   let enrollment: { status: string; endDate: string | null; price: number; billingPeriod: string } | null = null

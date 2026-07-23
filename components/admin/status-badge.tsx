@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-type Kind = "course" | "user" | "application" | "report" | "transaction"
+type Kind = "course" | "subject" | "user" | "application" | "report" | "transaction"
 
 export function StatusBadge({
   kind,
@@ -21,7 +21,7 @@ function getStatusClasses(kind: Kind, value: string) {
     if (v === "suspended") return "bg-amber-100 text-amber-800"
     if (v === "banned") return "bg-rose-100 text-rose-700"
   }
-  if (kind === "course") {
+  if (kind === "course" || kind === "subject") {
     if (v === "approved") return "bg-emerald-100 text-emerald-700"
     if (v === "pending") return "bg-amber-100 text-amber-800"
     if (v === "rejected") return "bg-rose-100 text-rose-700"
