@@ -54,8 +54,8 @@ export function RecentEnrollments() {
   }, [])
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm">
-      <div className="p-5 border-b border-border">
+    <div className="rounded-lg border border-border bg-card shadow-xs">
+      <div className="border-b border-border p-5">
         <h2 className="text-lg font-semibold text-foreground">Recent Enrollments</h2>
         <p className="text-sm text-muted-foreground">Latest students who enrolled in your courses</p>
       </div>
@@ -75,7 +75,7 @@ export function RecentEnrollments() {
       <div className="divide-y divide-border">
         {enrollments.map((enrollment) => (
           <div key={enrollment.id} className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/50 text-accent-foreground text-sm font-semibold flex-shrink-0">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
               {initialsFor(enrollment.studentName)}
             </div>
             <div className="flex-1 min-w-0">

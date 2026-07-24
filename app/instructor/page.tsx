@@ -13,34 +13,29 @@ export default async function InstructorDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <InstructorSidebar />
-      
+
       <div className="lg:pl-64">
         <InstructorHeader />
-        
+
         <main className="p-4 lg:p-6">
-          {/* Welcome Section */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-foreground">
+          <div className="mb-6 rounded-lg border border-border bg-gradient-to-r from-background via-muted/30 to-primary/5 p-5 shadow-xs">
+            <h1 className="text-2xl font-semibold text-foreground md:text-3xl">
               Welcome back{auth.user.name ? `, ${auth.user.name}` : ""}!
             </h1>
-            <p className="text-muted-foreground">
+            <p className="mt-2 text-muted-foreground">
               Here&apos;s what&apos;s happening with your courses today.
             </p>
           </div>
 
-          {/* Stats */}
           <div className="mb-6">
             <InstructorStats />
           </div>
 
-          {/* Main Content Grid */}
           <div className="grid gap-6 lg:grid-cols-3">
-            {/* Courses Table - Takes 2 columns */}
             <div className="lg:col-span-2">
               <InstructorCoursesTable />
             </div>
 
-            {/* Recent Enrollments Sidebar */}
             <div className="lg:col-span-1">
               <RecentEnrollments />
             </div>

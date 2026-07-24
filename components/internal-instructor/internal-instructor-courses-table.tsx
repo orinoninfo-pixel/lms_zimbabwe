@@ -79,8 +79,8 @@ export function InternalInstructorCoursesTable() {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 border-b border-border">
+    <div className="rounded-lg border border-border bg-card shadow-xs">
+      <div className="flex flex-col justify-between gap-4 border-b border-border p-5 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-lg font-semibold text-foreground">My Courses</h2>
           <p className="text-sm text-muted-foreground">Create and manage internal, platform-owned courses</p>
@@ -89,7 +89,7 @@ export function InternalInstructorCoursesTable() {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as (typeof filters)[number])}
-            className="h-9 rounded-lg border border-input bg-background px-3 text-sm capitalize"
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm capitalize"
           >
             {filters.map((f) => (
               <option key={f} value={f} className="capitalize">

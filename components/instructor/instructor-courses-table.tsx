@@ -104,19 +104,17 @@ export function InstructorCoursesTable() {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 border-b border-border">
+    <div className="rounded-lg border border-border bg-card shadow-xs">
+      <div className="flex flex-col justify-between gap-4 border-b border-border p-5 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-lg font-semibold text-foreground">My Courses</h2>
           <p className="text-sm text-muted-foreground">Manage and track your courses</p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Filter Dropdown */}
           <div className="relative">
             <button
               onClick={() => setOpenDropdown(openDropdown === "__filter__" ? null : "__filter__")}
-              className="flex items-center gap-2 h-9 px-3 rounded-lg border border-input bg-background text-sm font-medium hover:bg-muted transition-colors"
+              className="flex h-10 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-muted"
             >
               {filter}
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -124,7 +122,7 @@ export function InstructorCoursesTable() {
             {openDropdown === "__filter__" && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setOpenDropdown(null)} />
-                <div className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-border bg-card shadow-lg z-20">
+                <div className="absolute right-0 top-full z-20 mt-1 w-36 rounded-md border border-border bg-card shadow-sm">
                   {["All", "Published", "Draft", "Under Review", "Rejected", "Suspended"].map((status) => (
                     <button
                       key={status}
@@ -132,7 +130,7 @@ export function InstructorCoursesTable() {
                         setFilter(status)
                         setOpenDropdown(null)
                       }}
-                      className="w-full px-3 py-2 text-left text-sm hover:bg-muted transition-colors first:rounded-t-lg last:rounded-b-lg"
+                      className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-muted first:rounded-t-md last:rounded-b-md"
                     >
                       {status}
                     </button>
@@ -156,7 +154,6 @@ export function InstructorCoursesTable() {
         </div>
       ) : null}
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -197,7 +194,7 @@ export function InstructorCoursesTable() {
                 <tr key={course.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-20 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
+                      <div className="h-12 w-20 overflow-hidden rounded-md bg-muted flex-shrink-0">
                         <div className="h-full w-full bg-gradient-to-br from-accent/20 to-muted flex items-center justify-center">
                           <span className="text-xs text-muted-foreground">Thumbnail</span>
                         </div>
@@ -218,7 +215,7 @@ export function InstructorCoursesTable() {
                         </p>
                         {/* Mobile status badge */}
                         <span className={cn(
-                          "inline-flex md:hidden mt-1 px-2 py-0.5 rounded-full text-xs font-medium",
+                          "mt-1 inline-flex rounded-sm px-2 py-0.5 text-xs font-medium md:hidden",
                           statusColors[course.status]
                         )}>
                           {course.status}
@@ -228,7 +225,7 @@ export function InstructorCoursesTable() {
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
                     <span className={cn(
-                      "inline-flex px-2.5 py-1 rounded-full text-xs font-medium",
+                      "inline-flex rounded-sm px-2.5 py-1 text-xs font-medium",
                       statusColors[course.status]
                     )}>
                       {course.status}
@@ -275,7 +272,7 @@ export function InstructorCoursesTable() {
                       ) : null}
                       <button
                         onClick={() => setOpenDropdown(openDropdown === course.id ? null : course.id)}
-                        className="p-2 rounded-lg hover:bg-muted transition-colors"
+                        className="rounded-md p-2 transition-colors hover:bg-muted"
                         disabled={busy}
                       >
                         <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
@@ -283,11 +280,11 @@ export function InstructorCoursesTable() {
                       {openDropdown === course.id && (
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setOpenDropdown(null)} />
-                          <div className="absolute right-0 top-full mt-1 w-44 rounded-lg border border-border bg-card shadow-lg z-20">
+                          <div className="absolute right-0 top-full z-20 mt-1 w-44 rounded-md border border-border bg-card shadow-sm">
                             <Link
                               href={`/instructor/courses/${course.id}/edit`}
                               onClick={() => setOpenDropdown(null)}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors rounded-t-lg"
+                              className="flex w-full items-center gap-2 rounded-t-md px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                             >
                               <Edit className="h-4 w-4" />
                               Edit Course
@@ -297,7 +294,7 @@ export function InstructorCoursesTable() {
                               target="_blank"
                               rel="noreferrer"
                               onClick={() => setOpenDropdown(null)}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                             >
                               <Eye className="h-4 w-4" />
                               Preview
@@ -306,7 +303,7 @@ export function InstructorCoursesTable() {
                               <ConfirmDialog
                                 trigger={
                                   <button
-                                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors rounded-b-lg"
+                                    className="flex w-full items-center gap-2 rounded-b-md px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
                                     onClick={() => setOpenDropdown(null)}
                                   >
                                     <Trash2 className="h-4 w-4" />
@@ -332,7 +329,6 @@ export function InstructorCoursesTable() {
         </table>
       </div>
 
-      {/* Footer */}
       <div className="flex items-center justify-between px-5 py-4 border-t border-border">
         <p className="text-sm text-muted-foreground">
           Showing {filteredCourses.length} of {courses.length} courses

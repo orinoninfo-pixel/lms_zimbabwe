@@ -42,22 +42,22 @@ export function Navbar() {
   }
 
   const navLinkClass =
-    "text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors duration-200"
+    "text-sm font-medium text-foreground/75 transition-colors duration-200 hover:text-foreground"
   const primaryCtaClass =
-    "inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700"
+    "inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-xs transition-all duration-200 hover:bg-primary/95"
   const secondaryPillClass =
-    "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/80 px-5 py-2 text-sm font-medium text-slate-700 backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white"
+    "inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground/80 transition-colors duration-200 hover:bg-muted hover:text-foreground"
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 shadow-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary shadow-xs">
                 <span className="text-lg font-bold text-white">Z</span>
               </div>
-              <span className="text-xl font-semibold tracking-tight text-slate-900">Zim Learning</span>
+              <span className="text-lg font-semibold tracking-tight text-foreground">Zim Learning</span>
             </Link>
             <div className="hidden md:flex items-center gap-6">
               <Link href="/courses" className={navLinkClass}>
@@ -106,7 +106,7 @@ export function Navbar() {
           </div>
 
           <button
-            className="md:hidden p-2 rounded-full text-slate-600 hover:bg-slate-100 transition-colors"
+            className="rounded-md p-2 text-foreground/70 transition-colors hover:bg-muted hover:text-foreground md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -116,26 +116,26 @@ export function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md">
-          <div className="px-4 py-4 space-y-3">
-            <Link href="/courses" className="block text-sm text-slate-600 hover:text-slate-900 transition-colors py-2">
+        <div className="border-t border-border bg-background md:hidden">
+          <div className="space-y-2 px-4 py-4">
+            <Link href="/courses" className="block rounded-md px-2 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground">
               Courses
             </Link>
-            <Link href="/categories" className="block text-sm text-slate-600 hover:text-slate-900 transition-colors py-2">
+            <Link href="/categories" className="block rounded-md px-2 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground">
               Categories
             </Link>
-            <Link href="/for-business" className="block text-sm text-slate-600 hover:text-slate-900 transition-colors py-2">
+            <Link href="/for-business" className="block rounded-md px-2 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground">
               For Business
             </Link>
-            <Link href="/zimbabwe-learning-hub" className="block text-sm text-slate-600 hover:text-slate-900 transition-colors py-2">
+            <Link href="/zimbabwe-learning-hub" className="block rounded-md px-2 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground">
               Zimbabwe Learning Hub
             </Link>
-            <div className="flex flex-col gap-2 pt-3 border-t border-slate-100">
+            <div className="flex flex-col gap-2 border-t border-border pt-3">
               {isLoggedIn ? (
                 <>
                   <Link
                     href={dashboard.href}
-                    className="block w-full text-center text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
+                    className="block w-full rounded-md px-3 py-2 text-center text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground"
                   >
                     {dashboard.label}
                   </Link>
@@ -148,7 +148,7 @@ export function Navbar() {
                   {showBecomeInstructor ? (
                     <Link
                       href="/become-instructor"
-                      className="block w-full text-center text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
+                      className="block w-full rounded-md px-3 py-2 text-center text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground"
                     >
                       Become an Instructor
                     </Link>

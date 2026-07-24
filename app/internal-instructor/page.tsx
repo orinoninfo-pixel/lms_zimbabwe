@@ -29,12 +29,12 @@ export default async function InternalInstructorOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-gradient-to-r from-background via-muted/30 to-primary/5 p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-semibold text-foreground md:text-3xl">
             Welcome back{auth.user.name ? `, ${auth.user.name}` : ""}!
           </h1>
-          <p className="text-muted-foreground">Here&apos;s the status of your platform-owned courses.</p>
+          <p className="mt-2 text-muted-foreground">Here&apos;s the status of your platform-owned courses.</p>
         </div>
         <Button asChild className="gap-2">
           <Link href="/internal-instructor/courses/new">
@@ -45,7 +45,7 @@ export default async function InternalInstructorOverviewPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Total courses</CardTitle>
           </CardHeader>
@@ -53,7 +53,7 @@ export default async function InternalInstructorOverviewPage() {
             <div className="text-2xl font-semibold text-foreground">{courses.length}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Draft</CardTitle>
           </CardHeader>
@@ -61,7 +61,7 @@ export default async function InternalInstructorOverviewPage() {
             <div className="text-2xl font-semibold text-foreground">{draftCount}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Pending approval</CardTitle>
           </CardHeader>
@@ -69,7 +69,7 @@ export default async function InternalInstructorOverviewPage() {
             <div className="text-2xl font-semibold text-foreground">{pendingCount}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Approved (live)</CardTitle>
           </CardHeader>
@@ -80,7 +80,7 @@ export default async function InternalInstructorOverviewPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Total enrollments</CardTitle>
           </CardHeader>
@@ -90,7 +90,7 @@ export default async function InternalInstructorOverviewPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="shadow-xs">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">Recent courses</CardTitle>
           <Button asChild variant="outline" size="sm">

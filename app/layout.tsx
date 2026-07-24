@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter, Manrope, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 // next/font self-hosts and inlines these at build time — no runtime request
 // to fonts.googleapis.com, and `swap` avoids invisible-text on slow links.
-const geist = Geist({ subsets: ["latin"], display: "swap", variable: "--font-geist-sans" })
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" })
+const manrope = Manrope({ subsets: ["latin"], display: "swap", variable: "--font-manrope" })
 const geistMono = Geist_Mono({ subsets: ["latin"], display: "swap", variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <body className={`${geist.className} ${geistMono.className} font-sans antialiased`}>
+      <body className={`${inter.variable} ${manrope.variable} ${geistMono.variable} font-sans antialiased`}>
         {children}
         <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}

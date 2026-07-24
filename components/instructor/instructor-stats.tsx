@@ -35,7 +35,7 @@ export function InstructorStats() {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-card rounded-xl border border-border p-5 shadow-sm">
+          <div key={i} className="rounded-lg border border-border bg-card p-5 shadow-xs">
             <p className="text-sm text-muted-foreground">Loading...</p>
           </div>
         ))}
@@ -45,7 +45,7 @@ export function InstructorStats() {
 
   if (!stats) {
     return (
-      <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
+      <div className="rounded-lg border border-destructive/30 bg-card p-5 shadow-xs">
         <p className="text-sm text-destructive">Failed to load your stats.</p>
       </div>
     )
@@ -105,14 +105,14 @@ export function InstructorStats() {
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {primaryStats.map((stat) => (
-          <div key={stat.name} className="bg-card rounded-xl border border-border p-5 shadow-sm">
+          <div key={stat.name} className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
                 <p className="mt-1 text-2xl font-semibold text-foreground">{stat.value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{stat.change}</p>
               </div>
-              <div className={`rounded-lg p-2.5 ${stat.iconBg}`}>
+              <div className={`rounded-md p-2.5 ${stat.iconBg}`}>
                 <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
               </div>
             </div>
@@ -124,9 +124,9 @@ export function InstructorStats() {
         {secondaryStats.map((stat) => (
           <div
             key={stat.name}
-            className="bg-card rounded-xl border border-border p-4 shadow-sm flex items-center gap-4"
+            className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
           >
-            <div className="rounded-lg bg-muted p-2.5">
+            <div className="rounded-md bg-muted p-2.5">
               <stat.icon className="h-5 w-5 text-muted-foreground" />
             </div>
             <div className="flex-1">

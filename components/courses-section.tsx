@@ -26,10 +26,10 @@ export async function CoursesSection() {
 
   if (!courses || courses.length === 0) {
     return (
-      <section id="courses" className="py-20 md:py-28 bg-muted/50">
+      <section id="courses" className="bg-muted/30 py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center text-center">
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl text-balance">
+            <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               Featured Courses
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">No courses available right now.</p>
@@ -40,11 +40,11 @@ export async function CoursesSection() {
   }
 
   return (
-    <section id="courses" className="py-20 md:py-28 bg-muted/50">
+    <section id="courses" className="bg-muted/30 py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12 gap-4">
+        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl text-balance">
+            <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               Featured Courses
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
@@ -59,7 +59,7 @@ export async function CoursesSection() {
           {courses.map((course) => (
             <article
               key={course.id}
-              className="group bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-lg hover:border-muted-foreground/20 transition-all duration-300"
+              className="group overflow-hidden rounded-lg border border-border bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
             >
               <Link href={`/course/${course.id}`} className="block">
                 <div className="relative aspect-video overflow-hidden">
@@ -76,7 +76,7 @@ export async function CoursesSection() {
               </Link>
               <div className="p-5">
                 <Link href={`/course/${course.id}`}>
-                  <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-accent transition-colors">
+                  <h3 className="line-clamp-2 font-semibold text-foreground transition-colors group-hover:text-primary">
                     {course.title}
                   </h3>
                 </Link>

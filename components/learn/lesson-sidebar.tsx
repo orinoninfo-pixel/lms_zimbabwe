@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 import {
   ChevronDown,
@@ -61,17 +62,17 @@ export function LessonSidebar({
     0
   )
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <>
       {/* Header */}
       <div className="p-4 border-b border-border">
-        <a
+        <Link
           href="/"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
         >
           <ChevronLeft className="h-4 w-4" />
           Back to course
-        </a>
+        </Link>
         <h2 className="font-semibold text-foreground line-clamp-2 text-balance">
           {courseTitle}
         </h2>
@@ -237,7 +238,7 @@ export function LessonSidebar({
           isMobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
         )}
       >
-        <SidebarContent />
+        {sidebarContent}
       </aside>
     </>
   )

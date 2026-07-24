@@ -63,36 +63,33 @@ export function InstructorHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card px-4 lg:px-6">
-        {/* Mobile Menu Button */}
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background/95 px-4 backdrop-blur-sm lg:px-6">
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground"
+          className="-ml-2 rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
+          aria-label="Open instructor menu"
         >
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Mobile Logo */}
         <Link href="/instructor" className="flex items-center gap-2 lg:hidden">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary shadow-xs">
             <GraduationCap className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-semibold text-foreground">Zim Learning</span>
+          <span className="text-base font-semibold text-foreground">Zim Learning</span>
         </Link>
 
-        {/* Search Bar */}
         <div className="flex-1 max-w-md hidden sm:block">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
               placeholder="Search courses, students..."
-              className="w-full h-10 rounded-lg border border-input bg-background pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-10 w-full rounded-md border border-input bg-background pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </div>
         </div>
 
-        {/* Right Side */}
         <div className="ml-auto flex items-center gap-3">
           <Link
             href="/"
@@ -106,10 +103,10 @@ export function InstructorHeader() {
               Create Course
             </Button>
           </Link>
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative rounded-md">
             <Bell className="h-5 w-5" />
           </Button>
-          <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground font-semibold">
+          <div className="hidden h-10 w-10 items-center justify-center rounded-md bg-primary/10 font-semibold text-primary sm:flex">
             {initials}
           </div>
           <Button variant="ghost" size="sm" onClick={signOut} className="hidden sm:inline-flex">
@@ -118,7 +115,6 @@ export function InstructorHeader() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       <div
         className={cn(
           "fixed inset-0 z-50 lg:hidden transition-opacity duration-200",
@@ -128,20 +124,21 @@ export function InstructorHeader() {
         <div className="absolute inset-0 bg-foreground/20" onClick={() => setMobileMenuOpen(false)} />
         <nav
           className={cn(
-            "absolute left-0 top-0 h-full w-72 bg-card shadow-xl transition-transform duration-200",
+            "absolute left-0 top-0 h-full w-72 border-r border-sidebar-border bg-sidebar shadow-md transition-transform duration-200",
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
-          <div className="flex h-16 items-center justify-between border-b border-border px-4">
+          <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary shadow-xs">
                 <GraduationCap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-semibold text-foreground">Zim Learning</span>
+              <span className="text-base font-semibold text-sidebar-foreground">Zim Learning</span>
             </div>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 text-muted-foreground hover:text-foreground"
+              className="rounded-md p-2 text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              aria-label="Close instructor menu"
             >
               <X className="h-5 w-5" />
             </button>
@@ -150,7 +147,7 @@ export function InstructorHeader() {
             <Link
               href="/instructor/courses/new"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 mb-4 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
+              className="mb-4 flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-xs"
             >
               <Plus className="h-4 w-4" />
               Create Course
@@ -160,7 +157,7 @@ export function InstructorHeader() {
                 key={item.name}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               >
                 <item.icon className="h-5 w-5" />
                 {item.name}
@@ -168,7 +165,7 @@ export function InstructorHeader() {
             ))}
             <button
               onClick={signOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
               <LogOut className="h-5 w-5" />
               Log out

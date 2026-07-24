@@ -71,7 +71,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
     <div className="mt-6">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground">Zimbabwe Learning Hub</h2>
-        <Link href="/zimbabwe-learning-hub" className="text-sm text-accent hover:underline">
+        <Link href="/zimbabwe-learning-hub" className="text-sm font-medium text-primary hover:underline">
           Open hub
         </Link>
       </div>
@@ -79,7 +79,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href={upcoming?.subjectPackageId ? `/zimbabwe-learning-hub/${upcoming.subjectPackageId}` : "/zimbabwe-learning-hub"}
-          className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
+          className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
         >
           <div className="flex items-start justify-between">
             <div>
@@ -93,7 +93,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
                   : "Enroll to unlock live lessons"}
               </p>
             </div>
-            <div className="rounded-lg p-2.5 bg-blue-100">
+            <div className="rounded-md bg-blue-100 p-2.5">
               <Clock className="h-5 w-5 text-blue-600" />
             </div>
           </div>
@@ -101,7 +101,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
 
         <Link
           href="/zimbabwe-learning-hub"
-          className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
+          className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
         >
           <div className="flex items-start justify-between">
             <div>
@@ -109,7 +109,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
               <p className="mt-1 text-2xl font-semibold text-foreground">{pendingHomework}</p>
               <p className="mt-1 text-xs text-muted-foreground">From paid/enrolled subjects</p>
             </div>
-            <div className="rounded-lg p-2.5 bg-amber-100">
+            <div className="rounded-md bg-amber-100 p-2.5">
               <Target className="h-5 w-5 text-amber-600" />
             </div>
           </div>
@@ -117,7 +117,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
 
         <Link
           href="/zimbabwe-learning-hub"
-          className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
+          className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
         >
           <div className="flex items-start justify-between">
             <div>
@@ -125,7 +125,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
               <p className="mt-1 text-2xl font-semibold text-foreground">{papersCount}</p>
               <p className="mt-1 text-xs text-muted-foreground">Resources in paid subjects</p>
             </div>
-            <div className="rounded-lg p-2.5 bg-emerald-100">
+            <div className="rounded-md bg-emerald-100 p-2.5">
               <BookOpen className="h-5 w-5 text-emerald-600" />
             </div>
           </div>
@@ -133,7 +133,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
 
         <Link
           href="/zimbabwe-learning-hub"
-          className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
+          className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
         >
           <div className="flex items-start justify-between">
             <div>
@@ -141,7 +141,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
               <p className="mt-1 text-2xl font-semibold text-foreground">{holidayCount}</p>
               <p className="mt-1 text-xs text-muted-foreground">Subjects you can add</p>
             </div>
-            <div className="rounded-lg p-2.5 bg-rose-100">
+            <div className="rounded-md bg-rose-100 p-2.5">
               <Trophy className="h-5 w-5 text-rose-600" />
             </div>
           </div>
@@ -149,7 +149,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-muted-foreground">Active subscriptions</p>
             <p className="text-sm font-semibold text-foreground">{activeEnrollments.length}</p>
@@ -162,7 +162,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
                 <Link
                   key={e.id}
                   href={`/zimbabwe-learning-hub/${e.subjectPackageId}`}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-3 py-2 hover:bg-muted/40 transition-colors"
+                  className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/30 px-3 py-2 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0">
                     <p className="text-sm text-foreground truncate">{e.subjectPackage.title}</p>
@@ -170,17 +170,17 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
                       Grade {e.subjectPackage.grade} · {formatMonthly(e.price)}
                     </p>
                   </div>
-                  <span className="text-xs font-medium text-emerald-600">Active</span>
+                  <span className="rounded-sm bg-success px-2 py-0.5 text-xs font-semibold text-success-foreground">Active</span>
                 </Link>
               ))}
             </div>
           )}
         </div>
 
-        <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
+        <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-muted-foreground">Recommended subjects</p>
-            <Link href="/zimbabwe-learning-hub" className="text-sm text-accent hover:underline">
+            <Link href="/zimbabwe-learning-hub" className="text-sm font-medium text-primary hover:underline">
               Browse
             </Link>
           </div>
@@ -192,7 +192,7 @@ export async function ZimbabweLearningHubSummary({ userId }: { userId: string })
                 <Link
                   key={p.id}
                   href={`/zimbabwe-learning-hub/${p.id}`}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-3 py-2 hover:bg-muted/40 transition-colors"
+                  className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/30 px-3 py-2 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0">
                     <p className="text-sm text-foreground truncate">{p.title}</p>

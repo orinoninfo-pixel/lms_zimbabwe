@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
@@ -39,7 +39,7 @@ export function AdminReportsTable() {
     return s ? `?${s}` : ""
   }, [type, status, q])
 
-  const load = async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     setError(null)
     const res = await fetch(`/api/admin/reports${queryString}`, { cache: "no-store", signal }).catch(() => null)
@@ -52,13 +52,13 @@ export function AdminReportsTable() {
     }
     setRows((json?.reports ?? []) as ReportRow[])
     setIsLoading(false)
-  }
+  }, [queryString])
 
   useEffect(() => {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
-  }, [queryString])
+  }, [load])
 
   const patch = async (reportId: string, action: string) => {
     setBusyId(reportId)
@@ -80,8 +80,8 @@ export function AdminReportsTable() {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm">
-      <div className="flex flex-col gap-4 p-5 border-b border-border">
+    <div className="rounded-lg border border-border bg-card shadow-xs">
+      <div className="flex flex-col gap-4 border-b border-border p-5">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Reports</h2>
           <p className="text-sm text-muted-foreground">Handle course complaints and user reports</p>
@@ -95,7 +95,7 @@ export function AdminReportsTable() {
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="h-9 rounded-lg border border-input bg-background px-3 text-sm"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
             >
               <option value="">All types</option>
               <option value="course_complaint">Course complaint</option>
@@ -104,7 +104,7 @@ export function AdminReportsTable() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="h-9 rounded-lg border border-input bg-background px-3 text-sm"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
             >
               <option value="">All statuses</option>
               <option value="open">Open</option>

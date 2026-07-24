@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
@@ -39,7 +39,7 @@ export function AdminInstructorsTable() {
     return s ? `?${s}` : ""
   }, [status, q])
 
-  const load = async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     setError(null)
     const res = await fetch(`/api/admin/instructors${queryString}`, { cache: "no-store", signal }).catch(() => null)
@@ -52,13 +52,13 @@ export function AdminInstructorsTable() {
     }
     setRows((json?.instructors ?? []) as InstructorRow[])
     setIsLoading(false)
-  }
+  }, [queryString])
 
   useEffect(() => {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
-  }, [queryString])
+  }, [load])
 
   const patchUser = async (body: unknown) => {
     const res = await fetch("/api/admin/users", {

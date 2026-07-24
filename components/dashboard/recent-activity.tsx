@@ -55,14 +55,14 @@ const activities = [
 
 export function RecentActivity() {
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm">
-      <div className="p-5 border-b border-border">
+    <div className="rounded-lg border border-border bg-card shadow-xs">
+      <div className="border-b border-border p-5">
         <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
       </div>
       <div className="divide-y divide-border">
         {activities.map((activity) => (
-          <div key={activity.id} className="flex items-start gap-4 p-4">
-            <div className={`rounded-lg p-2 ${activity.iconBg} flex-shrink-0`}>
+          <div key={activity.id} className="flex items-start gap-4 p-4 transition-colors hover:bg-muted/20">
+            <div className={`rounded-md p-2 ${activity.iconBg} flex-shrink-0`}>
               <activity.icon className={`h-4 w-4 ${activity.iconColor}`} />
             </div>
             <div className="flex-1 min-w-0">

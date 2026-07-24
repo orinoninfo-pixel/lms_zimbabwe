@@ -45,14 +45,14 @@ export async function EnrolledCourses() {
           <h2 className="text-xl font-semibold text-foreground">My Courses</h2>
           <Link
             href="/dashboard/courses"
-            className="text-sm font-medium text-accent hover:underline"
+            className="text-sm font-medium text-primary hover:underline"
           >
             View All
           </Link>
         </div>
-        <div className="rounded-lg border border-border p-6 bg-card">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-xs">
           <p className="text-sm text-muted-foreground">You have not enrolled in any courses yet.</p>
-          <Link href="/courses" className="mt-4 inline-block text-sm text-accent hover:underline">Browse Courses</Link>
+          <Link href="/courses" className="mt-4 inline-block text-sm text-primary hover:underline">Browse Courses</Link>
         </div>
       </div>
     )
@@ -64,7 +64,7 @@ export async function EnrolledCourses() {
         <h2 className="text-xl font-semibold text-foreground">My Courses</h2>
         <Link
           href="/dashboard/courses"
-          className="text-sm font-medium text-accent hover:underline"
+          className="text-sm font-medium text-primary hover:underline"
         >
           View All
         </Link>
@@ -73,7 +73,7 @@ export async function EnrolledCourses() {
         {enrolledCourses.map((course) => (
           <article
             key={course.id}
-            className="group bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+            className="group overflow-hidden rounded-lg border border-border bg-card shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
           >
             <div className="relative aspect-video overflow-hidden">
               <Image
@@ -86,12 +86,12 @@ export async function EnrolledCourses() {
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <div className="h-14 w-14 rounded-full bg-primary/90 flex items-center justify-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-md bg-primary/90">
                   <Play className="h-6 w-6 text-primary-foreground ml-0.5" fill="currentColor" />
                 </div>
               </div>
               {course.progressPercent >= 90 && (
-                <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium bg-accent text-accent-foreground rounded-md">
+                <span className="absolute right-3 top-3 rounded-sm bg-warning px-2.5 py-1 text-xs font-semibold text-warning-foreground">
                   Almost Done!
                 </span>
               )}
@@ -126,7 +126,7 @@ export async function EnrolledCourses() {
               </div>
 
               {/* Continue Button */}
-              <Button asChild className="w-full mt-4" size="sm">
+              <Button asChild className="mt-4 w-full" size="sm">
                 <Link href={`/learn/${course.id}`}>
                   <Play className="h-4 w-4 mr-2" />
                   Continue Learning

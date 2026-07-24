@@ -65,20 +65,20 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card hidden lg:block">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-border bg-sidebar lg:block">
       <div className="flex h-full flex-col">
-        <Link href="/" className="flex h-16 items-center gap-2 border-b border-border px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+        <Link href="/" className="flex h-16 items-center gap-3 border-b border-sidebar-border px-6">
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary shadow-xs">
             <Shield className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-semibold text-foreground">Admin</span>
+          <span className="text-lg font-semibold text-sidebar-foreground">Admin</span>
         </Link>
 
-        <div className="mx-3 mt-4 rounded-lg bg-accent/30 px-3 py-2">
-          <p className="text-xs font-medium text-accent-foreground">Platform Console</p>
+        <div className="mx-4 mt-4 rounded-md bg-primary/10 px-3 py-2">
+          <p className="text-xs font-semibold text-primary">Platform Console</p>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-1 px-4 py-5">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -86,10 +86,10 @@ export function AdminSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -99,18 +99,18 @@ export function AdminSidebar() {
           })}
         </nav>
 
-        <div className="border-t border-border p-4">
+        <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground font-semibold">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 font-semibold text-primary">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.name ?? "Admin"}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email ?? ""}</p>
+              <p className="truncate text-sm font-medium text-sidebar-foreground">{user?.name ?? "Admin"}</p>
+              <p className="truncate text-xs text-sidebar-foreground/65">{user?.email ?? ""}</p>
             </div>
             <button
               onClick={signOut}
-              className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              className="rounded-md p-2 text-sidebar-foreground/75 transition-colors hover:bg-destructive/10 hover:text-destructive"
               aria-label="Log out"
             >
               <LogOut className="h-4 w-4" />

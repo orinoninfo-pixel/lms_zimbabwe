@@ -41,7 +41,7 @@ export function DashboardStats() {
       {stats.map((stat) => (
         <div
           key={stat.name}
-          className="bg-card rounded-xl border border-border p-5 shadow-sm"
+          className="rounded-lg border border-border bg-card p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
         >
           <div className="flex items-start justify-between">
             <div>
@@ -49,7 +49,7 @@ export function DashboardStats() {
               <p className="mt-1 text-2xl font-semibold text-foreground">{stat.value}</p>
               <p className="mt-1 text-xs text-muted-foreground">{stat.change}</p>
             </div>
-            <div className={`rounded-lg p-2.5 ${stat.iconBg}`}>
+            <div className={`rounded-md p-2.5 ${stat.iconBg}`}>
               <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
             </div>
           </div>

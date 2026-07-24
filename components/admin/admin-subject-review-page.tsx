@@ -524,7 +524,7 @@ export function AdminSubjectReviewPage({ subjectId }: { subjectId: string }) {
 
                   <p className="text-xs text-muted-foreground">
                     Grade/Form ({ZIM_LEVELS.find((l) => l.value === subject.grade)?.label ?? subject.grade}) is set by
-                    the tutor and can't be changed here.
+                    the tutor and can&apos;t be changed here.
                   </p>
                 </div>
 

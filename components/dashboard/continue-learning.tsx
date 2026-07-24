@@ -39,9 +39,8 @@ export async function ContinueLearning() {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-xs">
       <div className="flex flex-col md:flex-row">
-        {/* Thumbnail */}
         <div className="relative md:w-80 aspect-video md:aspect-auto md:min-h-[200px] flex-shrink-0">
           <Image
             src={currentCourse.thumbnail}
@@ -52,17 +51,16 @@ export async function ContinueLearning() {
             blurDataURL={THUMBNAIL_BLUR_DATA_URL}
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground/60 to-transparent flex items-center justify-center md:justify-start md:pl-8">
-            <div className="h-16 w-16 rounded-full bg-primary/90 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-foreground/60 to-transparent md:justify-start md:pl-8">
+            <div className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-md bg-primary/90 transition-colors hover:bg-primary">
               <Play className="h-7 w-7 text-primary-foreground ml-1" fill="currentColor" />
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
+        <div className="flex flex-1 flex-col justify-between p-5 md:p-6">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-accent">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
               Continue where you left off
             </p>
             <h2 className="mt-2 text-xl font-semibold text-foreground">
@@ -72,7 +70,7 @@ export async function ContinueLearning() {
               by {currentCourse.instructorName}
             </p>
 
-            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <div className="mt-4 rounded-md border border-border bg-muted/40 p-3">
               <p className="text-xs text-muted-foreground">Next up</p>
               <p className="mt-1 font-medium text-foreground line-clamp-1">
                 {currentCourse.description}

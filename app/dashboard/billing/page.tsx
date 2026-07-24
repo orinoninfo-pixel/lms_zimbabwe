@@ -5,6 +5,8 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 export const dynamic = "force-dynamic"
 
@@ -25,6 +27,13 @@ export default async function BillingPage() {
   const planName = subscription?.planName ?? "Free"
   const status = subscription?.status ?? "active"
 
+  const getStatusVariant = (value: string) => {
+    if (value === "paid" || value === "succeeded" || value === "active") return "success" as const
+    if (value === "pending") return "warning" as const
+    if (value === "failed" || value === "void") return "destructive" as const
+    return "secondary" as const
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardSidebar />
@@ -43,7 +52,10 @@ export default async function BillingPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <p className="text-lg font-semibold text-foreground">{planName}</p>
-                <p className="text-sm text-muted-foreground">Status: {status}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Status</span>
+                  <Badge variant={getStatusVariant(status)}>{status}</Badge>
+                </div>
                 <div className="pt-2">
                   <Button variant="outline" disabled>
                     Manage plan
@@ -82,42 +94,34 @@ export default async function BillingPage() {
                     <p className="text-sm text-muted-foreground">No invoices yet.</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-border bg-muted/50">
-                          <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Date
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Reference
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Status
-                          </th>
-                          <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Amount
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {invoices.map((inv) => (
-                          <tr key={inv.id} className="hover:bg-muted/30 transition-colors">
-                            <td className="px-4 py-3 text-sm text-foreground whitespace-nowrap">
-                              {inv.issuedAt.toLocaleDateString("en-ZW")}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-muted-foreground">
-                              {inv.reference ?? inv.id.slice(0, 8).toUpperCase()}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-foreground">{inv.status}</td>
-                            <td className="px-4 py-3 text-sm text-foreground text-right tabular-nums whitespace-nowrap">
-                              {formatUsd(inv.amount)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Reference</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {invoices.map((inv) => (
+                        <TableRow key={inv.id}>
+                          <TableCell className="text-foreground">
+                            {inv.issuedAt.toLocaleDateString("en-ZW")}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {inv.reference ?? inv.id.slice(0, 8).toUpperCase()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={getStatusVariant(inv.status)}>{inv.status}</Badge>
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-foreground">
+                            {formatUsd(inv.amount)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>

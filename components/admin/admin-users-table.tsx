@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { FilePenLine, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -59,7 +59,7 @@ export function AdminUsersTable({
     return s ? `?${s}` : ""
   }, [fixedRole, role, status, q])
 
-  const load = async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     setError(null)
     const res = await fetch(`/api/admin/users${queryString}`, { cache: "no-store", signal }).catch(() => null)
@@ -72,13 +72,13 @@ export function AdminUsersTable({
     }
     setUsers((json?.users ?? []) as AdminUser[])
     setIsLoading(false)
-  }
+  }, [queryString])
 
   useEffect(() => {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
-  }, [queryString])
+  }, [load])
 
   const patchUser = async (body: unknown) => {
     const res = await fetch("/api/admin/users", {

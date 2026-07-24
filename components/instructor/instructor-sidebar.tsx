@@ -66,24 +66,21 @@ export function InstructorSidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card hidden lg:block">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-border bg-sidebar lg:block">
       <div className="flex h-full flex-col">
-        {/* Logo */}
-        <Link href="/" className="flex h-16 items-center gap-2 border-b border-border px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+        <Link href="/" className="flex h-16 items-center gap-3 border-b border-sidebar-border px-6">
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary shadow-xs">
             <GraduationCap className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-semibold text-foreground">Zim Learning</span>
+          <span className="text-lg font-semibold text-sidebar-foreground">Zim Learning</span>
         </Link>
 
-        {/* Badge */}
-        <div className="mx-3 mt-4 rounded-lg bg-accent/30 px-3 py-2">
-          <p className="text-xs font-medium text-accent-foreground">Instructor Portal</p>
+        <div className="mx-4 mt-4 rounded-md bg-primary/10 px-3 py-2">
+          <p className="text-xs font-semibold text-primary">Instructor Portal</p>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          <div className="mb-2 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <nav className="flex-1 space-y-1 px-4 py-5">
+          <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
             Manage
           </div>
           {navigation.map((item) => {
@@ -93,10 +90,10 @@ export function InstructorSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -106,9 +103,8 @@ export function InstructorSidebar() {
           })}
         </nav>
 
-        {/* Bottom Navigation */}
-        <div className="border-t border-border px-3 py-4">
-          <div className="mb-2 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="border-t border-sidebar-border px-4 py-4">
+          <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
             Account
           </div>
           {bottomNavigation.map((item) => {
@@ -118,10 +114,10 @@ export function InstructorSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -131,22 +127,21 @@ export function InstructorSidebar() {
           })}
           <button
             onClick={signOut}
-            className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+            className="mt-2 flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut className="h-5 w-5" />
             Log out
           </button>
         </div>
 
-        {/* User Profile */}
-        <div className="border-t border-border p-4">
+        <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground font-semibold">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 font-semibold text-primary">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.name ?? "Instructor"}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email ?? ""}</p>
+              <p className="truncate text-sm font-medium text-sidebar-foreground">{user?.name ?? "Instructor"}</p>
+              <p className="truncate text-xs text-sidebar-foreground/65">{user?.email ?? ""}</p>
             </div>
           </div>
         </div>

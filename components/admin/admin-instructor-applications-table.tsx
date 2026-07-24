@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -49,7 +49,7 @@ export function AdminInstructorApplicationsTable() {
     return s ? `?${s}` : ""
   }, [status])
 
-  const load = async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     setError(null)
     const res = await fetch(`/api/admin/instructor-applications${queryString}`, { cache: "no-store", signal }).catch(
@@ -64,13 +64,13 @@ export function AdminInstructorApplicationsTable() {
     }
     setRows((json?.applications ?? []) as ApplicationRow[])
     setIsLoading(false)
-  }
+  }, [queryString])
 
   useEffect(() => {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
-  }, [queryString])
+  }, [load])
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase()

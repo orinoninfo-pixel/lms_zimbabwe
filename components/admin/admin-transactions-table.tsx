@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -65,7 +65,7 @@ export function AdminTransactionsTable() {
     return s ? `?${s}` : ""
   }, [type, status, q])
 
-  const load = async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     setError(null)
     const [txRes, instructorRes] = await Promise.all([
@@ -99,13 +99,13 @@ export function AdminTransactionsTable() {
       }))
     )
     setIsLoading(false)
-  }
+  }, [queryString])
 
   useEffect(() => {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
-  }, [queryString])
+  }, [load])
 
   const patchTx = async (body: unknown) => {
     const res = await fetch("/api/admin/transactions", {

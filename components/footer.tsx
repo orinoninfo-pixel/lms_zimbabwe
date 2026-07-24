@@ -35,18 +35,18 @@ const quickLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-card border-t border-border">
+    <footer className="border-t border-border bg-gradient-to-b from-background to-muted/40">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="py-12 md:py-16">
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-6">
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary shadow-xs">
                   <span className="text-lg font-bold text-primary-foreground">Z</span>
                 </div>
-                <span className="text-xl font-semibold text-foreground">Zim Learning</span>
+                <span className="text-lg font-semibold text-foreground">Zim Learning</span>
               </Link>
-              <p className="mt-4 text-sm text-muted-foreground max-w-xs leading-relaxed">
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
                 Supporting Zimbabwean learners with online courses, exam preparation, and flexible learning pathways.
               </p>
               <div className="mt-6 flex gap-4">
@@ -56,7 +56,7 @@ export function Footer() {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                      className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                       aria-label={item.name}
                     >
                       <Icon className="h-4 w-4" />
@@ -67,13 +67,13 @@ export function Footer() {
             </div>
             {Object.entries(footerLinks).map(([category, links]) => (
               <div key={category}>
-                <h3 className="font-semibold text-foreground">{category}</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground/85">{category}</h3>
                 <ul className="mt-4 space-y-3">
                   {links.map((link) => (
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {link.label}
                       </Link>
@@ -84,7 +84,7 @@ export function Footer() {
             ))}
           </div>
         </div>
-        <div className="border-t border-border py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-border py-6 sm:flex-row">
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Zim Learning. All rights reserved.
           </p>

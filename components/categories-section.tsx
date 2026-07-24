@@ -40,18 +40,18 @@ export async function CategoriesSection() {
   })
 
   return (
-    <section id="categories" className="py-20 md:py-28">
+    <section id="categories" className="bg-background py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl text-balance">
+        <div className="mb-12 text-center">
+          <h2 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Browse by Category
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Explore our wide range of topics and find the perfect course for your learning journey
           </p>
         </div>
         {categories.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-6 text-center">
+          <div className="rounded-lg border border-border bg-card p-6 text-center shadow-xs">
             <p className="text-sm text-muted-foreground">No categories yet.</p>
           </div>
         ) : (
@@ -64,14 +64,14 @@ export async function CategoriesSection() {
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
-                className="group flex flex-col items-center p-6 bg-card rounded-xl border border-border shadow-sm hover:shadow-md hover:border-muted-foreground/20 transition-all duration-200"
+                className="group flex flex-col items-center rounded-lg border border-border bg-card p-6 text-center shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
               >
                 <div
-                  className={`flex h-14 w-14 items-center justify-center rounded-xl ${style.color} mb-4 group-hover:scale-110 transition-transform`}
+                  className={`mb-4 flex h-14 w-14 items-center justify-center rounded-md ${style.color} transition-transform duration-200 group-hover:scale-105`}
                 >
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-medium text-foreground">{category.name}</h3>
+                <h3 className="font-semibold text-foreground">{category.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{meta}</p>
               </Link>
             )

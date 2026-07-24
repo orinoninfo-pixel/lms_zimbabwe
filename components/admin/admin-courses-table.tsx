@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { FilePenLine, Star, StarOff, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -47,7 +47,7 @@ export function AdminCoursesTable() {
     return s ? `?${s}` : ""
   }, [status, featured, q])
 
-  const load = async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     setError(null)
     const coursesRes = await fetch(`/api/admin/courses${queryString}`, { cache: "no-store", signal }).catch(() => null)
@@ -68,13 +68,13 @@ export function AdminCoursesTable() {
       Object.fromEntries((((coursesJson?.courses ?? []) as CourseRow[]) ?? []).map((course) => [course.id, String(course.price)]))
     )
     setIsLoading(false)
-  }
+  }, [queryString])
 
   useEffect(() => {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
-  }, [queryString])
+  }, [load])
 
   const patchCourse = async (body: unknown) => {
     const res = await fetch("/api/admin/courses", {

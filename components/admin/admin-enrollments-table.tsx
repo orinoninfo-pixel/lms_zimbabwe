@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
@@ -31,7 +31,7 @@ export function AdminEnrollmentsTable() {
     return s ? `?${s}` : ""
   }, [q, courseId])
 
-  const load = async (signal?: AbortSignal) => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true)
     setError(null)
     const res = await fetch(`/api/admin/enrollments${queryString}`, { cache: "no-store", signal }).catch(() => null)
@@ -44,13 +44,13 @@ export function AdminEnrollmentsTable() {
     }
     setRows((json?.enrollments ?? []) as EnrollmentRow[])
     setIsLoading(false)
-  }
+  }, [queryString])
 
   useEffect(() => {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
-  }, [queryString])
+  }, [load])
 
   const courseOptions = useMemo(() => {
     const map = new Map<string, string>()

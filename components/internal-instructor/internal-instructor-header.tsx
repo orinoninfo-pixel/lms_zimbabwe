@@ -49,19 +49,20 @@ export function InternalInstructorHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card px-4 lg:px-6">
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background/95 px-4 backdrop-blur-sm lg:px-6">
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground"
+          className="-ml-2 rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
+          aria-label="Open content manager menu"
         >
           <Menu className="h-6 w-6" />
         </button>
 
         <Link href="/internal-instructor" className="flex items-center gap-2 lg:hidden">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary shadow-xs">
             <Layers className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-semibold text-foreground">Content</span>
+          <span className="text-base font-semibold text-foreground">Content</span>
         </Link>
 
         <div className="ml-auto flex items-center gap-3">
@@ -71,7 +72,7 @@ export function InternalInstructorHeader() {
           >
             Home
           </Link>
-          <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground font-semibold">
+          <div className="hidden h-10 w-10 items-center justify-center rounded-md bg-primary/10 font-semibold text-primary sm:flex">
             {initials}
           </div>
           <Button variant="ghost" size="sm" onClick={signOut} className="hidden sm:inline-flex">
@@ -89,20 +90,21 @@ export function InternalInstructorHeader() {
         <div className="absolute inset-0 bg-foreground/20" onClick={() => setMobileMenuOpen(false)} />
         <nav
           className={cn(
-            "absolute left-0 top-0 h-full w-72 bg-card shadow-xl transition-transform duration-200",
+            "absolute left-0 top-0 h-full w-72 border-r border-sidebar-border bg-sidebar shadow-md transition-transform duration-200",
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
-          <div className="flex h-16 items-center justify-between border-b border-border px-4">
+          <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary shadow-xs">
                 <Layers className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-semibold text-foreground">Content</span>
+              <span className="text-base font-semibold text-sidebar-foreground">Content</span>
             </div>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 text-muted-foreground hover:text-foreground"
+              className="rounded-md p-2 text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              aria-label="Close content manager menu"
             >
               <X className="h-5 w-5" />
             </button>
@@ -114,14 +116,14 @@ export function InternalInstructorHeader() {
                 key={item.name}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="block rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                className="block rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               >
                 {item.name}
               </Link>
             ))}
             <button
               onClick={signOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
               <LogOut className="h-5 w-5" />
               Log out
