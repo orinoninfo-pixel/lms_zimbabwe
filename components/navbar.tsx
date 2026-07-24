@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ThemeSwitcher } from "@/components/theme-switcher"
 
 type SessionRole = "student" | "instructor" | "admin" | "internal_instructor"
 
@@ -76,6 +77,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <ThemeSwitcher />
             {isLoggedIn ? (
               <>
                 {showBecomeInstructor ? (
@@ -131,6 +133,7 @@ export function Navbar() {
               Zimbabwe Learning Hub
             </Link>
             <div className="flex flex-col gap-2 border-t border-border pt-3">
+              <ThemeSwitcher mobile />
               {isLoggedIn ? (
                 <>
                   <Link

@@ -17,32 +17,32 @@ export function StatusBadge({
 function getStatusClasses(kind: Kind, value: string) {
   const v = value.toLowerCase()
   if (kind === "user") {
-    if (v === "active") return "bg-emerald-100 text-emerald-700"
-    if (v === "suspended") return "bg-amber-100 text-amber-800"
-    if (v === "banned") return "bg-rose-100 text-rose-700"
+    if (v === "active") return "border border-success/35 bg-success/15 text-success"
+    if (v === "suspended") return "border border-warning/35 bg-warning/18 text-warning-foreground"
+    if (v === "banned") return "border border-destructive/35 bg-destructive/15 text-destructive"
   }
   if (kind === "course" || kind === "subject") {
-    if (v === "approved") return "bg-emerald-100 text-emerald-700"
-    if (v === "pending") return "bg-amber-100 text-amber-800"
-    if (v === "rejected") return "bg-rose-100 text-rose-700"
-    if (v === "suspended") return "bg-rose-100 text-rose-700"
+    if (v === "approved") return "border border-success/35 bg-success/15 text-success"
+    if (v === "pending") return "border border-warning/35 bg-warning/18 text-warning-foreground"
+    if (v === "rejected") return "border border-destructive/35 bg-destructive/15 text-destructive"
+    if (v === "suspended") return "border border-destructive/35 bg-destructive/15 text-destructive"
     if (v === "draft") return "bg-muted text-muted-foreground"
   }
   if (kind === "application") {
-    if (v === "approved") return "bg-emerald-100 text-emerald-700"
-    if (v === "pending") return "bg-amber-100 text-amber-800"
-    if (v === "rejected") return "bg-rose-100 text-rose-700"
+    if (v === "approved") return "border border-success/35 bg-success/15 text-success"
+    if (v === "pending") return "border border-warning/35 bg-warning/18 text-warning-foreground"
+    if (v === "rejected") return "border border-destructive/35 bg-destructive/15 text-destructive"
   }
   if (kind === "report") {
-    if (v === "open") return "bg-rose-100 text-rose-700"
-    if (v === "reviewing") return "bg-amber-100 text-amber-800"
-    if (v === "resolved") return "bg-emerald-100 text-emerald-700"
+    if (v === "open") return "border border-destructive/35 bg-destructive/15 text-destructive"
+    if (v === "reviewing") return "border border-warning/35 bg-warning/18 text-warning-foreground"
+    if (v === "resolved") return "border border-success/35 bg-success/15 text-success"
     if (v === "dismissed") return "bg-muted text-muted-foreground"
   }
   if (kind === "transaction") {
-    if (v === "succeeded") return "bg-emerald-100 text-emerald-700"
-    if (v === "pending") return "bg-amber-100 text-amber-800"
-    if (v === "failed") return "bg-rose-100 text-rose-700"
+    if (v === "succeeded") return "border border-success/35 bg-success/15 text-success"
+    if (v === "pending") return "border border-warning/35 bg-warning/18 text-warning-foreground"
+    if (v === "failed") return "border border-destructive/35 bg-destructive/15 text-destructive"
     if (v === "reversed") return "bg-muted text-muted-foreground"
   }
   return "bg-muted text-muted-foreground"

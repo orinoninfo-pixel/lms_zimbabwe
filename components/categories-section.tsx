@@ -11,25 +11,25 @@ type CategoryStyle = {
 const defaultStyle: CategoryStyle = {
   icon: BookOpen,
   meta: "Browse courses",
-  color: "bg-slate-100 text-slate-700",
+  color: "bg-muted text-muted-foreground",
 }
 
 const styleBySlug: Record<string, CategoryStyle> = {
-  "mathematical-literacy": { icon: Target, meta: "Grades 10–12", color: "bg-blue-100 text-blue-700" },
-  mathematics: { icon: Target, meta: "Grades 8–12", color: "bg-blue-100 text-blue-700" },
-  "physical-sciences": { icon: Trophy, meta: "ZIMSEC-aligned", color: "bg-pink-100 text-pink-700" },
-  "life-sciences": { icon: Users, meta: "Grades 10–12", color: "bg-green-100 text-green-700" },
-  accounting: { icon: TrendingUp, meta: "Grades 10–12", color: "bg-amber-100 text-amber-700" },
-  "business-studies": { icon: Users, meta: "Grades 10–12", color: "bg-indigo-100 text-indigo-700" },
-  economics: { icon: TrendingUp, meta: "Grades 10–12", color: "bg-emerald-100 text-emerald-700" },
-  english: { icon: BookOpen, meta: "Language & writing", color: "bg-red-100 text-red-700" },
-  afrikaans: { icon: BookOpen, meta: "Language & writing", color: "bg-rose-100 text-rose-700" },
-  geography: { icon: Map, meta: "Maps & revision", color: "bg-cyan-100 text-cyan-700" },
-  history: { icon: BookOpen, meta: "Essays & revision", color: "bg-violet-100 text-violet-700" },
-  cat: { icon: Cpu, meta: "Digital skills", color: "bg-fuchsia-100 text-fuchsia-700" },
-  it: { icon: Cpu, meta: "Programming basics", color: "bg-sky-100 text-sky-700" },
-  "homework-help": { icon: ClipboardCheck, meta: "Step-by-step help", color: "bg-orange-100 text-orange-700" },
-  "holiday-catch-up": { icon: Trophy, meta: "Catch up fast", color: "bg-yellow-100 text-yellow-700" },
+  "mathematical-literacy": { icon: Target, meta: "Grades 10–12", color: "bg-primary/12 text-primary" },
+  mathematics: { icon: Target, meta: "Grades 8–12", color: "bg-primary/12 text-primary" },
+  "physical-sciences": { icon: Trophy, meta: "ZIMSEC-aligned", color: "bg-accent/22 text-accent-foreground" },
+  "life-sciences": { icon: Users, meta: "Grades 10–12", color: "bg-secondary/20 text-secondary-foreground" },
+  accounting: { icon: TrendingUp, meta: "Grades 10–12", color: "bg-warning/20 text-warning-foreground" },
+  "business-studies": { icon: Users, meta: "Grades 10–12", color: "bg-info/20 text-info" },
+  economics: { icon: TrendingUp, meta: "Grades 10–12", color: "bg-success/20 text-success" },
+  english: { icon: BookOpen, meta: "Language & writing", color: "bg-destructive/16 text-destructive" },
+  afrikaans: { icon: BookOpen, meta: "Language & writing", color: "bg-destructive/12 text-destructive" },
+  geography: { icon: Map, meta: "Maps & revision", color: "bg-info/20 text-info" },
+  history: { icon: BookOpen, meta: "Essays & revision", color: "bg-primary/16 text-primary" },
+  cat: { icon: Cpu, meta: "Digital skills", color: "bg-primary/12 text-primary" },
+  it: { icon: Cpu, meta: "Programming basics", color: "bg-info/20 text-info" },
+  "homework-help": { icon: ClipboardCheck, meta: "Step-by-step help", color: "bg-warning/20 text-warning-foreground" },
+  "holiday-catch-up": { icon: Trophy, meta: "Catch up fast", color: "bg-warning/20 text-warning-foreground" },
 }
 
 export async function CategoriesSection() {

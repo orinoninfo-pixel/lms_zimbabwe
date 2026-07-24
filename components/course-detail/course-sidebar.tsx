@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { PlayCircle, Clock, FileText, Award, Download, RefreshCcw, Smartphone } from "lucide-react"
+import { PlayCircle, FileText, Award, Download, RefreshCcw, Smartphone, Share2, Gift, TicketPercent } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -204,15 +204,18 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
         </div>
 
         <div className="border-t border-border mt-6 pt-6">
-          <div className="flex items-center justify-between text-sm">
-            <button className="text-foreground font-medium hover:underline">
-              Share
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <button className="inline-flex items-center justify-center gap-2 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-card">
+              <Share2 className="h-4 w-4 shrink-0" />
+              <span>Share</span>
             </button>
-            <button className="text-foreground font-medium hover:underline">
-              Gift this course
+            <button className="inline-flex items-center justify-center gap-2 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-card">
+              <Gift className="h-4 w-4 shrink-0" />
+              <span>Gift this course</span>
             </button>
-            <button className="text-foreground font-medium hover:underline">
-              Apply Coupon
+            <button className="inline-flex items-center justify-center gap-2 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-card">
+              <TicketPercent className="h-4 w-4 shrink-0" />
+              <span>Apply Coupon</span>
             </button>
           </div>
         </div>

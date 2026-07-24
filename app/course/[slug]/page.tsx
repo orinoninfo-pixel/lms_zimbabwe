@@ -137,11 +137,11 @@ export default async function CourseDetailPage({
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-16">
-        <CourseHeader course={courseHeaderData} />
-        
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+          <CourseHeader course={courseHeaderData} />
+
           {showAdminPreviewBanner ? (
-            <div className="mb-6">
+            <div className="mt-6 mb-6">
               <Alert className="border-blue-200 bg-blue-50 text-blue-950 [&>svg]:text-blue-600">
                 <Eye className="h-4 w-4" />
                 <AlertTitle>Admin preview</AlertTitle>
@@ -156,7 +156,7 @@ export default async function CourseDetailPage({
               <CoursePaymentBanner courseId={course.id} reference={paymentReference} />
             </div>
           ) : null}
-          <div className="lg:grid lg:grid-cols-3 lg:gap-8">
+          <div className="mt-8 lg:grid lg:grid-cols-3 lg:gap-8">
             <div className="lg:col-span-2 space-y-10">
               <div className="lg:hidden">
                 <CourseSidebar {...sidebarData} />

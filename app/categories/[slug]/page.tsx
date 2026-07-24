@@ -1,18 +1,14 @@
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { CourseCard } from "@/components/shared/course-card"
 import { Button } from "@/components/ui/button"
 import { prisma } from "@/lib/prisma"
-import { THUMBNAIL_BLUR_DATA_URL } from "@/lib/utils"
 
 // Public, non-personalized listing (Navbar hydrates session client-side) —
 // ISR instead of force-dynamic so this doesn't hit Postgres on every request.
 export const revalidate = 120
-
-const formatUsd = (amount: number) =>
-  new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount)
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -58,41 +54,16 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             ) : (
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {courses.map((course) => (
-                  <article
+                  <CourseCard
                     key={course.id}
-                    className="group bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-lg hover:border-muted-foreground/20 transition-all duration-300"
-                  >
-                    <Link href={`/course/${course.id}`} className="block">
-                      <div className="relative aspect-video overflow-hidden">
-                        <Image
-                          src="/placeholder.jpg"
-                          alt={course.title}
-                          fill
-                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                          placeholder="blur"
-                          blurDataURL={THUMBNAIL_BLUR_DATA_URL}
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    </Link>
-                    <div className="p-5">
-                      <Link href={`/course/${course.id}`}>
-                        <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-accent transition-colors">
-                          {course.title}
-                        </h3>
-                      </Link>
-                      <p className="mt-1.5 text-sm text-muted-foreground">by {course.instructor.name}</p>
-                      <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{course.description}</p>
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-semibold text-foreground">{formatUsd(course.price)}</span>
-                        </div>
-                        <Button asChild size="sm" variant="secondary">
-                          <Link href={`/course/${course.id}`}>View</Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </article>
+                    id={course.id}
+                    title={course.title}
+                    description={course.description}
+                    price={course.price}
+                    instructorName={course.instructor.name}
+                    thumbnail="/placeholder.jpg"
+                    titleHoverClassName="group-hover:text-primary"
+                  />
                 ))}
               </div>
             )}

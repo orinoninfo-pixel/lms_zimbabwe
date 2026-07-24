@@ -108,24 +108,26 @@ export function HeroSection() {
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
-                  <span className="text-2xl font-semibold text-foreground">$899</span>
-                  <Button
-                    asChild
-                    size="sm"
-                    className="rounded-md"
-                  >
-                    <Link href="/courses">View course</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
+                <div className="mt-5 border-t border-border pt-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-2xl font-semibold text-foreground">$899</span>
+                    <Button
+                      asChild
+                      size="sm"
+                      className="rounded-md"
+                    >
+                      <Link href="/courses">View course</Link>
+                    </Button>
+                  </div>
 
-            <div className="absolute -bottom-6 -left-6 hidden items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 shadow-sm sm:flex">
-              <CheckCircle2 className="h-5 w-5 text-secondary" />
-              <div className="text-left">
-                <p className="text-sm font-semibold text-foreground">Certificate included</p>
-                <p className="text-xs text-muted-foreground">On course completion</p>
+                  <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-secondary" />
+                    <div className="min-w-0 text-left">
+                      <p className="text-sm font-semibold text-foreground">Certificate included</p>
+                      <p className="text-xs text-muted-foreground">On course completion</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

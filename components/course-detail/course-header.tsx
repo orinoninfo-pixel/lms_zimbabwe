@@ -21,8 +21,8 @@ interface CourseHeaderProps {
 
 export function CourseHeader({ course }: CourseHeaderProps) {
   return (
-    <div className="bg-primary text-primary-foreground">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+    <section className="rounded-xl border border-primary/20 bg-primary text-primary-foreground shadow-xs lg:rounded-2xl">
+      <div className="px-5 py-8 sm:px-6 lg:px-8 lg:py-12">
         <div className="max-w-3xl">
           <Badge variant="secondary" className="mb-4">
             {course.category}
@@ -85,6 +85,6 @@ export function CourseHeader({ course }: CourseHeaderProps) {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

@@ -34,12 +34,12 @@ const formatMonthly = (amount: number) =>
   new Intl.NumberFormat("en-ZW", { style: "currency", currency: "USD" }).format(amount) + "/month"
 
 const packageColors = [
-  "bg-blue-100 text-blue-700",
-  "bg-pink-100 text-pink-700",
-  "bg-emerald-100 text-emerald-700",
-  "bg-violet-100 text-violet-700",
-  "bg-cyan-100 text-cyan-700",
-  "bg-amber-100 text-amber-700",
+  "bg-primary/12 text-primary",
+  "bg-accent/22 text-accent-foreground",
+  "bg-success/20 text-success",
+  "bg-secondary/20 text-secondary-foreground",
+  "bg-info/20 text-info",
+  "bg-warning/20 text-warning-foreground",
 ] as const
 
 const selectClassName =
@@ -103,7 +103,7 @@ export function ZimbabweLearningHub() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100 text-blue-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/12 text-primary">
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
@@ -114,7 +114,7 @@ export function ZimbabweLearningHub() {
         </div>
         <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-violet-100 text-violet-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-secondary/20 text-secondary-foreground">
               <CalendarDays className="h-5 w-5" />
             </div>
             <div>
@@ -125,7 +125,7 @@ export function ZimbabweLearningHub() {
         </div>
         <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-emerald-100 text-emerald-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-success/20 text-success">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
@@ -136,7 +136,7 @@ export function ZimbabweLearningHub() {
         </div>
         <div className="rounded-lg border border-border bg-card p-5 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-amber-100 text-amber-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-warning/20 text-warning-foreground">
               <GraduationCap className="h-5 w-5" />
             </div>
             <div>

@@ -35,7 +35,7 @@ const quickLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-gradient-to-b from-background to-muted/40">
+    <footer className="border-t border-primary/15 bg-gradient-to-b from-background via-primary/5 to-secondary/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="py-12 md:py-16">
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-6">
@@ -56,7 +56,7 @@ export function Footer() {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
+                      className="flex h-9 w-9 items-center justify-center rounded-md border border-primary/25 bg-background/90 text-muted-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       aria-label={item.name}
                     >
                       <Icon className="h-4 w-4" />
@@ -67,13 +67,13 @@ export function Footer() {
             </div>
             {Object.entries(footerLinks).map(([category, links]) => (
               <div key={category}>
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground/85">{category}</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-primary">{category}</h3>
                 <ul className="mt-4 space-y-3">
                   {links.map((link) => (
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        className="text-sm text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         {link.label}
                       </Link>
@@ -84,15 +84,15 @@ export function Footer() {
             ))}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-border py-6 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-primary/20 py-6 sm:flex-row">
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Zim Learning. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
               Terms of Service
             </Link>
           </div>
