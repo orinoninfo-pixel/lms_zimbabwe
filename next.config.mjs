@@ -1,3 +1,9 @@
+import dotenv from "dotenv"
+
+dotenv.config({ path: ".env.migrate.local", override: true })
+dotenv.config({ path: ".env.local" })
+dotenv.config({ path: ".env" })
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {

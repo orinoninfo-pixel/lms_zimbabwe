@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { AuthCard, AuthLayout } from "@/components/auth/auth-layout"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,27 +44,44 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full p-8 bg-card rounded-lg border border-border space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Forgot password</h2>
-          <p className="text-sm text-muted-foreground">Enter your email and we will send password reset instructions.</p>
-        </div>
+    <AuthLayout
+      title="Forgot password"
+      description="Enter your email and we will send a secure reset link if an account exists."
+    >
+      <AuthCard>
         <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <Label>Email</Label>
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" />
+          <div className="space-y-2">
+            <Label htmlFor="forgot-email">Email</Label>
+            <Input
+              id="forgot-email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              required
+            />
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          {message && <p className="text-sm text-foreground">{message}</p>}
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+          {message ? (
+            <Alert>
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          ) : null}
+          <Button type="submit" className="w-full" disabled={isSubmitting} aria-busy={isSubmitting}>
             {isSubmitting ? "Submitting..." : "Send reset link"}
           </Button>
           <div className="text-sm text-muted-foreground">
-            <Link href="/login" className="underline">Back to login</Link>
+            <Link href="/login" className="underline underline-offset-4 hover:text-foreground">
+              Back to login
+            </Link>
           </div>
         </form>
-      </div>
-    </div>
+      </AuthCard>
+    </AuthLayout>
   )
 }

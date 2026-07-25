@@ -3,6 +3,9 @@
 import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
+import { Eye, EyeOff } from "lucide-react"
+import { AuthCard, AuthLayout } from "@/components/auth/auth-layout"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,6 +15,7 @@ function RegisterForm() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -48,31 +52,62 @@ function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full p-8 bg-card rounded-lg border border-border space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Register</h2>
-          <p className="text-sm text-muted-foreground">Create an account with email and password.</p>
-        </div>
+    <AuthLayout title="Create your account" description="Join Zim Learning with your email and a secure password.">
+      <AuthCard>
         <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <Label>Email</Label>
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" />
+          <div className="space-y-2">
+            <Label htmlFor="register-email">Email</Label>
+            <Input
+              id="register-email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              required
+            />
           </div>
-          <div>
-            <Label>Password</Label>
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="••••••••" />
+          <div className="space-y-2">
+            <Label htmlFor="register-password">Password</Label>
+            <div className="relative">
+              <Input
+                id="register-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="••••••••"
+                required
+                className="pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+          <Button type="submit" className="w-full" disabled={isSubmitting} aria-busy={isSubmitting}>
             {isSubmitting ? "Creating account..." : "Create account"}
           </Button>
           <div className="text-sm text-muted-foreground">
-            Already have an account? <Link href="/login" className="underline">Sign in</Link>
+            Already have an account?{" "}
+            <Link href="/login" className="underline underline-offset-4 hover:text-foreground">
+              Sign in
+            </Link>
           </div>
         </form>
-      </div>
-    </div>
+      </AuthCard>
+    </AuthLayout>
   )
 }
 
@@ -80,9 +115,11 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
+        <AuthLayout title="Create your account" description="Loading your registration form.">
+          <AuthCard>
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          </AuthCard>
+        </AuthLayout>
       }
     >
       <RegisterForm />

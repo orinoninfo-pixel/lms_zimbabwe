@@ -2,6 +2,10 @@
 
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { Eye, EyeOff } from "lucide-react"
+import { AuthCard, AuthLayout } from "@/components/auth/auth-layout"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,17 +15,20 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token") || ""
   const required = searchParams.get("required") === "1"
-  const next = searchParams.get("next")
+  const nextPath = searchParams.get("next")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (!token) {
-      setError("Invalid reset link.")
+      router.replace("/reset-password-invalid")
     }
-  }, [token])
+  }, [router, token])
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -35,31 +42,31 @@ function ResetPasswordForm() {
       setError("Password must be at least 8 characters.")
       return
     }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.")
+      return
+    }
 
     setIsSubmitting(true)
     try {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ token, newPassword: password, confirmPassword }),
       })
       const data = await res.json().catch(() => null)
       if (!res.ok) {
-        setError(data?.error ?? "Reset failed")
+        const message = data?.error ?? "Reset failed"
+        if (/invalid|expired|already been used/i.test(message)) {
+          router.push("/reset-password-invalid")
+          return
+        }
+        setError(message)
         return
       }
-      setMessage(required ? "Password changed. Signing you in..." : "Your password has been reset. Signing you in...")
-      const actualRole = data?.user?.role as "student" | "instructor" | "admin" | "internal_instructor" | undefined
-      const destination =
-        next ||
-        (actualRole === "admin"
-          ? "/admin"
-          : actualRole === "internal_instructor"
-          ? "/internal-instructor"
-          : actualRole === "instructor"
-          ? "/instructor"
-          : "/dashboard")
-      setTimeout(() => router.push(destination), 1200)
+      setMessage(required ? "Password changed successfully." : "Your password has been reset successfully.")
+      const next = nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""
+      setTimeout(() => router.push(`/password-reset-success${next}`), 900)
     } catch {
       setError("Reset failed")
     } finally {
@@ -68,35 +75,105 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full p-8 bg-card rounded-lg border border-border space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2">Reset password</h2>
-          <p className="text-sm text-muted-foreground">
-            {required
-              ? "Your administrator has issued a temporary password. Choose a new password to continue."
-              : "Enter a new password to finish resetting your account."}
-          </p>
-        </div>
+    <AuthLayout
+      title="Reset password"
+      description={
+        required
+          ? "Your account requires a password change before continuing."
+          : "Choose a new password to regain secure access to your account."
+      }
+    >
+      <AuthCard>
         <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <Label>New password</Label>
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="••••••••" />
+          <div className="space-y-2">
+            <Label htmlFor="new-password">New password</Label>
+            <div className="relative">
+              <Input
+                id="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="••••••••"
+                required
+                className="pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          {message && <p className="text-sm text-foreground">{message}</p>}
-          <Button type="submit" className="w-full" disabled={isSubmitting || !token}>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm new password</Label>
+            <div className="relative">
+              <Input
+                id="confirm-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                type={showConfirmPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="••••••••"
+                required
+                className="pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
+          </div>
+
+          {error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+          {message ? (
+            <Alert>
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          ) : null}
+
+          <Button type="submit" className="w-full" disabled={isSubmitting || !token} aria-busy={isSubmitting}>
             {isSubmitting ? "Resetting..." : "Reset password"}
           </Button>
+
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <Link href="/login" className="underline underline-offset-4 hover:text-foreground">
+              Back to login
+            </Link>
+            <Link href="/forgot-password" className="underline underline-offset-4 hover:text-foreground">
+              Request new link
+            </Link>
+          </div>
         </form>
-      </div>
-    </div>
+      </AuthCard>
+    </AuthLayout>
   )
 }
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <Suspense
+      fallback={
+        <AuthLayout title="Reset password" description="Loading your secure reset form.">
+          <AuthCard>
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          </AuthCard>
+        </AuthLayout>
+      }
+    >
       <ResetPasswordForm />
     </Suspense>
   )

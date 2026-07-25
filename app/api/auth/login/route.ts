@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
-import { randomBytes } from "crypto"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { createPasswordResetTokenForUser } from "@/lib/password-reset"
 
 const BodySchema = z.object({
   email: z.string().email(),
@@ -41,18 +41,12 @@ export async function POST(req: Request) {
   }
 
   if (userWithPasswordPolicy.mustChangePassword) {
-    const resetToken = randomBytes(24).toString("hex")
-    const resetTokenExpiresAt = new Date(Date.now() + 1000 * 60 * 15)
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { resetToken, resetTokenExpiresAt },
-    })
+    const { rawToken } = await createPasswordResetTokenForUser(user.id)
 
     return NextResponse.json(
       {
         requiresPasswordChange: true,
-        resetToken,
+        resetToken: rawToken,
         user: { id: user.id, email: user.email, role: user.role, name: user.name, status: user.status },
       },
       { status: 403 }
