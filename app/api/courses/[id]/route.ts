@@ -38,13 +38,13 @@ export async function GET(
       // Owner/admin preview of an unapproved course — never cache or share
       // this response, it must not leak to other visitors via a shared cache.
       return Response.json(
-        { ...course, thumbnail: "/placeholder.jpg" },
+        { ...course, thumbnail: course.imageUrl ?? "/placeholder.jpg" },
         { headers: { "Cache-Control": "private, no-store" } }
       )
     }
 
     return Response.json(
-      { ...course, thumbnail: "/placeholder.jpg" },
+      { ...course, thumbnail: course.imageUrl ?? "/placeholder.jpg" },
       { headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" } }
     )
   } catch (err) {

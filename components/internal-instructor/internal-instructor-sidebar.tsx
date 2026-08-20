@@ -15,6 +15,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  Library,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -22,6 +23,7 @@ const navigation = [
   { name: "Overview", href: "/internal-instructor", icon: LayoutDashboard },
   { name: "My Courses", href: "/internal-instructor/courses", icon: BookOpen },
   { name: "My Subjects", href: "/internal-instructor/subjects", icon: GraduationCap },
+  { name: "Free Tutorials", href: "/internal-instructor/tutorials", icon: Library },
   { name: "Live Lessons", href: "/internal-instructor/live-lessons", icon: Video },
   { name: "Homework", href: "/internal-instructor/homework", icon: ClipboardList },
   { name: "Categories", href: "/internal-instructor/categories", icon: Tags },

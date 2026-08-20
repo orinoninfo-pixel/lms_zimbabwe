@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/auth"
+import { getStudentCourseSummaries } from "@/lib/course-progress"
 
 export async function GET() {
   const session = await getSession()
@@ -11,45 +12,7 @@ export async function GET() {
   }
   const userId = session.userId
 
-  const enrollments = await prisma.enrollment.findMany({
-    where: { userId },
-    include: { course: { include: { instructor: { select: { name: true } } } } },
-  })
-
-  const courses = await Promise.all(
-    enrollments.map(async (enrollment) => {
-      const course = enrollment.course
-      const totalLessons = await prisma.lesson.count({
-        where: { section: { courseId: course.id } },
-      })
-      const completedLessons = await prisma.progress.count({
-        where: { userId, completed: true, lesson: { section: { courseId: course.id } } },
-      })
-      const firstLessonId =
-        (await prisma.lesson.findFirst({
-          where: { section: { courseId: course.id } },
-          select: { id: true },
-          orderBy: { id: "asc" },
-        }))?.id ?? null
-
-      const progressPercent =
-        totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
-
-      return {
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        price: course.price,
-        instructorId: course.instructorId,
-        thumbnail: "/placeholder.jpg",
-        instructorName: course.instructor.name,
-        progressPercent,
-        totalLessons,
-        completedLessons,
-        firstLessonId,
-      }
-    })
-  )
+  const courses = await getStudentCourseSummaries(userId)
 
   return Response.json({ userId, courses })
 }

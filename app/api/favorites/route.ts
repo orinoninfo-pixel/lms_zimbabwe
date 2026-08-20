@@ -47,7 +47,7 @@ export async function GET() {
         description: f.course.description,
         price: f.course.price,
         instructorName: f.course.instructor.name,
-        thumbnail: "/placeholder.jpg",
+        thumbnail: f.course.imageUrl ?? "/placeholder.jpg",
         favoritedAt: f.createdAt,
         enrolled: enrolledSet.has(f.courseId),
       })),

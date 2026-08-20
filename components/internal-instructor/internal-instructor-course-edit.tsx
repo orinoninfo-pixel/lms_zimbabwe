@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { StatusBadge } from "@/components/admin/status-badge"
 import { CurriculumBuilder, Section } from "@/components/instructor/course-creator/curriculum-builder"
+import { ImageUpload } from "@/components/shared/image-upload"
 
 type Category = { id: string; name: string }
 type CourseStatus = "draft" | "pending" | "approved" | "rejected" | "suspended"
@@ -47,6 +48,7 @@ export function InternalInstructorCourseEdit({ courseId }: { courseId: string })
   const [categoryId, setCategoryId] = useState<string>("")
   const [sections, setSections] = useState<Section[]>([])
   const [enrollmentsCount, setEnrollmentsCount] = useState(0)
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -84,6 +86,7 @@ export function InternalInstructorCourseEdit({ courseId }: { courseId: string })
       setModerationNote(course.moderationNote ?? null)
       setSections(toBuilderSections((course.sections ?? []) as ApiSection[]))
       setEnrollmentsCount(course._count?.enrollments ?? 0)
+      setImageUrl(course.imageUrl ?? null)
       setIsLoading(false)
     }
     void load()
@@ -191,6 +194,7 @@ export function InternalInstructorCourseEdit({ courseId }: { courseId: string })
           <CardTitle className="text-base">Course Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <ImageUpload entityType="course" entityId={courseId} initialUrl={imageUrl} />
           <div className="space-y-2">
             <Label htmlFor="title">Course Title</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} />

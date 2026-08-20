@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/hero-section"
 import { CategoriesSection } from "@/components/categories-section"
 import { CoursesSection } from "@/components/courses-section"
 import { Footer } from "@/components/footer"
+import { FreeLearningSection } from "@/components/free-learning-section"
 
 // Public, non-personalized landing page — ISR instead of per-request
 // rendering so it serves from the edge on repeat visits.
@@ -14,6 +15,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <CategoriesSection />
+      <FreeLearningSection />
       <CoursesSection />
       <Footer />
     </main>

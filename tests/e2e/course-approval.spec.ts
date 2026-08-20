@@ -42,7 +42,9 @@ test("content manager course lifecycle: draft -> pending -> approved -> visible 
 
   await test.step("Content Manager: course list shows the course under review", async () => {
     await expect(page.getByText(courseTitle)).toBeVisible()
-    await expect(page.getByText(/under review|pending/i).first()).toBeVisible()
+    const courseRow = page.getByRole("row", { name: new RegExp(courseTitle) })
+    await expect(courseRow).toBeVisible()
+    await expect(courseRow).toContainText("pending")
     await logout(page)
   })
 
@@ -62,7 +64,7 @@ test("content manager course lifecycle: draft -> pending -> approved -> visible 
     const categorySelect = page.locator("#admin-course-category")
     await categorySelect.selectOption({ index: 1 })
 
-    const approveButton = page.getByRole("button", { name: "Save and Approve" })
+    const approveButton = page.getByRole("button", { name: "Save and Approve" }).last()
     await expect(approveButton).toBeEnabled({ timeout: 10_000 })
     await approveButton.click()
     await expect(page.getByText(/course reviewed/i)).toBeVisible({ timeout: 10_000 })

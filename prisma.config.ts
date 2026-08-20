@@ -15,6 +15,6 @@ export default defineConfig({
   },
   datasource: {
     // Use a direct connection for Prisma CLI workflows when available.
-    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
+    url: process.env["TEST_DATABASE_URL"] ?? process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
   },
 });

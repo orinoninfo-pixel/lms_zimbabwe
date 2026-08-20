@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { requireInternalInstructor } from "@/lib/rbac"
+import { getCourseLessonTotals } from "@/lib/course-progress"
 
 export async function GET() {
   const auth = await requireInternalInstructor()
@@ -19,22 +20,18 @@ export async function GET() {
   const courseIds = courses.map((c) => c.id)
   const totalEnrollments = courses.reduce((sum, c) => sum + c._count.enrollments, 0)
 
-  const [distinctStudents, totalLessonsRows, enrollments] = await Promise.all([
+  const [distinctStudents, totalLessonsByCourseId, enrollments] = await Promise.all([
     prisma.enrollment.findMany({
       where: { courseId: { in: courseIds } },
       select: { userId: true },
       distinct: ["userId"],
     }),
-    Promise.all(
-      courseIds.map(async (id) => ({ id, total: await prisma.lesson.count({ where: { section: { courseId: id } } }) }))
-    ),
+    getCourseLessonTotals(courseIds),
     prisma.enrollment.findMany({
       where: { courseId: { in: courseIds } },
       select: { userId: true, courseId: true },
     }),
   ])
-
-  const totalLessonsByCourseId = new Map(totalLessonsRows.map((r) => [r.id, r.total]))
 
   const progress = await prisma.progress.findMany({
     where: {

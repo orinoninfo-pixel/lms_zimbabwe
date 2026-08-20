@@ -31,7 +31,7 @@ export async function GET(_req: Request, context: { params: Promise<{ id: string
 }
 
 const PostSchema = z.object({
-  action: z.enum(["start", "activate", "cancel"]),
+  action: z.literal("cancel"),
 })
 
 export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
@@ -45,24 +45,6 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
   const json = await req.json().catch(() => null)
   const parsed = PostSchema.safeParse(json)
   if (!parsed.success) return Response.json({ error: "Invalid request body" }, { status: 400 })
-
-  if (parsed.data.action === "start") {
-    const enrollment = await prisma.subjectEnrollment.upsert({
-      where: { userId_subjectPackageId: { userId: auth.user.id, subjectPackageId: id } },
-      update: { status: "pending", grade: pkg.grade, price: pkg.price, currency: pkg.currency, billingPeriod: pkg.billingPeriod },
-      create: {
-        userId: auth.user.id,
-        subjectPackageId: id,
-        status: "pending",
-        grade: pkg.grade,
-        price: pkg.price,
-        currency: pkg.currency,
-        billingPeriod: pkg.billingPeriod,
-      },
-      select: { id: true, status: true, startDate: true, endDate: true, price: true, billingPeriod: true },
-    })
-    return Response.json({ success: true, enrollment })
-  }
 
   if (parsed.data.action === "cancel") {
     const enrollment = await prisma.subjectEnrollment.upsert({
@@ -82,34 +64,5 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
     return Response.json({ success: true, enrollment })
   }
 
-  const startDate = new Date()
-  const endDate = new Date(startDate)
-  endDate.setMonth(endDate.getMonth() + 1)
-
-  const enrollment = await prisma.subjectEnrollment.upsert({
-    where: { userId_subjectPackageId: { userId: auth.user.id, subjectPackageId: id } },
-    update: {
-      status: "active",
-      grade: pkg.grade,
-      price: pkg.price,
-      currency: pkg.currency,
-      billingPeriod: pkg.billingPeriod,
-      startDate,
-      endDate,
-    },
-    create: {
-      userId: auth.user.id,
-      subjectPackageId: id,
-      status: "active",
-      grade: pkg.grade,
-      price: pkg.price,
-      currency: pkg.currency,
-      billingPeriod: pkg.billingPeriod,
-      startDate,
-      endDate,
-    },
-    select: { id: true, status: true, startDate: true, endDate: true, price: true, billingPeriod: true },
-  })
-
-  return Response.json({ success: true, enrollment })
+  return Response.json({ error: "Paid access can only be activated by verified payment" }, { status: 403 })
 }

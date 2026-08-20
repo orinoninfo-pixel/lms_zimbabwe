@@ -67,6 +67,9 @@ export function Navbar() {
               <Link href="/categories" className={navLinkClass}>
                 Categories
               </Link>
+              <Link href="/learn" className={navLinkClass}>
+                Learn Free
+              </Link>
               <Link href="/for-business" className={navLinkClass}>
                 For Business
               </Link>
@@ -125,6 +128,9 @@ export function Navbar() {
             </Link>
             <Link href="/categories" className="block rounded-md px-2 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground">
               Categories
+            </Link>
+            <Link href="/learn" className="block rounded-md px-2 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground">
+              Learn Free
             </Link>
             <Link href="/for-business" className="block rounded-md px-2 py-2 text-sm font-medium text-foreground/75 transition-colors hover:bg-muted hover:text-foreground">
               For Business

@@ -191,12 +191,6 @@ export default function NewInternalCoursePage() {
               <Save className="h-4 w-4" />
               <span className="hidden sm:inline">Save Draft</span>
             </Button>
-            {currentStep === 3 && (
-              <Button onClick={handlePublish} disabled={!isReadyToPublish || isSaving} className="gap-2">
-                <Send className="h-4 w-4" />
-                Submit for Review
-              </Button>
-            )}
           </div>
         </div>
       </header>

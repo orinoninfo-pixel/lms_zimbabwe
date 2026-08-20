@@ -18,7 +18,7 @@ export async function CoursesSection() {
       title: course.title,
       description: course.description,
       price: course.price,
-      thumbnail: "/placeholder.jpg",
+      thumbnail: course.imageUrl ?? "/placeholder.jpg",
       instructorName: course.instructor.name,
     }))
   ).catch(() => [])

@@ -1,0 +1,46 @@
+CREATE TYPE "TutorialStatus" AS ENUM ('draft', 'published');
+CREATE TYPE "TutorialDifficulty" AS ENUM ('beginner', 'intermediate', 'advanced');
+
+CREATE TABLE "Tutorial" ("id" UUID NOT NULL, "slug" TEXT NOT NULL, "title" TEXT NOT NULL, "shortDescription" TEXT NOT NULL, "description" TEXT NOT NULL, "icon" TEXT, "imageUrl" TEXT, "difficulty" "TutorialDifficulty" NOT NULL DEFAULT 'beginner', "estimatedDuration" INTEGER NOT NULL, "status" "TutorialStatus" NOT NULL DEFAULT 'draft', "publishedAt" TIMESTAMP(3), "createdById" UUID, "updatedById" UUID, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "Tutorial_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialSection" ("id" UUID NOT NULL, "tutorialId" UUID NOT NULL, "title" TEXT NOT NULL, "slug" TEXT NOT NULL, "description" TEXT, "order" INTEGER NOT NULL DEFAULT 0, CONSTRAINT "TutorialSection_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialLesson" ("id" UUID NOT NULL, "sectionId" UUID NOT NULL, "title" TEXT NOT NULL, "slug" TEXT NOT NULL, "summary" TEXT NOT NULL, "content" JSONB NOT NULL, "order" INTEGER NOT NULL DEFAULT 0, "estimatedMinutes" INTEGER NOT NULL DEFAULT 10, "isPublished" BOOLEAN NOT NULL DEFAULT false, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "TutorialLesson_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialCodeExample" ("id" UUID NOT NULL, "lessonId" UUID NOT NULL, "title" TEXT NOT NULL, "language" TEXT NOT NULL, "sourceCode" TEXT NOT NULL, "expectedOutput" TEXT, "explanation" TEXT, "order" INTEGER NOT NULL DEFAULT 0, CONSTRAINT "TutorialCodeExample_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialExercise" ("id" UUID NOT NULL, "lessonId" UUID NOT NULL, "title" TEXT NOT NULL, "instructions" TEXT NOT NULL, "starterCode" TEXT, "expectedAnswer" TEXT, "explanation" TEXT, "order" INTEGER NOT NULL DEFAULT 0, CONSTRAINT "TutorialExercise_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialQuiz" ("id" UUID NOT NULL, "lessonId" UUID NOT NULL, "title" TEXT NOT NULL, CONSTRAINT "TutorialQuiz_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialQuizQuestion" ("id" UUID NOT NULL, "quizId" UUID NOT NULL, "prompt" TEXT NOT NULL, "order" INTEGER NOT NULL DEFAULT 0, CONSTRAINT "TutorialQuizQuestion_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialQuizOption" ("id" UUID NOT NULL, "questionId" UUID NOT NULL, "text" TEXT NOT NULL, "isCorrect" BOOLEAN NOT NULL DEFAULT false, "order" INTEGER NOT NULL DEFAULT 0, CONSTRAINT "TutorialQuizOption_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialProgress" ("id" UUID NOT NULL, "userId" UUID NOT NULL, "tutorialId" UUID NOT NULL, "lessonId" UUID NOT NULL, "completedAt" TIMESTAMP(3), "lastViewedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "TutorialProgress_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "TutorialBookmark" ("id" UUID NOT NULL, "userId" UUID NOT NULL, "tutorialId" UUID NOT NULL, "lessonId" UUID NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "TutorialBookmark_pkey" PRIMARY KEY ("id"));
+
+CREATE UNIQUE INDEX "Tutorial_slug_key" ON "Tutorial"("slug");
+CREATE INDEX "Tutorial_status_publishedAt_idx" ON "Tutorial"("status", "publishedAt");
+CREATE UNIQUE INDEX "TutorialSection_tutorialId_slug_key" ON "TutorialSection"("tutorialId", "slug");
+CREATE INDEX "TutorialSection_tutorialId_order_idx" ON "TutorialSection"("tutorialId", "order");
+CREATE UNIQUE INDEX "TutorialLesson_sectionId_slug_key" ON "TutorialLesson"("sectionId", "slug");
+CREATE INDEX "TutorialLesson_sectionId_order_idx" ON "TutorialLesson"("sectionId", "order");
+CREATE INDEX "TutorialLesson_isPublished_idx" ON "TutorialLesson"("isPublished");
+CREATE INDEX "TutorialCodeExample_lessonId_order_idx" ON "TutorialCodeExample"("lessonId", "order");
+CREATE INDEX "TutorialExercise_lessonId_order_idx" ON "TutorialExercise"("lessonId", "order");
+CREATE UNIQUE INDEX "TutorialQuiz_lessonId_key" ON "TutorialQuiz"("lessonId");
+CREATE INDEX "TutorialQuizQuestion_quizId_order_idx" ON "TutorialQuizQuestion"("quizId", "order");
+CREATE INDEX "TutorialQuizOption_questionId_order_idx" ON "TutorialQuizOption"("questionId", "order");
+CREATE UNIQUE INDEX "TutorialProgress_userId_lessonId_key" ON "TutorialProgress"("userId", "lessonId");
+CREATE INDEX "TutorialProgress_userId_tutorialId_lastViewedAt_idx" ON "TutorialProgress"("userId", "tutorialId", "lastViewedAt");
+CREATE UNIQUE INDEX "TutorialBookmark_userId_lessonId_key" ON "TutorialBookmark"("userId", "lessonId");
+CREATE INDEX "TutorialBookmark_userId_tutorialId_idx" ON "TutorialBookmark"("userId", "tutorialId");
+
+ALTER TABLE "Tutorial" ADD CONSTRAINT "Tutorial_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Tutorial" ADD CONSTRAINT "Tutorial_updatedById_fkey" FOREIGN KEY ("updatedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "TutorialSection" ADD CONSTRAINT "TutorialSection_tutorialId_fkey" FOREIGN KEY ("tutorialId") REFERENCES "Tutorial"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialLesson" ADD CONSTRAINT "TutorialLesson_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "TutorialSection"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialCodeExample" ADD CONSTRAINT "TutorialCodeExample_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "TutorialLesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialExercise" ADD CONSTRAINT "TutorialExercise_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "TutorialLesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialQuiz" ADD CONSTRAINT "TutorialQuiz_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "TutorialLesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialQuizQuestion" ADD CONSTRAINT "TutorialQuizQuestion_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "TutorialQuiz"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialQuizOption" ADD CONSTRAINT "TutorialQuizOption_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "TutorialQuizQuestion"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialProgress" ADD CONSTRAINT "TutorialProgress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialProgress" ADD CONSTRAINT "TutorialProgress_tutorialId_fkey" FOREIGN KEY ("tutorialId") REFERENCES "Tutorial"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialProgress" ADD CONSTRAINT "TutorialProgress_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "TutorialLesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialBookmark" ADD CONSTRAINT "TutorialBookmark_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialBookmark" ADD CONSTRAINT "TutorialBookmark_tutorialId_fkey" FOREIGN KEY ("tutorialId") REFERENCES "Tutorial"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TutorialBookmark" ADD CONSTRAINT "TutorialBookmark_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "TutorialLesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;

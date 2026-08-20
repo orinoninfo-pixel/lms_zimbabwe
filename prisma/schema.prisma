@@ -129,6 +129,17 @@ enum BillingPeriod {
   monthly
 }
 
+enum TutorialStatus {
+  draft
+  published
+}
+
+enum TutorialDifficulty {
+  beginner
+  intermediate
+  advanced
+}
+
 model User {
   id        String     @id @default(uuid()) @db.Uuid
   name      String
@@ -172,6 +183,28 @@ model User {
   subjectQuizAttempts SubjectQuizAttempt[]
   passwordResetTokens PasswordResetToken[]
   passwordResetRequests PasswordResetRequest[]
+  sessions Session[]
+  tutorialsCreated Tutorial[] @relation("TutorialCreator")
+  tutorialsUpdated Tutorial[] @relation("TutorialUpdater")
+  tutorialProgress TutorialProgress[]
+  tutorialBookmarks TutorialBookmark[]
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  lastUsedAt DateTime @default(now())
+  revokedAt DateTime?
+  userAgent String?
+  ipHash    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, expiresAt])
+  @@index([expiresAt])
 }
 
 model PasswordResetToken {
@@ -212,6 +245,7 @@ model Course {
   instructorId String   @db.Uuid
   status       CourseStatus @default(draft)
   featured     Boolean   @default(false)
+  imageUrl     String?
   categoryId   String?   @db.Uuid
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @default(now()) @updatedAt
@@ -336,11 +370,21 @@ model Transaction {
   userId       String?           @db.Uuid
   courseId     String?           @db.Uuid
   enrollmentId String?           @db.Uuid
+  subjectPackageId String?       @db.Uuid
+  providerPollUrl String?
+  providerReference String?
+  verifiedAt DateTime?
   createdAt    DateTime          @default(now())
 
   user       User?       @relation("TransactionUser", fields: [userId], references: [id])
   course     Course?     @relation("TransactionCourse", fields: [courseId], references: [id])
   enrollment Enrollment? @relation("TransactionEnrollment", fields: [enrollmentId], references: [id])
+  subjectPackage SubjectPackage? @relation(fields: [subjectPackageId], references: [id])
+
+  @@unique([reference])
+  @@unique([enrollmentId, type])
+  @@index([userId, status, createdAt])
+  @@index([subjectPackageId, status])
 }
 
 model Report {
@@ -444,6 +488,7 @@ model Invoice {
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId, issuedAt])
+  @@unique([userId, reference])
 }
 
 model LiveLesson {
@@ -597,6 +642,7 @@ model SubjectPackage {
   resources     LearningResource[]
   announcements Announcement[]
   sections      SubjectSection[]
+  transactions  Transaction[]
 
   @@index([grade, subject])
   @@index([term])
@@ -719,4 +765,170 @@ model SubjectEnrollment {
 
   @@unique([userId, subjectPackageId])
   @@index([status])
+}
+
+model RateLimitEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  action    String
+  keyHash   String
+  createdAt DateTime @default(now())
+
+  @@index([action, keyHash, createdAt])
+  @@index([createdAt])
+}
+
+model Tutorial {
+  id                String             @id @default(uuid()) @db.Uuid
+  slug              String             @unique
+  title             String
+  shortDescription  String
+  description       String
+  icon              String?
+  imageUrl          String?
+  difficulty        TutorialDifficulty @default(beginner)
+  estimatedDuration Int
+  status            TutorialStatus     @default(draft)
+  publishedAt       DateTime?
+  createdById       String?            @db.Uuid
+  updatedById       String?            @db.Uuid
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now()) @updatedAt
+
+  createdBy User? @relation("TutorialCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("TutorialUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  sections TutorialSection[]
+  progress TutorialProgress[]
+  bookmarks TutorialBookmark[]
+
+  @@index([status, publishedAt])
+}
+
+model TutorialSection {
+  id          String @id @default(uuid()) @db.Uuid
+  tutorialId  String @db.Uuid
+  title       String
+  slug        String
+  description String?
+  order       Int    @default(0)
+
+  tutorial Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  lessons  TutorialLesson[]
+
+  @@unique([tutorialId, slug])
+  @@index([tutorialId, order])
+}
+
+model TutorialLesson {
+  id               String   @id @default(uuid()) @db.Uuid
+  sectionId        String   @db.Uuid
+  title            String
+  slug             String
+  summary          String
+  content          Json
+  order            Int      @default(0)
+  estimatedMinutes Int      @default(10)
+  isPublished      Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt
+
+  section TutorialSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  codeExamples TutorialCodeExample[]
+  exercises TutorialExercise[]
+  quiz TutorialQuiz?
+  progress TutorialProgress[]
+  bookmarks TutorialBookmark[]
+
+  @@unique([sectionId, slug])
+  @@index([sectionId, order])
+  @@index([isPublished])
+}
+
+model TutorialCodeExample {
+  id             String @id @default(uuid()) @db.Uuid
+  lessonId       String @db.Uuid
+  title          String
+  language       String
+  sourceCode     String
+  expectedOutput String?
+  explanation    String?
+  order          Int    @default(0)
+
+  lesson TutorialLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  @@index([lessonId, order])
+}
+
+model TutorialExercise {
+  id             String @id @default(uuid()) @db.Uuid
+  lessonId       String @db.Uuid
+  title          String
+  instructions   String
+  starterCode    String?
+  expectedAnswer String?
+  explanation    String?
+  order          Int    @default(0)
+
+  lesson TutorialLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  @@index([lessonId, order])
+}
+
+model TutorialQuiz {
+  id       String @id @default(uuid()) @db.Uuid
+  lessonId String @unique @db.Uuid
+  title    String
+
+  lesson TutorialLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions TutorialQuizQuestion[]
+}
+
+model TutorialQuizQuestion {
+  id       String @id @default(uuid()) @db.Uuid
+  quizId   String @db.Uuid
+  prompt   String
+  order    Int    @default(0)
+
+  quiz TutorialQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options TutorialQuizOption[]
+  @@index([quizId, order])
+}
+
+model TutorialQuizOption {
+  id         String  @id @default(uuid()) @db.Uuid
+  questionId String  @db.Uuid
+  text       String
+  isCorrect  Boolean @default(false)
+  order      Int     @default(0)
+
+  question TutorialQuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  @@index([questionId, order])
+}
+
+model TutorialProgress {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  tutorialId   String   @db.Uuid
+  lessonId     String   @db.Uuid
+  completedAt  DateTime?
+  lastViewedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tutorial Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  lesson TutorialLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, tutorialId, lastViewedAt])
+}
+
+model TutorialBookmark {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  tutorialId String   @db.Uuid
+  lessonId   String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tutorial Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  lesson TutorialLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, tutorialId])
 }

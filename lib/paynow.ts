@@ -30,6 +30,11 @@ export async function preparePaynowCheckout({
   returnUrl?: string
   resultUrl?: string
 }): Promise<PreparedCheckout> {
+  const testMode = process.env.PAYNOW_TEST_MODE === "mock" && /test/i.test(process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? "")
+  if (testMode) {
+    const query = new URLSearchParams({ reference, amount: String(amount) })
+    return { provider: "paynow", status: "pending", reference, description, amount, currency: "USD", requiresPayment: true, message: "Mock Paynow checkout ready.", redirectUrl: returnUrl ? `${returnUrl}${returnUrl.includes("?") ? "&" : "?"}mockPayment=1` : null, pollUrl: `https://mock.paynow.co.zw/poll?${query}`, configured: true, success: true }
+  }
   const integrationId = process.env.PAYNOW_INTEGRATION_ID?.trim()
   const integrationKey = process.env.PAYNOW_INTEGRATION_KEY?.trim()
 

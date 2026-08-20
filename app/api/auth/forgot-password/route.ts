@@ -14,12 +14,14 @@ import {
   getClientIpAddress,
   getPasswordResetExpiryMinutes,
 } from "@/lib/password-reset"
+import { isSafeE2ETestMode } from "@/lib/test-database"
 
 const BodySchema = z.object({
   email: z.string().email(),
 })
 
 export async function POST(req: Request) {
+  const allowTestDelivery = isSafeE2ETestMode()
   const json = await req.json().catch(() => null)
   const parsed = BodySchema.safeParse(json)
   if (!parsed.success) {
@@ -31,7 +33,7 @@ export async function POST(req: Request) {
     message: "If an account exists for this email address, a password reset link has been sent.",
   }
 
-  if (process.env.NODE_ENV === "production" && !isEmailDeliveryConfigured()) {
+  if (process.env.NODE_ENV === "production" && !allowTestDelivery && !isEmailDeliveryConfigured()) {
     return NextResponse.json(
       { error: "Password reset email is not configured yet. Please contact support." },
       { status: 503 }
@@ -57,7 +59,7 @@ export async function POST(req: Request) {
 
   if (!user) {
     const debugToken =
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === "production" && !allowTestDelivery
         ? undefined
         : buildPasswordResetUrl(randomBytes(32).toString("base64url"))
     return NextResponse.json({
@@ -71,12 +73,14 @@ export async function POST(req: Request) {
   const resetUrl = buildPasswordResetUrl(rawToken)
 
   try {
-    await sendPasswordResetEmail({
-      toEmail: user.email,
-      userName: user.name,
-      resetUrl,
-      expiresInMinutes,
-    })
+    if (!allowTestDelivery) {
+      await sendPasswordResetEmail({
+        toEmail: user.email,
+        userName: user.name,
+        resetUrl,
+        expiresInMinutes,
+      })
+    }
   } catch (error) {
     if (error instanceof EmailNotConfiguredError) {
       return NextResponse.json({ error: "Password reset email is not configured yet. Please contact support." }, { status: 503 })
@@ -90,7 +94,7 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json(
-    process.env.NODE_ENV === "production"
+    process.env.NODE_ENV === "production" && !allowTestDelivery
       ? genericSuccess
       : { ...genericSuccess, debugResetUrl: resetUrl }
   )

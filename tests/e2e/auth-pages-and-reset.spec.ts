@@ -22,7 +22,7 @@ test.describe("Authentication pages navigation and theming", () => {
     ]
 
     for (const route of pages) {
-      await page.goto(route, { waitUntil: "domcontentloaded" })
+      await page.goto(route, { waitUntil: "networkidle" })
 
       await expect(page.getByRole("link", { name: "Go to Zim Learning home" })).toBeVisible()
       await expect(page.getByRole("link", { name: "← Back to home" })).toBeVisible()

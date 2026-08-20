@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/prisma"
+import { createSession, setSessionCookie } from "@/lib/auth"
+import { rateLimit } from "@/lib/rate-limit"
 
 const BodySchema = z.object({
   email: z.string().email(),
@@ -17,6 +19,8 @@ export async function POST(req: Request) {
   }
 
   const email = parsed.data.email.toLowerCase()
+  const limited = await rateLimit(req, "registration", 5, 60 * 60, email)
+  if (limited) return limited
   const password = parsed.data.password
   const name = parsed.data.name?.trim() ||
     email.split("@")[0].replace(/[._-]+/g, " ").trim() ||
@@ -43,14 +47,13 @@ export async function POST(req: Request) {
     },
   })
 
+  const session = await createSession(user.id, req)
   const res = NextResponse.json({
     success: true,
     user: { id: user.id, email: user.email, role: user.role, name: user.name, status: user.status },
   })
 
-  const maxAge = 60 * 60 * 24 * 30
-  res.cookies.set("lms_user_id", user.id, { httpOnly: true, sameSite: "lax", path: "/", maxAge })
-  res.cookies.set("lms_role", user.role, { httpOnly: true, sameSite: "lax", path: "/", maxAge })
+  setSessionCookie(res, session.token)
 
   return res
 }

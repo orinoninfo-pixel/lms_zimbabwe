@@ -16,6 +16,7 @@ import {
   Receipt,
   Flag,
   Settings,
+  Library,
   LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -27,6 +28,7 @@ const navigation = [
   { name: "Applications", href: "/admin/instructor-applications", icon: BadgeCheck },
   { name: "Courses", href: "/admin/courses", icon: BookOpen },
   { name: "Subjects", href: "/admin/subjects", icon: Layers },
+  { name: "Free Tutorials", href: "/admin/tutorials", icon: Library },
   { name: "Categories", href: "/admin/categories", icon: Tags },
   { name: "Enrollments", href: "/admin/enrollments", icon: ListChecks },
   { name: "Transactions", href: "/admin/transactions", icon: Receipt },

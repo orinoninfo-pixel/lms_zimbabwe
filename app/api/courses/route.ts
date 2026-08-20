@@ -14,7 +14,7 @@ export async function GET() {
       description: course.description,
       price: course.price,
       instructorId: course.instructorId,
-      thumbnail: "/placeholder.jpg",
+      thumbnail: course.imageUrl ?? "/placeholder.jpg",
       instructorName: course.instructor.name,
     })),
     {

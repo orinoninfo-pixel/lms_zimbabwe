@@ -2,9 +2,12 @@ import "dotenv/config"
 import { PrismaClient } from "../lib/generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
+import { seedTutorials } from "./seed-tutorials"
+import { postgresConnectionOptions } from "../lib/database-url"
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
-const adapter = new PrismaPg(pool)
+const databaseOptions = postgresConnectionOptions()
+const pool = new Pool(databaseOptions.poolConfig)
+const adapter = new PrismaPg(pool, databaseOptions.schema ? { schema: databaseOptions.schema } : undefined)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
@@ -941,6 +944,8 @@ async function main() {
     ],
     skipDuplicates: true,
   })
+
+  await seedTutorials(prisma)
 }
 
 main()

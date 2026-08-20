@@ -3,6 +3,7 @@ import { z } from "zod"
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { hashResetToken, isPasswordResetTablesAvailable, validatePasswordPolicy } from "@/lib/password-reset"
+import { revokeAllUserSessions } from "@/lib/auth"
 
 const BodySchema = z.object({
   token: z.string().min(1),
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
         resetTokenExpiresAt: null,
       },
     })
+    await revokeAllUserSessions(user.id)
 
     return NextResponse.json({ success: true })
   }
@@ -121,6 +123,11 @@ export async function POST(req: Request) {
         resetToken: null,
         resetTokenExpiresAt: null,
       },
+    })
+
+    await tx.session.updateMany({
+      where: { userId: tokenRecord.userId, revokedAt: null },
+      data: { revokedAt: now },
     })
 
     await txAny.passwordResetToken.updateMany({

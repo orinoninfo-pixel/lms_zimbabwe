@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { requireAdmin } from "@/lib/rbac"
+import { revalidatePath } from "next/cache"
 
 const UpdateSchema = z.object({
   title: z.string().trim().min(1).optional(),
@@ -22,7 +23,7 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     where: { id },
     include: {
       instructor: { select: { id: true, name: true, email: true } },
-      category: { select: { id: true, name: true } },
+      category: { select: { id: true, name: true, slug: true } },
       sections: {
         orderBy: [{ order: "asc" }, { title: "asc" }],
         include: {
@@ -70,10 +71,15 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
     data: updateData,
     include: {
       instructor: { select: { id: true, name: true, email: true } },
-      category: { select: { id: true, name: true } },
+      category: { select: { id: true, name: true, slug: true } },
       _count: { select: { enrollments: true, sections: true } },
     },
   })
+
+  revalidatePath("/")
+  revalidatePath("/courses")
+  revalidatePath(`/course/${id}`)
+  if (updated.category?.slug) revalidatePath(`/categories/${updated.category.slug}`)
 
   return Response.json({ success: true, course: updated })
 }

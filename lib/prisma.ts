@@ -1,6 +1,10 @@
 import { PrismaClient } from "@/lib/generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
+import { postgresConnectionOptions } from "@/lib/database-url"
+import { validateProductionEnvironment } from "@/lib/env"
+
+validateProductionEnvironment()
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; pgPool?: Pool }
 
@@ -11,16 +15,17 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; pgPool
 // small so concurrent invocations can't add up past Postgres's own
 // connection limit even when PgBouncer is multiplexing behind them.
 // DIRECT_URL (unpooled) stays reserved for `prisma migrate` in prisma.config.ts.
+const databaseOptions = postgresConnectionOptions()
 const pool =
   globalForPrisma.pgPool ??
   new Pool({
-    connectionString: process.env.DATABASE_URL,
+    ...databaseOptions.poolConfig,
     max: 5,
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: 10_000,
   })
 
-const adapter = new PrismaPg(pool)
+const adapter = new PrismaPg(pool, databaseOptions.schema ? { schema: databaseOptions.schema } : undefined)
 
 export const prisma =
   globalForPrisma.prisma ??

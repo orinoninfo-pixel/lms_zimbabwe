@@ -12,6 +12,7 @@ import { hash } from "bcryptjs"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
 import { PrismaClient } from "../lib/generated/prisma/client"
+import { postgresConnectionOptions } from "../lib/database-url"
 
 const PASSWORD_FALLBACK = "E2eTest!Passw0rd"
 
@@ -43,8 +44,9 @@ const accounts = [
 ]
 
 async function main() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL })
-  const prisma = new PrismaClient({ adapter: new PrismaPg(pool) })
+  const databaseOptions = postgresConnectionOptions()
+  const pool = new Pool(databaseOptions.poolConfig)
+  const prisma = new PrismaClient({ adapter: new PrismaPg(pool, databaseOptions.schema ? { schema: databaseOptions.schema } : undefined) })
 
   try {
     const createdUsers: Record<string, { id: string; email: string; role: string }> = {}
@@ -98,6 +100,7 @@ async function main() {
           data: { status: "approved", price: 0, categoryId: category.id },
           select: { id: true, title: true, status: true },
         })
+
       : await prisma.course.create({
           data: {
             title: "E2E Fixture: Free Course",
@@ -126,6 +129,20 @@ async function main() {
           select: { id: true, title: true, status: true },
         })
 
+    const existingPaidCourse = await prisma.course.findFirst({ where: { instructorId, title: "E2E Fixture: Paid Course" }, select: { id: true } })
+    const paidCourse = existingPaidCourse
+      ? await prisma.course.update({ where: { id: existingPaidCourse.id }, data: { status: "approved", price: 12, categoryId: category.id }, select: { id: true, title: true, status: true } })
+      : await prisma.course.create({ data: { title: "E2E Fixture: Paid Course", description: "Seeded paid course for mocked Paynow verification and idempotency tests.", price: 12, status: "approved", categoryId: category.id, instructorId }, select: { id: true, title: true, status: true } })
+
+    async function subjectFixture(title: string, price: number) {
+      const existing = await prisma.subjectPackage.findFirst({ where: { title, teacherId: instructorId }, select: { id: true } })
+      return existing
+        ? prisma.subjectPackage.update({ where: { id: existing.id }, data: { price, status: "approved", categoryId: category.id }, select: { id: true, title: true, price: true } })
+        : prisma.subjectPackage.create({ data: { title, description: `${title} used only by the isolated E2E test schema.`, subject: "Computer Science", grade: 10, price, currency: "USD", status: "approved", teacherId: instructorId, categoryId: category.id }, select: { id: true, title: true, price: true } })
+    }
+    const freeSubject = await subjectFixture("E2E Fixture: Free Subject", 0)
+    const paidSubject = await subjectFixture("E2E Fixture: Paid Subject", 9)
+
     console.log(
       JSON.stringify(
         {
@@ -133,6 +150,9 @@ async function main() {
           accounts: Object.values(createdUsers),
           category,
           fixtureCourse: course,
+          paidCourse,
+          freeSubject,
+          paidSubject,
           note: "Passwords are whatever you set via E2E_*_PASSWORD env vars, or the fallback baked into this script/tests/e2e/utils/auth.ts if unset.",
         },
         null,

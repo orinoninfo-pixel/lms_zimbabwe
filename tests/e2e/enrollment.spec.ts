@@ -23,12 +23,12 @@ test.describe("Student browsing and enrollment", () => {
 
     await page.getByText("E2E Test Category").click()
     await expect(page).toHaveURL(new RegExp(`/categories/${FIXTURE_CATEGORY_SLUG}$`))
-    await expect(page.getByText(FIXTURE_COURSE_TITLE)).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByText(FIXTURE_COURSE_TITLE).first()).toBeVisible({ timeout: 10_000 })
   })
 
   test("public catalog lists the fixture course", async ({ page }) => {
     await page.goto("/courses")
-    await expect(page.getByText(FIXTURE_COURSE_TITLE)).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByText(FIXTURE_COURSE_TITLE).first()).toBeVisible({ timeout: 10_000 })
   })
 
   test("student can enroll in the free fixture course and it appears on their dashboard", async ({ page }) => {
@@ -53,7 +53,7 @@ test.describe("Student browsing and enrollment", () => {
     await expect(page).toHaveURL(/\/learn\/[0-9a-f-]+$/, { timeout: 15_000 })
 
     await page.goto("/dashboard")
-    await expect(page.getByText(FIXTURE_COURSE_TITLE)).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByText(FIXTURE_COURSE_TITLE).first()).toBeVisible({ timeout: 10_000 })
   })
 
   test("unauthenticated enroll attempt redirects to login with a return path", async ({ page, context }) => {

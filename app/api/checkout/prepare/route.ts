@@ -2,6 +2,7 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/auth"
 import { preparePaynowCheckout } from "@/lib/paynow"
+import { rateLimit } from "@/lib/rate-limit"
 
 const PrepareSchema = z.object({
   itemType: z.enum(["course", "training"]),
@@ -30,6 +31,8 @@ export async function POST(req: Request) {
   if (session.role !== "student") {
     return Response.json({ error: "Only students can make course purchases" }, { status: 403 })
   }
+  const limited = await rateLimit(req, "checkout", 12, 10 * 60, session.userId)
+  if (limited) return limited
 
   const json = await req.json().catch(() => null)
   const parsed = PrepareSchema.safeParse(json)
@@ -129,8 +132,9 @@ export async function POST(req: Request) {
             amount: course.price,
             userId: session.userId,
             courseId: course.id,
-            reference: checkout.reference,
-            description: checkout.description,
+              reference: checkout.reference,
+              description: checkout.description,
+              providerPollUrl: checkout.pollUrl,
           },
         })
       }
@@ -145,15 +149,44 @@ export async function POST(req: Request) {
 
     const pkg = await prisma.subjectPackage.findUnique({
       where: { id: itemId },
-      select: { id: true, title: true, price: true, currency: true },
+      select: { id: true, title: true, price: true, currency: true, billingPeriod: true, grade: true, status: true },
     })
 
     if (!pkg) {
       return Response.json({ error: "Training package not found" }, { status: 404 })
     }
 
+    if (pkg.status !== "approved") {
+      return Response.json({ error: "Training package is not available for enrollment" }, { status: 400 })
+    }
+
+    const existingSubjectEnrollment = await prisma.subjectEnrollment.findUnique({
+      where: { userId_subjectPackageId: { userId: session.userId, subjectPackageId: pkg.id } },
+      select: { status: true, endDate: true },
+    })
+    if (existingSubjectEnrollment?.status === "active" && (!existingSubjectEnrollment.endDate || existingSubjectEnrollment.endDate > new Date())) {
+      return Response.json({ success: true, requiresPayment: false, alreadyEnrolled: true, item: { type: "training", id: pkg.id, title: pkg.title, price: pkg.price } })
+    }
+
     const requiresPayment = pkg.price > 0
     const reference = buildReference("TRAIN", pkg.id)
+    if (!requiresPayment) {
+      const startDate = new Date()
+      const endDate = new Date(startDate)
+      endDate.setMonth(endDate.getMonth() + 1)
+      await prisma.$transaction(async (tx) => {
+        await tx.subjectEnrollment.upsert({
+          where: { userId_subjectPackageId: { userId: session.userId, subjectPackageId: pkg.id } },
+          update: { status: "active", grade: pkg.grade, price: 0, currency: pkg.currency, billingPeriod: pkg.billingPeriod, startDate, endDate },
+          create: { userId: session.userId, subjectPackageId: pkg.id, status: "active", grade: pkg.grade, price: 0, currency: pkg.currency, billingPeriod: pkg.billingPeriod, startDate, endDate },
+        })
+        await tx.transaction.create({
+          data: { type: "enrollment", status: "succeeded", currency: pkg.currency, amount: 0, userId: session.userId, subjectPackageId: pkg.id, reference: `FREE-${reference}`, description: `Free subject enrollment for ${pkg.title}`, verifiedAt: new Date() },
+        })
+      })
+      return Response.json({ success: true, requiresPayment: false, enrolledFree: true, item: { type: "training", id: pkg.id, title: pkg.title, price: 0 } })
+    }
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
     const checkout = await preparePaynowCheckout({
       reference,
@@ -167,13 +200,15 @@ export async function POST(req: Request) {
     if (requiresPayment && checkout.success) {
       await prisma.transaction.create({
         data: {
-          type: "adjustment",
+          type: "enrollment",
           status: "pending",
           currency: pkg.currency,
           amount: pkg.price,
           userId: session.userId,
+          subjectPackageId: pkg.id,
           reference: checkout.reference,
           description: checkout.description,
+          providerPollUrl: checkout.pollUrl,
         },
       })
     }

@@ -5,34 +5,9 @@ Run this before any release to production. Pair with the automated suite in
 covers things Playwright doesn't (visual polish, real payment gateway, email
 delivery) plus a few things worth eyeballing even though they're automated.
 
-> **Known findings from building this suite** — read first, these affect what
-> "correct" looks like below:
-> 1. **All role-gate redirects go to `/` (home), not `/login` and not the
->    visitor's own dashboard.** This applies to admin, internal-instructor, and
->    student areas. If your mental model says "should redirect to /login",
->    that's not what's implemented — decide if that's acceptable UX or a fix
->    to schedule, don't assume it's a bug in this checklist.
-> 2. **`/instructor/**` has no server-side route guard**, unlike the other
->    three roles. Protection is a client-side check (`fetch("/api/auth/me")`
->    then `router.replace("/")`) that runs after the page's own JS mounts.
->    A fast connection or a paused debugger can show a flash of the
->    authenticated-looking page shell before the redirect fires. Low risk today
->    (no sensitive data renders before the check), but worth hardening with a
->    real layout-level guard like the other three roles have.
-> 3. **The course-creation wizard's Category/Level/Language selects on step 1
->    do nothing.** They're required to unlock "Submit for Review" client-side,
->    but are never sent to the API — `course.categoryId` stays `null` until an
->    admin sets one manually on the review page. Every course you approve needs
->    its category set at approval time, or it'll never satisfy the admin
->    checklist and will look uncategorized on the public site.
-> 4. **The public `/courses` catalog has no in-page filter/search** — category
->    filtering only exists via `/categories` → click a category tile →
->    `/categories/[slug]`. If you're expecting a filter dropdown on the catalog
->    page itself, it isn't there.
-> 5. **Paynow is live**, not a sandbox/mock (`.env` has real
->    `PAYNOW_INTEGRATION_ID`/`KEY`). Never QA a real purchase against a paid
->    course with a real card unless you intend to actually pay — use a $0
->    course, or stop at the "redirected to Paynow" step.
+> Automated E2E uses an isolated database and a guarded Paynow mock. Release QA
+> must use staging provider credentials. Never simulate success by posting a
+> status to the callback: fulfillment must follow a verified Paynow poll.
 
 ---
 
@@ -56,11 +31,11 @@ delivery) plus a few things worth eyeballing even though they're automated.
       redirected to `/`.
 - [ ] Admin visiting `/dashboard` (student area) → redirected to `/`.
 - [ ] Anonymous visit to any of the above gated routes → redirected to `/`.
-- [ ] Anonymous or wrong-role visit to `/instructor/**` → watch closely for a
-      flash of instructor UI before the client-side redirect fires (see
-      finding #2 above); confirm no sensitive data is visible in that window.
-- [ ] Session cookies (`lms_user_id`, `lms_role`) are `httpOnly` and not
-      readable from `document.cookie` in devtools console.
+- [ ] Anonymous or wrong-role visit to `/instructor/**` is rejected by the
+      server layout with no privileged UI or API data rendered.
+- [ ] The `dzidza_session` cookie is HTTP-only, Secure in production, SameSite
+      Lax, and not readable from `document.cookie`; legacy identity cookies do
+      not grant access.
 
 ## 2. Course creation & approval lifecycle
 

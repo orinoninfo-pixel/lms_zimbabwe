@@ -67,6 +67,7 @@ export async function PATCH(req: Request) {
       data: { role },
       select: { id: true, role: true, status: true },
     })
+    await prisma.session.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: new Date() } })
     return Response.json({ success: true, user: updated })
   }
 
@@ -81,6 +82,7 @@ export async function PATCH(req: Request) {
     data: { status: statusMap[action] },
     select: { id: true, role: true, status: true },
   })
+  if (updated.status !== "active") await prisma.session.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: new Date() } })
 
   return Response.json({ success: true, user: updated })
 }

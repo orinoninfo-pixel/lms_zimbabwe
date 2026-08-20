@@ -20,6 +20,7 @@ type PaymentStatusResponse = {
   itemType: "course" | "training"
   itemId: string | null
   hasCourseAccess: boolean
+  hasSubjectAccess: boolean
 }
 
 function formatMoney(amount: number, currency: PaymentStatusResponse["currency"]) {
@@ -130,7 +131,7 @@ export function PaymentStatusPanel({
       return { href: `/learn/${data.itemId}`, label: "Open Course" }
     }
 
-    if (data.status === "succeeded" && data.itemType === "training" && data.itemId) {
+    if (data.status === "succeeded" && data.itemType === "training" && data.itemId && data.hasSubjectAccess) {
       return { href: `/zimbabwe-learning-hub/${data.itemId}`, label: "Open Training" }
     }
 

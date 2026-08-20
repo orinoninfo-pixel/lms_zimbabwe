@@ -5,6 +5,7 @@ declare module "paynow" {
     returnUrl: string
     createPayment(reference: string, email?: string): Payment
     send(payment: Payment): Promise<PaynowResponse>
+    pollTransaction(url: string): Promise<PaynowStatusResponse>
   }
 
   export interface Payment {
@@ -17,5 +18,14 @@ declare module "paynow" {
     pollUrl?: string
     error?: string
     instructions?: string
+  }
+
+  export interface PaynowStatusResponse {
+    reference?: string
+    amount?: string
+    paynowReference?: string
+    pollUrl?: string
+    status?: string
+    error?: string
   }
 }

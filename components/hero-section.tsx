@@ -38,7 +38,7 @@ export function HeroSection() {
 
             <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
               <Link
-                href="/courses"
+                href="/learn"
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-semibold text-primary-foreground shadow-xs transition-colors duration-200 hover:bg-primary/95"
               >
                 Start Learning Free

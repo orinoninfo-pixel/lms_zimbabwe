@@ -35,7 +35,7 @@ export function CourseCard({
   titleHoverClassName = "group-hover:text-primary",
 }: CourseCardProps) {
   const courseHref = href ?? `/course/${id}`
-  const displayPrice = typeof price === "number" ? formatUsd(price) : "Free"
+  const displayPrice = typeof price === "number" && price > 0 ? formatUsd(price) : "Free"
 
   return (
     <article
@@ -50,6 +50,7 @@ export function CourseCard({
             sizes={imageSizes}
             placeholder="blur"
             blurDataURL={THUMBNAIL_BLUR_DATA_URL}
+            unoptimized={Boolean(thumbnail?.startsWith("http"))}
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>

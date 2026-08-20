@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
+import { clearSessionCookies, revokeCurrentSession } from "@/lib/auth"
 
 export async function POST() {
+  await revokeCurrentSession()
   const res = NextResponse.json({ success: true })
-  res.cookies.set("lms_user_id", "", { httpOnly: true, sameSite: "lax", path: "/", maxAge: 0 })
-  res.cookies.set("lms_role", "", { httpOnly: true, sameSite: "lax", path: "/", maxAge: 0 })
+  clearSessionCookies(res)
   return res
 }
 

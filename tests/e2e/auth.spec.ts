@@ -6,16 +6,8 @@ import { loginAs, logout, CREDENTIALS, POST_LOGIN_PATH, type Role } from "./util
  * their dashboard" assumption in the original test brief. As implemented today
  * (app/admin/layout.tsx, app/internal-instructor/layout.tsx, app/dashboard/page.tsx,
  * all via lib/rbac.ts's requireRoleForPage):
- *   - Unauthenticated OR wrong-role access to a gated route redirects to "/" (home),
- *     never to "/login" and never to the visitor's own dashboard.
- *   - /instructor/** has NO server-side layout guard at all — protection is a
- *     client-side useEffect that calls /api/auth/me after mount and then does
- *     router.replace("/") on mismatch. There is a brief window where the page's
- *     initial HTML is visible before the redirect fires. This is weaker than the
- *     other three roles' guards and is flagged in QA_CHECKLIST.md as a finding,
- *     not silently "fixed" here.
- * These tests assert the real behavior so they encode ground truth, not the
- * originally-assumed spec.
+ * Dashboard and instructor routes now have server-side layout guards. Their
+ * unauthenticated and wrong-role redirects go to /login before private UI renders.
  */
 
 const roles: Role[] = ["student", "instructor", "internal_instructor", "admin"]
@@ -46,13 +38,14 @@ test.describe("Logout", () => {
       // Re-visiting the gated route after logout must bounce again — proves
       // the session cookie was actually cleared, not just a client nav away.
       await page.goto(POST_LOGIN_PATH[role])
-      await expect(page).toHaveURL("/")
+      if (role === "student" || role === "instructor") await expect(page).toHaveURL(/\/login$/)
+      else await expect(page).toHaveURL("/")
     })
   }
 })
 
 test.describe("Route protection — unauthenticated visitors", () => {
-  const gatedRoutes = ["/admin", "/admin/transactions", "/internal-instructor", "/dashboard"]
+  const gatedRoutes = ["/admin", "/admin/transactions", "/internal-instructor"]
 
   for (const route of gatedRoutes) {
     test(`anonymous visit to ${route} redirects to home`, async ({ page }) => {
@@ -61,11 +54,16 @@ test.describe("Route protection — unauthenticated visitors", () => {
     })
   }
 
-  test("anonymous visit to /instructor/courses/new eventually redirects to home (client-side guard)", async ({
+  test("anonymous visit to /dashboard redirects to login", async ({ page }) => {
+    await page.goto("/dashboard")
+    await expect(page).toHaveURL(/\/login$/)
+  })
+
+  test("anonymous visit to /instructor/courses/new redirects to login server-side", async ({
     page,
   }) => {
     await page.goto("/instructor/courses/new")
-    await expect(page).toHaveURL("/", { timeout: 10_000 })
+    await expect(page).toHaveURL(/\/login$/, { timeout: 10_000 })
   })
 })
 
@@ -106,15 +104,15 @@ test.describe("Route protection — cross-role access", () => {
     await expect(page).toHaveURL("/")
   })
 
-  test("admin opening /dashboard (student area) is redirected to home", async ({ page }) => {
+  test("admin opening /dashboard (student area) is redirected to login", async ({ page }) => {
     await loginAs(page, "admin")
     await page.goto("/dashboard")
-    await expect(page).toHaveURL("/")
+    await expect(page).toHaveURL(/\/login$/)
   })
 
-  test("student opening /instructor/courses/new is bounced back to home (client-side guard)", async ({ page }) => {
+  test("student opening /instructor/courses/new is rejected by the server layout", async ({ page }) => {
     await loginAs(page, "student")
     await page.goto("/instructor/courses/new")
-    await expect(page).toHaveURL("/", { timeout: 10_000 })
+    await expect(page).toHaveURL(/\/login$/, { timeout: 10_000 })
   })
 })

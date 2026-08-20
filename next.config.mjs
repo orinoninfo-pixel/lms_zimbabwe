@@ -6,9 +6,6 @@ dotenv.config({ path: ".env" })
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     // AVIF first: ~30-50% smaller than WebP at equal quality, huge win on
     // 3G/4G bundles. Next.js negotiates via Accept header, falling back to
@@ -22,6 +19,17 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(self)' },
+          { key: 'Content-Security-Policy', value: `default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; form-action 'self' https://www.paynow.co.zw; img-src 'self' data: blob: https:; media-src 'self' https:; connect-src 'self' https://*.paynow.co.zw https://*.neon.tech; script-src 'self' 'unsafe-inline'${process.env.NODE_ENV !== 'production' ? " 'unsafe-eval'" : ''}; style-src 'self' 'unsafe-inline'; font-src 'self' data:; upgrade-insecure-requests` },
+          ...(process.env.NODE_ENV === 'production' ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' }] : []),
+        ],
+      },
       {
         // Not content-hashed, so avoid `immutable` — a day of hard caching
         // plus a week of background revalidation still saves repeat

@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { requireRoleForPage } from "@/lib/rbac"
+import { getStudentCourseSummaries } from "@/lib/course-progress"
 
 export const dynamic = "force-dynamic"
 
@@ -13,38 +14,7 @@ export default async function DashboardCoursesPage() {
   const auth = await requireRoleForPage("student")
   if (!auth) redirect("/")
 
-  const enrollments = await prisma.enrollment.findMany({
-    where: { userId: auth.user.id },
-    include: {
-      course: {
-        include: {
-          instructor: { select: { name: true } },
-        },
-      },
-    },
-    orderBy: { id: "desc" },
-  })
-
-  const courses = await Promise.all(
-    enrollments.map(async (enrollment) => {
-      const course = enrollment.course
-      const totalLessons = await prisma.lesson.count({
-        where: { section: { courseId: course.id } },
-      })
-      const completedLessons = await prisma.progress.count({
-        where: { userId: auth.user.id, completed: true, lesson: { section: { courseId: course.id } } },
-      })
-      const percent = totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
-      return {
-        id: course.id,
-        title: course.title,
-        instructorName: course.instructor.name,
-        totalLessons,
-        completedLessons,
-        percent,
-      }
-    })
-  )
+  const courses = (await getStudentCourseSummaries(auth.user.id)).map((course) => ({ ...course, percent: course.progressPercent }))
 
   return (
     <div className="min-h-screen bg-background">

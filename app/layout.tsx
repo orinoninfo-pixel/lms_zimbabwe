@@ -1,15 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter, Manrope, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
-
-// next/font self-hosts and inlines these at build time — no runtime request
-// to fonts.googleapis.com, and `swap` avoids invisible-text on slow links.
-const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" })
-const manrope = Manrope({ subsets: ["latin"], display: "swap", variable: "--font-manrope" })
-const geistMono = Geist_Mono({ subsets: ["latin"], display: "swap", variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://lms-zimbabwe.onrender.com'),
@@ -56,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="bg-background">
-      <body className={`${inter.variable} ${manrope.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="blue" enableSystem={false} themes={["blue", "green", "dark"]}>
           {children}
           <Toaster />

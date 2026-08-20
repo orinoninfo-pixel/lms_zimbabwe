@@ -167,6 +167,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
       },
       select: userDetailSelect,
     })
+    await prisma.session.updateMany({ where: { userId: id, revokedAt: null }, data: { revokedAt: new Date() } })
 
     return Response.json({
       success: true,
@@ -183,6 +184,9 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
     },
     select: userDetailSelect,
   })
+  if (parsed.data.role || (parsed.data.status && parsed.data.status !== "active")) {
+    await prisma.session.updateMany({ where: { userId: id, revokedAt: null }, data: { revokedAt: new Date() } })
+  }
 
   return Response.json({
     success: true,

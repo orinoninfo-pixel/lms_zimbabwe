@@ -125,15 +125,10 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
     <Card className="sticky top-24 shadow-lg border-border">
       <CardContent className="p-6">
         <div className="flex items-baseline gap-3 mb-2">
-          <span className="text-4xl font-bold text-foreground">${price}</span>
-          <span className="text-lg text-muted-foreground line-through">${originalPrice}</span>
-          <span className="text-sm font-medium text-accent bg-accent/10 px-2 py-0.5 rounded">
-            {discount}% off
-          </span>
+          <span className="text-4xl font-bold text-foreground">{price === 0 ? "Free" : `$${price}`}</span>
+          {price > 0 ? <><span className="text-lg text-muted-foreground line-through">${originalPrice}</span><span className="text-sm font-medium text-accent bg-accent/10 px-2 py-0.5 rounded">{discount}% off</span></> : null}
         </div>
-        <p className="text-sm text-destructive font-medium mb-6">
-          Sale ends in 2 days!
-        </p>
+        {price > 0 ? <p className="text-sm text-destructive font-medium mb-6">Sale ends in 2 days!</p> : <div className="mb-6" />}
 
         <div className="space-y-3 mb-6">
           {isEnrolled ? (

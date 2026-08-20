@@ -18,10 +18,10 @@ export function ZimbabweSubjectEnrollmentActions({
     setStatus(initialStatus)
   }, [initialStatus])
 
-  const act = async (action: "start" | "activate" | "cancel") => {
+  const act = async (action: "start" | "cancel") => {
     setBusy(true)
     try {
-      if (action === "start" || action === "activate") {
+      if (action === "start") {
         const res = await fetch("/api/checkout/prepare", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -74,14 +74,14 @@ export function ZimbabweSubjectEnrollmentActions({
   if (status === "pending") {
     return (
       <div className="space-y-2">
-        <Button className="w-full" onClick={() => void act("activate")} disabled={busy}>
-          Activate subscription (test payment)
+        <Button className="w-full" onClick={() => void act("start")} disabled={busy}>
+          Continue to secure payment
         </Button>
         <Button variant="outline" className="w-full" onClick={() => void act("cancel")} disabled={busy}>
           Cancel
         </Button>
         <p className="text-xs text-muted-foreground">
-          Payment provider is not integrated. Activate simulates a successful monthly payment.
+          Access activates only after Paynow confirms the payment.
         </p>
       </div>
     )

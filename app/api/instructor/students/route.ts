@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/auth"
+import { getCompletedLessonTotals, getCourseLessonTotals } from "@/lib/course-progress"
 
 export async function GET() {
   const session = await getSession()
@@ -20,32 +21,19 @@ export async function GET() {
     orderBy: { title: "asc" },
   })
 
-  const courseTotals = await Promise.all(
-    courses.map(async (c) => {
-      const totalLessons = await prisma.lesson.count({ where: { section: { courseId: c.id } } })
-      return { courseId: c.id, totalLessons, price: c.price }
-    })
-  )
-
-  const totalsByCourseId = new Map(courseTotals.map((t) => [t.courseId, t]))
+  const courseIds = courses.map((course) => course.id)
+  const totalLessonsByCourseId = await getCourseLessonTotals(courseIds)
 
   const enrollments = await prisma.enrollment.findMany({
-    where: { courseId: { in: courses.map((c) => c.id) } },
+    where: { courseId: { in: courseIds } },
     include: { user: { select: { id: true, name: true, email: true } }, course: { select: { id: true, title: true } } },
     orderBy: { id: "desc" },
   })
 
-  const rows = await Promise.all(
-    enrollments.map(async (e) => {
-      const totals = totalsByCourseId.get(e.courseId)
-      const totalLessons = totals?.totalLessons ?? 0
-      const completedLessons = await prisma.progress.count({
-        where: {
-          userId: e.userId,
-          completed: true,
-          lesson: { section: { courseId: e.courseId } },
-        },
-      })
+  const completedTotals = await getCompletedLessonTotals(courseIds, Array.from(new Set(enrollments.map((enrollment) => enrollment.userId))))
+  const rows = enrollments.map((e) => {
+      const totalLessons = totalLessonsByCourseId.get(e.courseId) ?? 0
+      const completedLessons = completedTotals.get(`${e.userId}:${e.courseId}`) ?? 0
       const percent = totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
       return {
         courseId: e.courseId,
@@ -58,7 +46,6 @@ export async function GET() {
         percent,
       }
     })
-  )
 
   return Response.json({
     totalStudents: new Set(rows.map((r) => r.userId)).size,
