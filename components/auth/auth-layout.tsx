@@ -17,7 +17,7 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
 
       <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-6">
         <header className="flex items-start justify-between gap-4">
-          <div className="space-y-3">
+          <div className="flex flex-col items-start gap-3">
             <Link
               href="/"
               className="inline-flex items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
