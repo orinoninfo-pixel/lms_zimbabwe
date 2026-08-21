@@ -39,7 +39,7 @@ export function CodeExample({ title, language, sourceCode, expectedOutput, expla
           {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}{copied ? "Copied" : "Copy"}
         </Button>
       </figcaption>
-      <pre className="max-w-full overflow-x-auto p-4 text-sm leading-7"><code>{code}</code></pre>
+      <pre className="max-w-full overflow-x-auto p-4 text-sm leading-7 text-slate-100"><code>{code}</code></pre>
       {expectedOutput ? <div className="border-t border-slate-800 bg-slate-900 px-4 py-3"><p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Expected output</p><pre className="overflow-x-auto text-sm text-emerald-300">{expectedOutput}</pre></div> : null}
       {explanation ? <p className="border-t border-slate-800 px-4 py-3 text-sm leading-6 text-slate-300">{explanation}</p> : null}
     </figure>
