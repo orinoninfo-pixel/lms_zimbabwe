@@ -187,8 +187,8 @@ export default function NewInternalCoursePage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={handleSave} disabled={isSaving} className="gap-2">
-              <Save className="h-4 w-4" />
+            <Button variant="outline" onClick={handleSave} loading={isSaving} className="gap-2">
+              {isSaving ? null : <Save className="h-4 w-4" />}
               <span className="hidden sm:inline">Save Draft</span>
             </Button>
           </div>
@@ -248,8 +248,8 @@ export default function NewInternalCoursePage() {
               <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handlePublish} disabled={!isReadyToPublish || isSaving} className="gap-2">
-              <Send className="h-4 w-4" />
+            <Button onClick={handlePublish} disabled={!isReadyToPublish} loading={isSaving} className="gap-2">
+              {isSaving ? null : <Send className="h-4 w-4" />}
               Submit for Review
             </Button>
           )}

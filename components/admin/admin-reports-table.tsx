@@ -228,7 +228,7 @@ export function AdminReportsTable() {
                           <div className="flex gap-2">
                             <ConfirmDialog
                               trigger={
-                                <Button variant="outline" size="sm" disabled={busy}>
+                                <Button variant="outline" size="sm" loading={busy}>
                                   Suspend user
                                 </Button>
                               }
@@ -240,7 +240,7 @@ export function AdminReportsTable() {
                             />
                             <ConfirmDialog
                               trigger={
-                                <Button variant="destructive" size="sm" disabled={busy}>
+                                <Button variant="destructive" size="sm" loading={busy}>
                                   Ban user
                                 </Button>
                               }
@@ -257,7 +257,7 @@ export function AdminReportsTable() {
                           <div className="flex gap-2">
                             <ConfirmDialog
                               trigger={
-                                <Button variant="outline" size="sm" disabled={busy}>
+                                <Button variant="outline" size="sm" loading={busy}>
                                   Suspend course
                                 </Button>
                               }
@@ -269,7 +269,7 @@ export function AdminReportsTable() {
                             />
                             <ConfirmDialog
                               trigger={
-                                <Button variant="destructive" size="sm" disabled={busy}>
+                                <Button variant="destructive" size="sm" loading={busy}>
                                   Delete course
                                 </Button>
                               }

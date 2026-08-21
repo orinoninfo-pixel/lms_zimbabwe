@@ -260,13 +260,13 @@ export function InternalInstructorCourseEdit({ courseId }: { courseId: string })
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" onClick={() => void save(false)} disabled={isSaving} className="gap-2">
-              <Save className="h-4 w-4" />
+            <Button variant="outline" onClick={() => void save(false)} loading={isSaving} className="gap-2">
+              {isSaving ? null : <Save className="h-4 w-4" />}
               Save Changes
             </Button>
             {canSubmit ? (
-              <Button onClick={() => void save(true)} disabled={isSaving} className="gap-2">
-                <Send className="h-4 w-4" />
+              <Button onClick={() => void save(true)} loading={isSaving} className="gap-2">
+                {isSaving ? null : <Send className="h-4 w-4" />}
                 {status === "rejected" ? "Resubmit for Review" : "Submit for Review"}
               </Button>
             ) : null}

@@ -299,16 +299,16 @@ export function HomeworkManager({
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex flex-wrap justify-end gap-2">
-                        <Button variant="secondary" size="sm" disabled={busy} onClick={() => void openSubmissions(assignment)}>
+                        <Button variant="secondary" size="sm" loading={busy} onClick={() => void openSubmissions(assignment)}>
                           <ClipboardList className="h-4 w-4 mr-2" />
                           Submissions
                         </Button>
-                        <Button variant="outline" size="sm" disabled={busy} onClick={() => openEdit(assignment)}>
+                        <Button variant="outline" size="sm" loading={busy} onClick={() => openEdit(assignment)}>
                           Edit
                         </Button>
                         <ConfirmDialog
                           trigger={
-                            <Button variant="destructive" size="sm" disabled={busy}>
+                            <Button variant="destructive" size="sm" loading={busy}>
                               Delete
                             </Button>
                           }
@@ -385,7 +385,7 @@ export function HomeworkManager({
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => void save()} disabled={saving}>
+            <Button onClick={() => void save()} loading={saving}>
               {editingId ? "Save Changes" : "Assign"}
             </Button>
           </DialogFooter>

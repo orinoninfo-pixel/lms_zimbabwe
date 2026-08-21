@@ -167,7 +167,7 @@ export function SubjectQuizTaker({ quizId, open, onOpenChange }: { quizId: strin
             Close
           </Button>
           {data && !result ? (
-            <Button onClick={() => void submit()} disabled={submitting}>
+            <Button onClick={() => void submit()} loading={submitting}>
               Submit Quiz
             </Button>
           ) : null}

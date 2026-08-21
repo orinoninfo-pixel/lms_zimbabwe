@@ -145,7 +145,7 @@ function ResetPasswordForm() {
             </Alert>
           ) : null}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting || !token} aria-busy={isSubmitting}>
+          <Button type="submit" className="w-full" disabled={!token} loading={isSubmitting}>
             {isSubmitting ? "Resetting..." : "Reset password"}
           </Button>
 

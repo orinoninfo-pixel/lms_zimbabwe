@@ -264,7 +264,8 @@ export function AdminCoursesTable() {
                           variant="outline"
                           size="sm"
                           onClick={() => void savePrice(c.id)}
-                          disabled={busy || (priceDrafts[c.id] ?? String(c.price)) === String(c.price)}
+                          disabled={(priceDrafts[c.id] ?? String(c.price)) === String(c.price)}
+                          loading={busy}
                         >
                           Save
                         </Button>
@@ -287,7 +288,7 @@ export function AdminCoursesTable() {
                             variant="secondary"
                             size="sm"
                             onClick={() => void act(c.id, "unfeature")}
-                            disabled={busy}
+                            loading={busy}
                           >
                             <StarOff className="h-4 w-4 mr-2" />
                             Unfeature
@@ -297,7 +298,7 @@ export function AdminCoursesTable() {
                             variant="secondary"
                             size="sm"
                             onClick={() => void act(c.id, "feature")}
-                            disabled={busy}
+                            loading={busy}
                           >
                             <Star className="h-4 w-4 mr-2" />
                             Feature
@@ -305,7 +306,7 @@ export function AdminCoursesTable() {
                         )}
                         <ConfirmDialog
                           trigger={
-                            <Button variant="destructive" size="sm" disabled={busy}>
+                            <Button variant="destructive" size="sm" loading={busy}>
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
                             </Button>

@@ -122,7 +122,7 @@ export function NotificationsList() {
         <p className="text-sm text-muted-foreground">
           {unread > 0 ? `${unread} unread` : "All read"}
         </p>
-        <Button variant="outline" size="sm" onClick={() => void markAllRead()} disabled={busy || unread === 0}>
+        <Button variant="outline" size="sm" onClick={() => void markAllRead()} disabled={unread === 0} loading={busy}>
           <CheckCheck className="h-4 w-4 mr-2" />
           Mark all as read
         </Button>

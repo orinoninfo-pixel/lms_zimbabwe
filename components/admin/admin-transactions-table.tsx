@@ -467,7 +467,7 @@ export function AdminTransactionsTable() {
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => void submitCreate()} disabled={busyId === "create"}>
+              <Button onClick={() => void submitCreate()} loading={busyId === "create"}>
                 Create
               </Button>
             </DialogFooter>

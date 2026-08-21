@@ -190,10 +190,10 @@ export function AdminUserReviewPage({ userId }: { userId: string }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => void save()} disabled={isSaving || !user}>
+          <Button variant="secondary" onClick={() => void save()} disabled={!user} loading={isSaving}>
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
-          <Button onClick={() => void resetPassword()} disabled={isSaving || !user}>
+          <Button onClick={() => void resetPassword()} disabled={!user} loading={isSaving}>
             <KeyRound className="mr-2 h-4 w-4" />
             Reset Password
           </Button>
@@ -434,7 +434,7 @@ export function AdminUserReviewPage({ userId }: { userId: string }) {
                       value={role}
                       onChange={(e) => setRole(e.target.value as ReviewUser["role"])}
                       className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
-                      disabled={isSaving}
+                      loading={isSaving}
                     >
                       <option value="student">student</option>
                       <option value="instructor">instructor</option>
@@ -450,7 +450,7 @@ export function AdminUserReviewPage({ userId }: { userId: string }) {
                       value={status}
                       onChange={(e) => setStatus(e.target.value as ReviewUser["status"])}
                       className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
-                      disabled={isSaving}
+                      loading={isSaving}
                     >
                       <option value="active">active</option>
                       <option value="suspended">suspended</option>
@@ -462,10 +462,10 @@ export function AdminUserReviewPage({ userId }: { userId: string }) {
                 <Separator className="my-5" />
 
                 <div className="flex flex-col gap-2">
-                  <Button variant="secondary" onClick={() => void save()} disabled={isSaving}>
+                  <Button variant="secondary" onClick={() => void save()} loading={isSaving}>
                     {isSaving ? "Saving..." : "Save Changes"}
                   </Button>
-                  <Button onClick={() => void resetPassword()} disabled={isSaving}>
+                  <Button onClick={() => void resetPassword()} loading={isSaving}>
                     <KeyRound className="mr-2 h-4 w-4" />
                     Reset Password
                   </Button>

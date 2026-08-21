@@ -234,16 +234,16 @@ export function AdminCourseReviewPage({ courseId }: { courseId: string }) {
             Next Pending
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <Button variant="outline" onClick={() => void save("rejected")} disabled={isSaving || !course}>
+          <Button variant="outline" onClick={() => void save("rejected")} disabled={!course} loading={isSaving}>
             Reject
           </Button>
-          <Button variant="outline" onClick={() => void save("suspended")} disabled={isSaving || !course}>
+          <Button variant="outline" onClick={() => void save("suspended")} disabled={!course} loading={isSaving}>
             Suspend
           </Button>
-          <Button variant="secondary" onClick={() => void save()} disabled={isSaving || !course}>
+          <Button variant="secondary" onClick={() => void save()} disabled={!course} loading={isSaving}>
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
-          <Button onClick={() => void save("approved")} disabled={isSaving || !course || !approvalReady}>
+          <Button onClick={() => void save("approved")} disabled={!course || !approvalReady} loading={isSaving}>
             Save and Approve
           </Button>
         </div>
@@ -514,17 +514,17 @@ export function AdminCourseReviewPage({ courseId }: { courseId: string }) {
                 <Separator className="my-5" />
 
                 <div className="flex flex-col gap-2">
-                  <Button variant="secondary" onClick={() => void save()} disabled={isSaving || !course}>
+                  <Button variant="secondary" onClick={() => void save()} disabled={!course} loading={isSaving}>
                     {isSaving ? "Saving..." : "Save Changes"}
                   </Button>
-                  <Button onClick={() => void save("approved")} disabled={isSaving || !course || !approvalReady}>
+                  <Button onClick={() => void save("approved")} disabled={!course || !approvalReady} loading={isSaving}>
                     Save and Approve
                   </Button>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" onClick={() => void save("rejected")} disabled={isSaving || !course}>
+                    <Button variant="outline" onClick={() => void save("rejected")} disabled={!course} loading={isSaving}>
                       Reject
                     </Button>
-                    <Button variant="outline" onClick={() => void save("suspended")} disabled={isSaving || !course}>
+                    <Button variant="outline" onClick={() => void save("suspended")} disabled={!course} loading={isSaving}>
                       Suspend
                     </Button>
                   </div>

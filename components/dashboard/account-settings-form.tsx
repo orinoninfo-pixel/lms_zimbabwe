@@ -133,7 +133,7 @@ export function AccountSettingsForm() {
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={() => void save()} disabled={busy || !name.trim()}>
+            <Button onClick={() => void save()} disabled={!name.trim()} loading={busy}>
               Save changes
             </Button>
           </div>

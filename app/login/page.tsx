@@ -120,7 +120,7 @@ function LoginForm() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
-          <Button type="submit" className="w-full" disabled={isSubmitting} aria-busy={isSubmitting}>
+          <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
           <div className="flex items-center justify-between text-sm text-muted-foreground">

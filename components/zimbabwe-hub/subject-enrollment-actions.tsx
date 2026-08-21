@@ -64,7 +64,7 @@ export function ZimbabweSubjectEnrollmentActions({
         <Button className="w-full" disabled>
           Active access
         </Button>
-        <Button variant="outline" className="w-full" onClick={() => void act("cancel")} disabled={busy}>
+        <Button variant="outline" className="w-full" onClick={() => void act("cancel")} loading={busy}>
           Cancel access
         </Button>
       </div>
@@ -74,10 +74,10 @@ export function ZimbabweSubjectEnrollmentActions({
   if (status === "pending") {
     return (
       <div className="space-y-2">
-        <Button className="w-full" onClick={() => void act("start")} disabled={busy}>
+        <Button className="w-full" onClick={() => void act("start")} loading={busy}>
           Continue to secure payment
         </Button>
-        <Button variant="outline" className="w-full" onClick={() => void act("cancel")} disabled={busy}>
+        <Button variant="outline" className="w-full" onClick={() => void act("cancel")} loading={busy}>
           Cancel
         </Button>
         <p className="text-xs text-muted-foreground">
@@ -90,7 +90,7 @@ export function ZimbabweSubjectEnrollmentActions({
   if (status === "cancelled") {
     return (
       <div className="space-y-2">
-        <Button className="w-full" onClick={() => void act("start")} disabled={busy}>
+        <Button className="w-full" onClick={() => void act("start")} loading={busy}>
           Re-enroll
         </Button>
         <p className="text-xs text-muted-foreground">Your access is currently cancelled.</p>
@@ -100,7 +100,7 @@ export function ZimbabweSubjectEnrollmentActions({
 
   return (
     <div className="space-y-2">
-      <Button className="w-full" onClick={() => void act("start")} disabled={busy}>
+      <Button className="w-full" onClick={() => void act("start")} loading={busy}>
         Start subscription
       </Button>
       <p className="text-xs text-muted-foreground">

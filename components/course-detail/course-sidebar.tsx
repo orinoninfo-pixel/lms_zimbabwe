@@ -136,7 +136,7 @@ export function CourseSidebar({ courseId, price, originalPrice, discount, featur
               <Link href={`/learn/${courseId}`}>Open Course</Link>
             </Button>
           ) : (
-            <Button className="w-full" size="lg" onClick={handleEnroll} disabled={isEnrolling}>
+            <Button className="w-full" size="lg" onClick={handleEnroll} loading={isEnrolling}>
               {price === 0
                 ? isEnrolling
                   ? "Enrolling..."

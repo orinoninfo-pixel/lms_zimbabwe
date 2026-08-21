@@ -171,7 +171,7 @@ export function WishlistList() {
                   variant="ghost"
                   size="sm"
                   onClick={() => void toggleWishlist(course.id)}
-                  disabled={busy}
+                  loading={busy}
                 >
                   <HeartOff className="h-4 w-4 mr-2" />
                   Remove
@@ -190,7 +190,7 @@ export function WishlistList() {
                     </Link>
                   </Button>
                 ) : (
-                  <Button size="sm" onClick={() => void startCheckout(course.id)} disabled={busy}>
+                  <Button size="sm" onClick={() => void startCheckout(course.id)} loading={busy}>
                     Buy Now
                   </Button>
                 )}

@@ -180,7 +180,8 @@ export function AdminInstructorsTable() {
                           variant="secondary"
                           size="sm"
                           onClick={() => void onStatusAction(r.id, "activate")}
-                          disabled={busy || r.status === "active"}
+                          disabled={r.status === "active"}
+                          loading={busy}
                         >
                           Activate
                         </Button>
@@ -188,13 +189,14 @@ export function AdminInstructorsTable() {
                           variant="secondary"
                           size="sm"
                           onClick={() => void onStatusAction(r.id, "suspend")}
-                          disabled={busy || r.status === "suspended"}
+                          disabled={r.status === "suspended"}
+                          loading={busy}
                         >
                           Suspend
                         </Button>
                         <ConfirmDialog
                           trigger={
-                            <Button variant="outline" size="sm" disabled={busy || r.status === "banned"}>
+                            <Button variant="outline" size="sm" disabled={r.status === "banned"} loading={busy}>
                               Ban
                             </Button>
                           }

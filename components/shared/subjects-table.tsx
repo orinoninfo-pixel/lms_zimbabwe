@@ -186,7 +186,7 @@ export function SubjectsTable({
                         {canDelete ? (
                           <ConfirmDialog
                             trigger={
-                              <Button variant="destructive" size="sm" disabled={busy}>
+                              <Button variant="destructive" size="sm" loading={busy}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             }

@@ -275,7 +275,8 @@ export function AdminUsersTable({
                           variant="secondary"
                           size="sm"
                           onClick={() => void onStatusAction(u.id, "activate")}
-                          disabled={busy || u.status === "active"}
+                          disabled={u.status === "active"}
+                          loading={busy}
                         >
                           Activate
                         </Button>
@@ -283,13 +284,14 @@ export function AdminUsersTable({
                           variant="secondary"
                           size="sm"
                           onClick={() => void onStatusAction(u.id, "suspend")}
-                          disabled={busy || u.status === "suspended"}
+                          disabled={u.status === "suspended"}
+                          loading={busy}
                         >
                           Suspend
                         </Button>
                         <ConfirmDialog
                           trigger={
-                            <Button variant="destructive" size="sm" disabled={busy}>
+                            <Button variant="destructive" size="sm" loading={busy}>
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete
                             </Button>
@@ -302,7 +304,7 @@ export function AdminUsersTable({
                         />
                         <ConfirmDialog
                           trigger={
-                            <Button variant="outline" size="sm" disabled={busy || u.status === "banned"}>
+                            <Button variant="outline" size="sm" disabled={u.status === "banned"} loading={busy}>
                               Ban
                             </Button>
                           }

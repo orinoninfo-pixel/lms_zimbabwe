@@ -475,18 +475,18 @@ export function AdminCourseReviewSheet({
         <DialogFooter className="border-t border-border px-6 py-4">
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-between">
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={() => void save("rejected")} disabled={isSaving || !course}>
+              <Button variant="outline" onClick={() => void save("rejected")} disabled={!course} loading={isSaving}>
                 Reject
               </Button>
-              <Button variant="outline" onClick={() => void save("suspended")} disabled={isSaving || !course}>
+              <Button variant="outline" onClick={() => void save("suspended")} disabled={!course} loading={isSaving}>
                 Suspend
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" onClick={() => void save()} disabled={isSaving || !course}>
+              <Button variant="secondary" onClick={() => void save()} disabled={!course} loading={isSaving}>
                 {isSaving ? "Saving..." : "Save Changes"}
               </Button>
-              <Button onClick={() => void save("approved")} disabled={isSaving || !course || !approvalReady}>
+              <Button onClick={() => void save("approved")} disabled={!course || !approvalReady} loading={isSaving}>
                 Save and Approve
               </Button>
             </div>

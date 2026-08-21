@@ -202,19 +202,20 @@ export default function CreateCoursePage() {
             <Button
               variant="outline"
               onClick={handleSave}
-              disabled={isSaving}
+              loading={isSaving}
               className="gap-2"
             >
-              <Save className="h-4 w-4" />
+              {isSaving ? null : <Save className="h-4 w-4" />}
               <span className="hidden sm:inline">Save Draft</span>
             </Button>
             {currentStep === 3 && (
               <Button
                 onClick={handlePublish}
-                disabled={!isReadyToPublish || isSaving}
+                disabled={!isReadyToPublish}
+                loading={isSaving}
                 className="gap-2"
               >
-                <Send className="h-4 w-4" />
+                {isSaving ? null : <Send className="h-4 w-4" />}
                 Submit for Review
               </Button>
             )}
@@ -290,10 +291,11 @@ export default function CreateCoursePage() {
           ) : (
             <Button
               onClick={handlePublish}
-              disabled={!isReadyToPublish || isSaving}
+              disabled={!isReadyToPublish}
+              loading={isSaving}
               className="gap-2"
             >
-              <Send className="h-4 w-4" />
+              {isSaving ? null : <Send className="h-4 w-4" />}
               Submit for Review
             </Button>
           )}

@@ -155,13 +155,13 @@ export function AdminCategoriesTable() {
                   <td className="px-5 py-4 text-right text-sm text-foreground tabular-nums">{c._count.courses}</td>
                   <td className="px-5 py-4">
                     <div className="flex justify-end gap-2">
-                      <Button variant="secondary" size="sm" onClick={() => openEdit(c)} disabled={busy}>
+                      <Button variant="secondary" size="sm" onClick={() => openEdit(c)} loading={busy}>
                         <Pencil className="h-4 w-4 mr-2" />
                         Edit
                       </Button>
                       <ConfirmDialog
                         trigger={
-                          <Button variant="destructive" size="sm" disabled={busy}>
+                          <Button variant="destructive" size="sm" loading={busy}>
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete
                           </Button>
@@ -203,7 +203,7 @@ export function AdminCategoriesTable() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => void save()} disabled={busy || !name.trim()}>
+            <Button onClick={() => void save()} disabled={!name.trim()} loading={busy}>
               Save
             </Button>
           </DialogFooter>

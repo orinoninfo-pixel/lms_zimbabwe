@@ -385,13 +385,13 @@ export function SubjectEditor({
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button onClick={() => void save()} disabled={isSaving || isSubmitting} variant={canSubmitForReview ? "outline" : "default"} className="gap-2">
-              <Save className="h-4 w-4" />
+            <Button onClick={() => void save()} loading={isSaving || isSubmitting} variant={canSubmitForReview ? "outline" : "default"} className="gap-2">
+              {isSaving || isSubmitting ? null : <Save className="h-4 w-4" />}
               {isEdit ? "Save Changes" : "Create Subject"}
             </Button>
             {canSubmitForReview ? (
-              <Button onClick={() => void save(true)} disabled={isSaving || isSubmitting} className="gap-2">
-                <Send className="h-4 w-4" />
+              <Button onClick={() => void save(true)} loading={isSaving || isSubmitting} className="gap-2">
+                {isSaving || isSubmitting ? null : <Send className="h-4 w-4" />}
                 {isSubmitting ? "Submitting..." : "Submit for Review"}
               </Button>
             ) : null}

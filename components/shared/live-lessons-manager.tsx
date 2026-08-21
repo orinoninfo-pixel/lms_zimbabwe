@@ -313,7 +313,7 @@ export function LiveLessonsManager({
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex flex-wrap justify-end gap-2">
-                        <Button variant="outline" size="sm" disabled={busy} onClick={() => openEdit(lesson)}>
+                        <Button variant="outline" size="sm" loading={busy} onClick={() => openEdit(lesson)}>
                           Edit
                         </Button>
                         {lesson.status === "upcoming" ? (
@@ -321,7 +321,7 @@ export function LiveLessonsManager({
                             <Button
                               variant="secondary"
                               size="sm"
-                              disabled={busy}
+                              loading={busy}
                               onClick={() => void setStatus(lesson.id, "completed")}
                             >
                               Mark done
@@ -329,7 +329,7 @@ export function LiveLessonsManager({
                             <Button
                               variant="outline"
                               size="sm"
-                              disabled={busy}
+                              loading={busy}
                               onClick={() => void setStatus(lesson.id, "canceled")}
                             >
                               Cancel
@@ -338,7 +338,7 @@ export function LiveLessonsManager({
                         ) : null}
                         <ConfirmDialog
                           trigger={
-                            <Button variant="destructive" size="sm" disabled={busy}>
+                            <Button variant="destructive" size="sm" loading={busy}>
                               Delete
                             </Button>
                           }
@@ -437,7 +437,7 @@ export function LiveLessonsManager({
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => void save()} disabled={saving} className="gap-2">
+            <Button onClick={() => void save()} loading={saving} className="gap-2">
               <Video className="h-4 w-4" />
               {editingId ? "Save Changes" : "Schedule"}
             </Button>

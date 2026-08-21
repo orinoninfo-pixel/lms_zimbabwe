@@ -127,7 +127,7 @@ export function AdminSettingsForm() {
           ) : null}
 
           <div className="flex justify-end">
-            <Button onClick={() => void save()} disabled={busy || isLoading}>
+            <Button onClick={() => void save()} disabled={isLoading} loading={busy}>
               Save changes
             </Button>
           </div>

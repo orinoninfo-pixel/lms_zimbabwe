@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
               <AlertDescription>{message}</AlertDescription>
             </Alert>
           ) : null}
-          <Button type="submit" className="w-full" disabled={isSubmitting} aria-busy={isSubmitting}>
+          <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? "Submitting..." : "Send reset link"}
           </Button>
           <div className="text-sm text-muted-foreground">

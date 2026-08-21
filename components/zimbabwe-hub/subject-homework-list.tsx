@@ -111,7 +111,7 @@ export function SubjectHomeworkList({ items, canSubmit }: { items: HomeworkItem[
                   placeholder="Write your answer..."
                   className="bg-background"
                 />
-                <Button size="sm" onClick={() => void submit(item.id)} disabled={submitting === item.id}>
+                <Button size="sm" onClick={() => void submit(item.id)} loading={submitting === item.id}>
                   {status === "submitted" ? "Resubmit" : "Submit"}
                 </Button>
               </div>

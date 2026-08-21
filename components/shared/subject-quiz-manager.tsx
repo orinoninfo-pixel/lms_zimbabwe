@@ -256,7 +256,7 @@ export function SubjectQuizManager({
           />
         </>
       ) : (
-        <Button variant="outline" size="sm" onClick={() => void openEditor()} className="gap-1" disabled={checking}>
+        <Button variant="outline" size="sm" onClick={() => void openEditor()} className="gap-1" loading={checking}>
           <HelpCircle className="h-3.5 w-3.5" />
           Add Quiz
         </Button>
@@ -383,7 +383,7 @@ export function SubjectQuizManager({
             <Button variant="outline" onClick={() => setEditorOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => void save()} disabled={saving}>
+            <Button onClick={() => void save()} loading={saving}>
               Save Quiz
             </Button>
           </DialogFooter>
@@ -438,7 +438,7 @@ export function SubjectQuizManager({
                   ))}
 
                   {shortAnswers.length > 0 ? (
-                    <Button size="sm" onClick={() => void gradeAttempt(attempt)} disabled={gradingAttemptId === attempt.id}>
+                    <Button size="sm" onClick={() => void gradeAttempt(attempt)} loading={gradingAttemptId === attempt.id}>
                       {attempt.gradedAt ? "Update grade" : "Grade attempt"}
                     </Button>
                   ) : null}

@@ -172,7 +172,7 @@ export function PaymentStatusPanel({
             <AlertDescription>{error}</AlertDescription>
           </Alert>
           <div className="mt-4 flex gap-3">
-            <Button variant="outline" onClick={() => void load(true)} disabled={isRefreshing}>
+            <Button variant="outline" onClick={() => void load(true)} loading={isRefreshing}>
               {isRefreshing ? "Refreshing..." : "Refresh"}
             </Button>
             <Button asChild>
@@ -243,7 +243,7 @@ export function PaymentStatusPanel({
               <Link href={withPaymentContext(`/course/${data.itemId}`, data.reference ?? reference)}>Back to Course</Link>
             </Button>
           ) : null}
-          <Button variant="outline" onClick={() => void load(true)} disabled={isRefreshing}>
+          <Button variant="outline" onClick={() => void load(true)} loading={isRefreshing}>
             <RefreshCcw className="mr-2 h-4 w-4" />
             {isRefreshing ? "Refreshing..." : "Refresh Status"}
           </Button>

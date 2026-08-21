@@ -146,7 +146,7 @@ export function InternalInstructorCategoriesTable() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => void create()} disabled={busy || !name.trim()}>
+            <Button onClick={() => void create()} disabled={!name.trim()} loading={busy}>
               Create
             </Button>
           </DialogFooter>
