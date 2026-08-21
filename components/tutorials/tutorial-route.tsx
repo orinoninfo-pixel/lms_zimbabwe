@@ -25,6 +25,7 @@ export async function TutorialRoute({ tutorialSlug, lessonSlug }: { tutorialSlug
     id: tutorial.id,
     slug: tutorial.slug,
     title: tutorial.title,
+    icon: tutorial.icon,
     sections: tutorial.sections.map((section) => ({
       id: section.id,
       title: section.title,
