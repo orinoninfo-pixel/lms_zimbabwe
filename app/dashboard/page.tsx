@@ -27,7 +27,7 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <DashboardStats />
+          <DashboardStats userId={auth.user.id} />
 
           <ZimbabweLearningHubSummary userId={auth.user.id} />
 
@@ -41,7 +41,7 @@ export default async function DashboardPage() {
             </div>
 
             <div className="lg:col-span-1">
-              <RecentActivity />
+              <RecentActivity userId={auth.user.id} />
             </div>
           </div>
         </main>

@@ -1,41 +1,16 @@
 import { BookOpen, Clock, Trophy, Target } from "lucide-react"
+import { getStudentDashboardStats } from "@/lib/dashboard-activity"
 
-const stats = [
-  {
-    name: "Enrolled Courses",
-    value: "4",
-    change: "+1 this month",
-    icon: BookOpen,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-  },
-  {
-    name: "Hours Learned",
-    value: "47.5",
-    change: "+8.2 this week",
-    icon: Clock,
-    iconBg: "bg-emerald-100",
-    iconColor: "text-emerald-600",
-  },
-  {
-    name: "Certificates",
-    value: "2",
-    change: "1 in progress",
-    icon: Trophy,
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
-  },
-  {
-    name: "Completion Rate",
-    value: "72%",
-    change: "+5% vs last month",
-    icon: Target,
-    iconBg: "bg-rose-100",
-    iconColor: "text-rose-600",
-  },
-]
+export async function DashboardStats({ userId }: { userId: string }) {
+  const { enrolledCourses, hoursLearned, certificates, completionRate } = await getStudentDashboardStats(userId)
 
-export function DashboardStats() {
+  const stats = [
+    { name: "Enrolled Courses", value: String(enrolledCourses), icon: BookOpen, iconBg: "bg-blue-100", iconColor: "text-blue-600" },
+    { name: "Hours Learned", value: hoursLearned.toString(), icon: Clock, iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+    { name: "Certificates", value: String(certificates), icon: Trophy, iconBg: "bg-amber-100", iconColor: "text-amber-600" },
+    { name: "Completion Rate", value: `${completionRate}%`, icon: Target, iconBg: "bg-rose-100", iconColor: "text-rose-600" },
+  ]
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
@@ -47,7 +22,6 @@ export function DashboardStats() {
             <div>
               <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
               <p className="mt-1 text-2xl font-semibold text-foreground">{stat.value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{stat.change}</p>
             </div>
             <div className={`rounded-md p-2.5 ${stat.iconBg}`}>
               <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
