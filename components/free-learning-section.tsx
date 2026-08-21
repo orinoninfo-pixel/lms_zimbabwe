@@ -3,8 +3,8 @@ import { ArrowRight, Braces, Code2, Database, FileCode2, GitBranch, Palette } fr
 
 const topics = [
   { name: "Python", href: "/learn/python", icon: Code2, available: true },
-  { name: "JavaScript", href: "/learn?topic=javascript", icon: Braces, available: false },
-  { name: "HTML", href: "/learn?topic=html", icon: FileCode2, available: false },
+  { name: "JavaScript", href: "/learn/javascript", icon: Braces, available: true },
+  { name: "HTML", href: "/learn/html", icon: FileCode2, available: true },
   { name: "CSS", href: "/learn?topic=css", icon: Palette, available: false },
   { name: "SQL", href: "/learn?topic=sql", icon: Database, available: false },
   { name: "Git", href: "/learn?topic=git", icon: GitBranch, available: false },
