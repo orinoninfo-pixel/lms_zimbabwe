@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Bookmark, BookmarkCheck, Braces, Check, CheckCircle2, ChevronLeft, ChevronRight, Code2, FileCode2, Lightbulb, Menu, Search, TriangleAlert } from "lucide-react"
 import { CodeExample } from "@/components/tutorials/code-example"
 import { Button } from "@/components/ui/button"
@@ -22,10 +22,14 @@ function TutorialBrand({ title, icon }: { title: string; icon?: string | null })
 
 function TutorialNav({ tutorialSlug, sections, currentLessonId, completed, onNavigate }: { tutorialSlug: string; sections: Section[]; currentLessonId: string; completed: Set<string>; onNavigate?: () => void }) {
   const [search, setSearch] = useState("")
+  const currentRef = useRef<HTMLAnchorElement | null>(null)
+  useEffect(() => {
+    currentRef.current?.scrollIntoView({ block: "center" })
+  }, [currentLessonId])
   return <div className="space-y-5"><div className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search this tutorial" className="pl-9" aria-label="Search tutorial lessons" /></div>{sections.map((section) => {
     const lessons = section.lessons.filter((lesson) => lesson.title.toLowerCase().includes(search.toLowerCase()))
     if (!lessons.length) return null
-    return <section key={section.id}><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{section.title}</h3><div className="space-y-0.5">{lessons.map((lesson) => { const isCurrent = currentLessonId === lesson.id; const isDone = completed.has(lesson.id); return <Link key={lesson.id} href={`/learn/${tutorialSlug}/${lesson.slug}`} onClick={onNavigate} className={cn("flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors", isCurrent ? "bg-primary/10 font-semibold text-primary" : "text-foreground/75 hover:bg-muted hover:text-foreground")}><span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", isCurrent ? "bg-primary" : isDone ? "bg-emerald-500" : "bg-border")} /><span className="min-w-0 flex-1 truncate">{lesson.title}</span>{isDone && !isCurrent ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" /> : null}{isCurrent ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-primary" /> : null}</Link> })}</div></section>
+    return <section key={section.id}><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{section.title}</h3><div className="space-y-0.5">{lessons.map((lesson) => { const isCurrent = currentLessonId === lesson.id; const isDone = completed.has(lesson.id); return <Link key={lesson.id} ref={isCurrent ? currentRef : undefined} href={`/learn/${tutorialSlug}/${lesson.slug}`} onClick={onNavigate} className={cn("flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors", isCurrent ? "bg-primary/10 font-semibold text-primary" : "text-foreground/75 hover:bg-muted hover:text-foreground")}><span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", isCurrent ? "bg-primary" : isDone ? "bg-emerald-500" : "bg-border")} /><span className="min-w-0 flex-1 truncate">{lesson.title}</span>{isDone && !isCurrent ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" /> : null}{isCurrent ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-primary" /> : null}</Link> })}</div></section>
   })}</div>
 }
 
